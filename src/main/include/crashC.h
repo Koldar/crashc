@@ -80,7 +80,26 @@ static SectionId currentTestHierarchyState[MAX_SECTION_DEPTH];
  * \attention
  * the array has a meaning up until ::hierarchyId
  */
-static int totalNumberOfSubSectionInCurrentContainer[MAX_SECTION_DEPTH];
+static int subSectionNumber[MAX_SECTION_DEPTH];
+
+/**
+ * Tells you if we have already computed the number of subsections in the current container
+ *
+ * \includedot hierarchy01.dot
+ *
+ * Suppose you've just entered in a test case (eg. test case 1). As soon as you enter, you don't know how many "when"
+ * clauses you will have to scan. So in your first execution you need to do 2 things:
+ * \li run the first "when" you encounter;
+ * \li compute the number of "when" the container have;
+ *
+ * This variable tells (depending on ::hierarchyId) whether or not we have computed the number
+ * of subsection of the container. For example as soon as we enter in "test case 1" the cell indexed by "0" (the hierarchy id
+ * of the test cases) will be set to false. After the first loop, the cell will have the value "true".
+ *
+ * \attention
+ * the array has a meaning up until ::hierarchyId
+ */
+static bool isSubSectionNumberSet[MAX_SECTION_DEPTH];
 
 /**
  * Name of the section we're currently in
@@ -118,6 +137,9 @@ static char* currentContainerName[MAX_SECTION_DEPTH];
 
 #define SECTIONCONTAINER(id, hierarchyId, total) \
 		currentContainerName[hierarchyId] = strdup( #id ); \
+		isSubSectionNumberSet[hierarchyId] = false; \
+		subSectionNumber[hierarchyId] = 0; \
+		for(SectionId i = 0; )
 
 		currentContainerVariable = strdup( #id ); \
 		totalNumberOfSubSectionInCurrentContainer[]
