@@ -1,0 +1,10 @@
+
+ALGORITHM
+=========
+
+Container loop
+--------------
+
+Suppose you're inside a container, a test case, and there are 5 "when" clauses, each of them with 3 "then" clauses.
+You need to run the container a total of 5*3 = 15 times. There is only \b one for loop that needs to handle all
+the possible combinations

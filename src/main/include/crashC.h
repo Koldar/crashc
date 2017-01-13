@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include "sections.h"
 
 static char* currentTestCase = NULL;
 static char* currentWhen = NULL;
@@ -31,6 +32,9 @@ typedef unsigned int SectionId;
 
 #define MAX_SECTION_DEPTH 10
 
+static SectionTree* root;
+static Section* currentSection;
+
 /**
  * Represents in what level of the hierarchy we're currently in
  *
@@ -41,7 +45,7 @@ typedef unsigned int SectionId;
  * \li test cases contain whens, so whens have indexes 1;
  * \li whens contain then, so thens have indexes 2;
  */
-static SectionId hierarchyId;
+static int hierarchyId;
 
 /**
  * Represent which sector of the tests we're currently analyzing
@@ -80,7 +84,7 @@ static SectionId currentTestHierarchyState[MAX_SECTION_DEPTH];
  * \attention
  * the array has a meaning up until ::hierarchyId
  */
-static int subSectionNumber[MAX_SECTION_DEPTH];
+static int subSectionsNumber[MAX_SECTION_DEPTH];
 
 /**
  * Tells you if we have already computed the number of subsections in the current container
@@ -102,6 +106,13 @@ static int subSectionNumber[MAX_SECTION_DEPTH];
 static bool isSubSectionNumberSet[MAX_SECTION_DEPTH];
 
 /**
+ * The index of the loop of a container
+ *
+ *
+ */
+static SectionId subSectionIdToAnalyze[MAX_SECTION_DEPTH];
+
+/**
  * Name of the section we're currently in
  *
  * \def a section is either a container or a subsection
@@ -110,6 +121,7 @@ static bool isSubSectionNumberSet[MAX_SECTION_DEPTH];
  * the array has a meaning up until ::hierarchyId
  */
 static char* currentContainerName[MAX_SECTION_DEPTH];
+
 
 /**
 	- devo ciclare sullo stesso test case in modo da eseguire tutte le combinazioni di sottosezioni (dirette ed indirette) all'interno della sezione.
@@ -135,15 +147,20 @@ static char* currentContainerName[MAX_SECTION_DEPTH];
 	} \
 	if ((i == whenCaseUnderAnalysis))
 
-#define SECTIONCONTAINER(id, hierarchyId, total) \
-		currentContainerName[hierarchyId] = strdup( #id ); \
-		isSubSectionNumberSet[hierarchyId] = false; \
-		subSectionNumber[hierarchyId] = 0; \
-		for(SectionId i = 0; )
+#define HIGHESTCONTAINER(id) \
+		Section* sec = addChildToSection(root, #id); \
+		currentSection = sec; \
+		currentSection->isSubSectionNumberSet = false; \
+		currentSection->subSectionNumber = 0; \
+		int totalNumberOfCombinations = 0; \
+		for(int i = 0; (currentTestHierarchyState[hierarchyId+1] = -1) && ((!isSubSectionNumberSet[hierarchyId]) || (i < subSectionsNumber[hierarchyId])); isSubSectionNumberSet[hierarchyId]=true, i++)
 
-		currentContainerVariable = strdup( #id ); \
-		totalNumberOfSubSectionInCurrentContainer[]
-
+#define SUBSECTION(id, hierarchyId) \
+		currentTestHierarchyState[hierarchyId]++; \
+		if (!isSubSectionNumberSet[hierarchyId-1]) { \
+			subSectionsNumber[hierarchyId-1]++; \
+		} \
+		if ( loopIndex)
 
 
 //i when devono contenere un qualcosa che permette ci capire quanti sono
