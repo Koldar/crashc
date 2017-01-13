@@ -1,0 +1,16 @@
+@dot
+  	digraph {
+  		TC1 [label="test case 1"];
+  		TC2 [label="test case 2"];
+  		W1 [label="when 1"];
+  		W2 [label="when 2"];
+  		W3 [label="when 3"];
+  		W4 [label="when 4"];
+  		T1 [label="then 1"];
+ 
+  		TC1 -> W1;
+  		TC1 -> W2;
+  		TC1 -> W3 -> T1;
+  		TC2 -> W4;
+  	}
+  @enddot
