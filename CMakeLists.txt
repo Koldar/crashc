@@ -12,4 +12,4 @@ endif(NOT CMAKE_BUILD_TYPE)
 add_definitions(-Wfatal-errors)
 
 add_subdirectory(src/main/c)
-#add_subdirectory(src/test/c)
+add_subdirectory(src/test/c)

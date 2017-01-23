@@ -18,173 +18,127 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "sections.h"
-
-static char* currentTestCase = NULL;
-static char* currentWhen = NULL;
-static char* currentThen = NULL;
-
-static int whenCasesInCurrentTest = 0;
-static int whenCaseUnderAnalysis = 0;
-static bool totalNumberOfWhenCasesInCurrentTestCase = false;
-
-typedef unsigned int SectionId;
 
 #define MAX_SECTION_DEPTH 10
 
-static SectionTree* root;
-static Section* currentSection;
+typedef struct Run {
+	const char* id;
 
-/**
- * Represents in what level of the hierarchy we're currently in
- *
- * \includedot hierarchy01.dot
- *
- * For example if we're in "when 2" the index should be "1", because:
- * \li test cases contain everything, so their index is 0;
- * \li test cases contain whens, so whens have indexes 1;
- * \li whens contain then, so thens have indexes 2;
- */
-static int hierarchyId;
+	bool hasComputedChildrenRunNumber;
+	bool completed;
 
-/**
- * Represent which sector of the tests we're currently analyzing
- *
- * the index of the array represents the depth of the test hierarchy.
- *
- * \includedot hierarchy01.dot
- *
- * For example "test cases" have hierarchy id "0", "whens" have id "1" whilst "thens" have id "2".
- * If we're running "then 1", then the array would be {0, 2, 0, ...} because we're running test case 1 (with id 0),
- * when 3 (id 2) and then 1 (id 0).
- *
- * \attention
- * the array has a meaning up until ::hierarchyId
- */
-static SectionId currentTestHierarchyState[MAX_SECTION_DEPTH];
+	int currentChild;
+	int nextChildToRun;
+	int totalChildrenRunNumber;
 
-/**
- * Represents how many sub section
- *
- * \def a \b container is named block ("{...}") containing some code and optionally some sub sections. For example,
- * ::TESTCASE is a container
- *
- * \def a sub section is a named block ("{...}") inside a container. It can also be a container. For example ::WHEN is sub
- * section but it is also a container. THEN is only a container.
- *
- * We can run only one container of the same hierarchy at a time. If we enter in a container at the hierarchy
- * index "i", we need to get the number of subsections inside the container at index "i+1". By
- * default you can't insert in a container somethin in the hierarchy at index different than "i+1".
- *
- * \includedot hierarchy01.dot
- *
- * For example in the figure if we're in test case 1 (the hierarchy id of "test case" is 0) the value inside "1" should be
- * 3 because inside test case 1 there are 3 "when" clauses. As soon as we go to "test case 2", the cell should be set to 1.
- *
- * \attention
- * the array has a meaning up until ::hierarchyId
- */
-static int subSectionsNumber[MAX_SECTION_DEPTH];
+	bool accessLoop;
+	bool accessLoop2;
 
-/**
- * Tells you if we have already computed the number of subsections in the current container
- *
- * \includedot hierarchy01.dot
- *
- * Suppose you've just entered in a test case (eg. test case 1). As soon as you enter, you don't know how many "when"
- * clauses you will have to scan. So in your first execution you need to do 2 things:
- * \li run the first "when" you encounter;
- * \li compute the number of "when" the container have;
- *
- * This variable tells (depending on ::hierarchyId) whether or not we have computed the number
- * of subsection of the container. For example as soon as we enter in "test case 1" the cell indexed by "0" (the hierarchy id
- * of the test cases) will be set to false. After the first loop, the cell will have the value "true".
- *
- * \attention
- * the array has a meaning up until ::hierarchyId
- */
-static bool isSubSectionNumberSet[MAX_SECTION_DEPTH];
+	struct Run* firstChild;
+	struct Run* nextSibling;
+	struct Run* parent;
+} Run;
+typedef Run RootRun;
 
-/**
- * The index of the loop of a container
- *
- *
- */
-static SectionId subSectionIdToAnalyze[MAX_SECTION_DEPTH];
+static RootRun* rootRun;
+static Run* currentRun;
 
-/**
- * Name of the section we're currently in
- *
- * \def a section is either a container or a subsection
- *
- * \attention
- * the array has a meaning up until ::hierarchyId
- */
-static char* currentContainerName[MAX_SECTION_DEPTH];
+Run* initRun(const char* id);
+void destroyRun(Run* run);
+void clearRuns(RootRun* rootRun);
+void addRunOnTail(Run* list, Run* run);
+Run* getNRun(RootRun* rootRun, int n);
+Run* getNextRun(Run* run);
 
+#define LOOPCONTAINER(id) \
+		clearRuns(rootRun); \
+		rootRun = (RootRun*) initRun(id); \
+		currentRun = rootRun;\
+		\
+		for( \
+				; \
+				!currentRun->completed; \
+				\
+		)
 
-/**
-	- devo ciclare sullo stesso test case in modo da eseguire tutte le combinazioni di sottosezioni (dirette ed indirette) all'interno della sezione.
-	- il ciclo for mi serve perché così posso eseguire istruzioni alla fine di ogni iterazione;
-	- all'inizio fisso
- */
-#define TESTCASE(id) \
-	currentTestCase = strdup( #id ); \
-	totalNumberOfWhenCasesInCurrentTestCase = false; \
-	whenCasesInCurrentTest = 0; \
-	for (int i=0; (whenCaseUnderAnalysis = -1)&&((!totalNumberOfWhenCasesInCurrentTestCase) || (i<whenCasesInCurrentTest));totalNumberOfWhenCasesInCurrentTestCase = true,i++)
-
-/**
-	- se devo ancora calcolare il numero totale di sotto sezioni, incremento il numero di sottosezioni fino ad ora individuate
-	- se devo ancora calcolare il numero totale di sotto sezioni e questa è la prima che incontro la eseguo perché nel primo ciclo dovrò eseguire la prima
-		(mentre le altre verranno evitate)
-	- se conosco il numero totali di sotto sezioni eseguo soltanto la n°esima: whenCaseUnderAnalysis dice qual'è il numero della sottosezione
-*/
-#define WHEN(id) \
-	whenCaseUnderAnalysis++; \
-	if (!totalNumberOfWhenCasesInCurrentTestCase) { \
-		whenCasesInCurrentTest++; \
-	} \
-	if ((i == whenCaseUnderAnalysis))
-
-#define HIGHESTCONTAINER(id) \
-		Section* sec = addChildToSection(root, #id); \
-		currentSection = sec; \
-		currentSection->isSubSectionNumberSet = false; \
-		currentSection->subSectionNumber = 0; \
-		int totalNumberOfCombinations = 0; \
-		for(int i = 0; (currentTestHierarchyState[hierarchyId+1] = -1) && ((!isSubSectionNumberSet[hierarchyId]) || (i < subSectionsNumber[hierarchyId])); isSubSectionNumberSet[hierarchyId]=true, i++)
-
-#define SUBSECTION(id, hierarchyId) \
-		currentTestHierarchyState[hierarchyId]++; \
-		if (!isSubSectionNumberSet[hierarchyId-1]) { \
-			subSectionsNumber[hierarchyId-1]++; \
+#define TESTCONTAINER(id) \
+		/*when we run this currentRun refers to the test container parent!*/ \
+		if (!currentRun->hasComputedChildrenRunNumber) { \
+			/*we still need to know how many child there are in this container. We got a child container hence we increase the number by 1*/ \
+			currentRun->totalChildrenRunNumber++; \
+			addToRunChildren(currentRun, initRun(id)); \
 		} \
-		if ( loopIndex)
+		/**
+		 * This first is only here to increment currentChild at the end of the child container. The function does the
+		 * increment netherless: either if we enter in the test container or not. Since we cannot define a flag (since test containers
+		 * can be nested) we use a flag inside currentRun. When the increase statement of the loop is execute, we have scanned all the children
+		 * inside the container. Hence we can set the hasComputedChildrenRunNumber flag to true
+		 */ \
+		for ( \
+				currentRun->accessLoop = false; \
+				\
+				!currentRun->accessLoop; \
+				\
+				/**
+				 * If the test container contains only one other test container, the first (and the last) loop where we execute its children
+				 * won't set the complete flag. Hence the child won't update the parent next children to execute. completeChildIfUnique
+				 * deals with that
+				 */ \
+				currentRun->currentChild++, \
+				currentRun->hasComputedChildrenRunNumber = true, \
+				completeChildIfUnique(currentRun) \
+			) \
+			/** This second for checks if we need to enter in the container:
+			 * if this is the first child and we're still getting the number of children inside the container that we
+			 * should execute the child (in the first run we still need to execute something! Otheriwse we execute the
+			 * container only if there it's the child turn to be executed). The third line of the loop is executed only
+			 * if we actually enter inside the test container: we need it to return to the parent since after this container we may encouter
+			 * a different one.
+			 */ \
+			for ( \
+				currentRun->accessLoop = true; \
+				(currentRun->currentChild == currentRun->nextChildToRun) && (((!currentRun->hasComputedChildrenRunNumber)&&(currentRun->currentChild == 0))||(currentRun->hasComputedChildrenRunNumber)); \
+				\
+			) \
+				/*NOW WE ARE INSIDE THE TEST CONTAINER SINCE CURRENTRUN POINTS TO THE TEST CONTAINER
+				 * This is a dummy if: it it always true but we need it to properly set currentRun*/ \
+				for \
+				( \
+						currentRun->accessLoop2 = true; \
+						currentRun = getChild(currentRun, currentRun->nextChildToRun), \
+						\
+						currentRun->accessLoop2; \
+						\
+						currentRun->nextChildToRun += (currentRun->completed ? 0 : 1), \
+						currentRun->completed = currentRun->hasComputedChildrenRunNumber ? currentRun->nextChildToRun == currentRun->totalChildrenRunNumber : false, \
+						goToNextSibling(currentRun),\
+						currentRun = currentRun->parent, \
+						currentRun->accessLoop2 = false \
+				) \
 
+#define TESTCASE(id)	LOOPCONTAINER(id)
+#define WHEN(id)		TESTCONTAINER(id)
+#define THEN(id)		TESTCONTAINER(id)
 
-//i when devono contenere un qualcosa che permette ci capire quanti sono
-//il ciclo for mi permette di eseguire istruzioni alla fine del "{" e del "}"
-
-int main(int argc, const char* argv[]) {
-
-	TESTCASE(testcase) {
-		printf("before when1\n");
-		WHEN(when1) {
-			printf("when1\n");
-		}
-		printf("when1 -> when2\n");
-		WHEN(when2) {
-			printf("when2\n");
-		}
-		printf("when2 -> when3\n");
-		WHEN(when3) {
-			printf("when3\n");
-		}
-		printf("after when3\n");
+void goToNextSibling(Run* run) {
+	if (run->completed) {
+		run->parent->nextChildToRun++;
 	}
+}
 
-	return 0;
+void completeChildIfUnique(Run* run) {
+	if (run->firstChild == NULL) {
+		return;
+	}
+	if (run->firstChild->nextSibling != NULL) {
+		return;
+	}
+	run->firstChild->completed = true;
+	run->firstChild->hasComputedChildrenRunNumber = true;
+
+	run->nextChildToRun++;
+	run->completed = true;
+
 }
 
 #endif /* CRASHC_H_ */
