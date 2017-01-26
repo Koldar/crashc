@@ -1,138 +1,3 @@
-///*
-// * crashC.h
-// *
-// *  Created on: Jan 4, 2017
-// *      Author: koldar
-// */
-//
-//#ifndef CRASHC_H_
-//#define CRASHC_H_
-//
-//
-//
-//
-//#define STR(x) #x
-//#define ARGSTR(x) STR(x)
-//
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
-//#include <stdbool.h>
-//
-//#define MAX_SECTION_DEPTH 10
-//
-//typedef struct Run {
-//	const char* id;
-//	const char* description;
-//
-//	bool hasComputedChildrenRunNumber;
-//	bool completed;
-//
-//	int currentChild;
-//	int nextChildToRun;
-//	int totalChildrenRunNumber;
-//
-//	bool accessLoop1;
-//	bool accessLoop2;
-//	bool accessLoop3;
-//
-//	struct Run* firstChild;
-//	struct Run* nextSibling;
-//	struct Run* parent;
-//} Run;
-//typedef Run RootRun;
-//
-//static RootRun* rootRun;
-//static Run* currentRun;
-//
-//Run* initRun(const char* id, const char* description);
-//void destroyRun(Run* run);
-//Run* getChild(Run* run, int n);
-//void goToNextSibling(Run* run);
-//void completeChildIfUnique(Run* run);
-//void sprintRun(char* buffer, const Run* r);
-//
-//#define LOOPCONTAINER(id, name, description) \
-//		destroyRun(rootRun); \
-//		rootRun = (RootRun*) initRun(id, description); \
-//		currentRun = rootRun;\
-//		\
-//		for( \
-//				; \
-//				!currentRun->completed; \
-//				\
-//		)
-//
-///**
-// * currentRun is the run of the TESTCONTAINER
-// * parentRun is the run of the container owning TESTCONTAINER
-// */
-//#define TESTCONTAINER(parentRun, id, name, description) \
-//		/*when we run this currentRun refers to the test container parent!*/ \
-//		if (!parentRun->hasComputedChildrenRunNumber) { \
-//			/*we still need to know how many child there are in this container. We got a child container hence we increase the number by 1*/ \
-//			parentRun->totalChildrenRunNumber++; \
-//			addToRunChildren(parentRun, initRun(id, description)); \
-//		} \
-//		/**
-//		 * This first loop execute code that needs to be run netherless: whether or not we enter in the test container
-//		 * we need to execute the code
-//		 */ \
-//		for ( \
-//			parentRun->accessLoop1 = true \
-//			; \
-//			parentRun->accessLoop1 \
-//			; \
-//			parentRun->currentChild += 1, \
-//			parentRun->accessLoop1 = false \
-//		) \
-//			/**
-//			 * The second loop control whether or not we should access in the given test container
-//			 */ \
-//			 for ( \
-//				parentRun->accessLoop2 = true, \
-//				sprintRun(stdout, currentRun) \
-//				; \
-//				parentRun->accessLoop2 && \
-//				(!parentRun->completed) && \
-//				(parentRun->currentChild == parentRun->nextChildToRun) && \
-//				(((!parentRun->hasComputedChildrenRunNumber)&&(parentRun->currentChild == 0))||(parentRun->hasComputedChildrenRunNumber)) \
-//				; \
-//				/*
-//				 * Note that this piece of code is executed only if we enter in the test container. It is the glue code connectint loop2 and loop3.
-//				 * This piece of code is execute just right after ALPHA
-//				 */ \
-//				parentRun = currentRun->parent, \
-//				parentRun->accessLoop2 = false \
-//			) \
-//				/**
-//				 * The third loop execute code when the software grants us access to the particular test container
-//				 */ \
-//				for ( \
-//						currentRun = getChild(parentRun, parentRun->nextChildToRun), \
-//						currentRun->accessLoop3 = true, \
-//						sprintRun(stdout, currentRun) \
-//						; \
-//						currentRun->accessLoop3 \
-//						; \
-//						/*
-//						 * ALPHA: We have just terminated the given test container.
-//						 * Hence we assume we have scanned all its children
-//						 */ \
-//						currentRun->hasComputedChildrenRunNumber = true, \
-//						currentRun->completed = currentRun->hasComputedChildrenRunNumber ? currentRun->nextChildToRun == currentRun->totalChildrenRunNumber : false, \
-//						currentRun->nextChildToRun += (currentRun->completed ? 0 : 1), \
-//						currentRun->parent->nextChildToRun += (currentRun->completed ? 1 : 0), \
-//						currentRun->accessLoop3 = false \
-//				) \
-//
-//#define TESTCASE(id, description)	LOOPCONTAINER(id, "test name", description)
-//#define WHEN(id, description)		TESTCONTAINER(currentRun, id, "when", description)
-//#define THEN(id, description)		TESTCONTAINER(currentRun, id, "then", description)
-//
-//#endif /* CRASHC_H_ */
-
-
 #ifndef CRASHC_H_
 #define CRASHC_H_
 
@@ -150,6 +15,7 @@ typedef struct Section {
 	int currentChild;
 
 	bool loop1;
+	bool loop2;
 
 	struct Section* parent;
 
@@ -157,7 +23,9 @@ typedef struct Section {
 	struct Section* nextSibling;
 } Section;
 
-Section rootSection = {false, 0, 0, false, NULL, NULL, NULL};
+typedef bool (*condition_section)(Section*);
+
+Section rootSection = {"root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
 
 #define MALLOCERRORCALLBACK()
@@ -168,6 +36,10 @@ bool runOnceAndThenGoToParent(Section* child, Section** newCurrentSection);
 Section* initSection(const char* description);
 void destroySection(Section* section);
 void printSectionData(Section* section);
+bool areWeComputingChildren(Section* section);
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs);
+
+bool getAlwaysTrue(Section* section);
 
 Section* addSectionToParent(Section* toAdd, Section* parent) {
 	Section* r = NULL;
@@ -247,20 +119,50 @@ void printSectionData(Section* section) {
 	if (section->nextSibling != NULL) {
 		printSectionData(section->nextSibling);
 	}
+}
 
+bool areWeComputingChildren(Section* section) {
+	return !section->childrenNumberComputed;
 }
 
 bool runOnceAndThenGoToParent(Section* child, Section** newCurrentSection) {
 	if (child->loop1) {
 		return true;
 	}
+	//we finished a section. Hence now we know the number of children that section have
+	child->childrenNumberComputed = true;
+	//we finish a section. we return to the parent
 	*newCurrentSection = child->parent;
+	//we just finished analyzing a child of the parent. We need to increase the child we're analyzing
+	(*newCurrentSection)->currentChild += 1;
 	return false;
 }
 
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs) {
+	if (!section->loop2) {
+		return false;
+	}
+	return cs(section);
+}
 
-#define CONTAINABLESECTION(parent, description)											\
-		if (!(parent)->childrenNumberComputed) {										\
+bool getAlwaysTrue(Section* section) {
+	return true;
+}
+
+#define LOOPER(parent, description)														\
+		for (																			\
+		;																				\
+		;																				\
+		)																				\
+
+#define CONTAINABLESECTION(parent, description, condition)								\
+		/**
+		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
+		 * create a new metadata data representing such section (if not created yet)
+		 * and then we enter in such section. At the end of the execution,
+		 * we return to the parent section
+		 */																				\
+		if (areWeComputingChildren(parent)) {											\
 			(parent)->childrenNumber += 1;												\
 			currentSection = addSectionToParent(initSection(description), (parent));	\
 		} else {																		\
@@ -271,15 +173,26 @@ bool runOnceAndThenGoToParent(Section* child, Section** newCurrentSection) {
 				;																		\
 				runOnceAndThenGoToParent(currentSection, &currentSection)				\
 				;																		\
-				currentSection->loop1 = false,											\
-				currentSection->childrenNumberComputed = true,							\
-				currentSection->currentChild += 1										\
-		)
+				/**
+				 *  This code is execute when we have already executed the code
+				 *  inside the container. We assume every post condition of
+				 *  CONTAINABLESECTION is satisfied for its children
+				 *  CONTAINABLESECTION.
+				 */																		\
+				currentSection->loop1 = false											\
+		)																				\
+			for (																		\
+					currentSection->loop2 = true										\
+					;																	\
+					runOnceAndCheckAccessToSection(currentSection, condition)			\
+					;																	\
+					currentSection->loop2 = false										\
+			)
 
 #define TESTCASE(description)															\
 		currentSection = &rootSection;													\
-		CONTAINABLESECTION(currentSection, description)
-#define WHEN(description) CONTAINABLESECTION(currentSection, description)
-#define THEN(description) CONTAINABLESECTION(currentSection, description)
+		CONTAINABLESECTION(currentSection, description, getAlwaysTrue)
+#define WHEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue)
+#define THEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue)
 
 #endif
