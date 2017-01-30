@@ -6,7 +6,10 @@
 #include <string.h>
 #include <stdio.h>
 
+typedef int SectionLevelId;
+
 typedef struct Section {
+	SectionLevelId levelId;
 	const char* description;
 
 	bool childrenNumberComputed;
@@ -26,14 +29,14 @@ typedef struct Section {
 typedef bool (*condition_section)(Section*);
 typedef void (*ContainableSectionTerminateCallBack)(Section* parent, Section* child);
 
-Section rootSection = {"root", false, 0, 0, false, NULL, NULL, NULL};
+Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
 
 #define MALLOCERRORCALLBACK()
 
 Section* addSectionToParent(Section* toAdd, Section* parent);
 Section* getNSection(Section* parent, int nChild);
-Section* initSection(const char* description);
+Section* initSection(SectionLevelId levelId, const char* description);
 void destroySection(Section* section);
 void printSectionData(Section* section, bool recursive);
 bool areWeComputingChildren(Section* section);
@@ -41,7 +44,7 @@ bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, Containa
 bool haveWeRunEverythingInSection(Section* section);
 bool haveWeRunEveryChildrenInSection(Section* section);
 void markSectionAsExecuted(Section* section);
-Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription);
+Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription);
 
 bool getAlwaysTrue(Section* section);
 
@@ -78,7 +81,7 @@ Section* getNSection(Section* parent, int nChild) {
 	}
 }
 
-Section* initSection(const char* description) {
+Section* initSection(SectionLevelId levelId, const char* description) {
 	Section* retVal = malloc(sizeof(Section));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
@@ -90,6 +93,7 @@ Section* initSection(const char* description) {
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
+	retVal->levelId = levelId;
 	retVal->loop1 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
@@ -195,22 +199,22 @@ void markSectionAsExecuted(Section* section) {
 	printf("%s completed\n", currentSection->description);
 }
 
-Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
+Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
-		return addSectionToParent(initSection(decription), parent);
+		return addSectionToParent(initSection(sectionLevelId, decription), parent);
 	}
 	return getNSection((parent), (parent)->currentChild);
 }
 
-#define CONTAINABLESECTION(parent, description, condition, getBackToParentCallBack, setupCode)						\
+#define CONTAINABLESECTION(parent, sectionLevelId, description, condition, getBackToParentCallBack, setupCode)		\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
 		 */																											\
-		 currentSection = getSectionOrCreateIfNotExist(parent, description);										\
+		 currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description);						\
 		 setupCode																									\
 		 for (																										\
 				 currentSection->loop1 = true																		\
@@ -236,8 +240,8 @@ Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
 
 #define NOCODE ;
 
-#define LOOPER(parent, description)																					\
-		CONTAINABLESECTION(parent, description, getAlwaysTrue, callbackResetContainer,								\
+#define LOOPER(parent, sectionLevelId, description)																	\
+		CONTAINABLESECTION(parent, sectionLevelId, description, getAlwaysTrue, callbackResetContainer,					\
 				for (																								\
 						;																							\
 						!haveWeRunEveryChildrenInSection(currentSection)											\
@@ -246,13 +250,14 @@ Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
 		)
 
 
-#define TESTCASE(description) LOOPER(&rootSection, description)
+#define TESTCASE(description) LOOPER(&rootSection, 1, description)
 
-#define ALWAYS_ENTER(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(currentSection, sectionLevelId, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+//#define ENTER_ONE_PER_LOOP(sectionLevelId, description) CONTAINABLEECTION(currentSection, sectionLevelId, description, )
 
 
 
-#define WHEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
-#define THEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define WHEN(description) CONTAINABLESECTION(currentSection, 5, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define THEN(description) CONTAINABLESECTION(currentSection, 10, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
 
 #endif
