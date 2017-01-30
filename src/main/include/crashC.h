@@ -244,7 +244,6 @@ Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
 						;																							\
 						!haveWeRunEveryChildrenInSection(currentSection)											\
 						;																							\
-						currentSection->currentChild = 0															\
 				),																									\
 				callbackResetContainer																				\
 		)
