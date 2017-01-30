@@ -8,10 +8,10 @@
 
 typedef int SectionLevelId;
 
-typedef struct SectionLevelIdList {
-	SectionLevelId levelId;
-	struct SectionLevelIdList* next;
-} SectionLevelIdList;
+typedef struct SectionCell {
+	Section* section;
+	struct SectionCell* next;
+} SectionCell;
 
 typedef struct Section {
 	SectionLevelId levelId;
@@ -26,7 +26,7 @@ typedef struct Section {
 	bool loop1;
 	bool loop2;
 
-	SectionLevelIdList* levelIdBlackList;
+	SectionCell* levelIdBlackList;
 
 	struct Section* parent;
 	struct Section* firstChild;
@@ -34,7 +34,7 @@ typedef struct Section {
 } Section;
 
 typedef bool (*condition_section)(Section*);
-typedef void (*SectionTerminatedCallBack)(Section* parent, Section* child);
+typedef void (*SectionTerminatedCallBack)(Section** parentPosition, Section* child);
 typedef void (*AccessGrantedCallBack)(Section* sectionGranted);
 
 Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
@@ -42,11 +42,11 @@ Section* currentSection = NULL;
 
 #define MALLOCERRORCALLBACK()
 
-SectionLevelIdList* initSectionLevelIdList();
-void addSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
-bool containsSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
-bool removeSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
-void destroySectionLevelIdList(SectionLevelIdList** list);
+SectionCell* initSectionLevelIdList();
+void addSectionInSectionList(SectionCell** list, Section* section);
+bool containsSectionInSectionList(SectionCell** list, Section* section);
+bool removeSectionInSectionList(SectionCell** list, Section* section);
+void destroySectionList(SectionCell** list);
 Section* addSectionToParent(Section* toAdd, Section* parent);
 Section* getNSection(Section* parent, int nChild);
 Section* initSection(SectionLevelId levelId, const char* description);
@@ -61,18 +61,19 @@ void markSectionAsExecuted(Section* section);
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription);
 
 bool getAlwaysTrue(Section* section);
+bool getAccessOnlyIfNotInBlackList(Section* section);
 
-SectionLevelIdList* initSectionLevelIdList() {
+SectionCell* initSectionLevelIdList() {
 	return NULL;
 }
 
-void addSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
-	SectionLevelIdList* retVal = malloc(sizeof(SectionLevelIdList));
+void addSectionInSectionList(SectionCell** list, Section* section) {
+	SectionCell* retVal = malloc(sizeof(SectionCell));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->levelId = id;
+	retVal->section = section;
 	retVal->next = NULL;
 
 	if ((*list) == NULL) {
@@ -83,11 +84,11 @@ void addSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
 	}
 }
 
-bool removeSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
-	SectionLevelIdList* tmp = *list;
-	SectionLevelIdList* previous = NULL;
+bool removeSectionInSectionList(SectionCell** list, Section* section) {
+	SectionCell* tmp = *list;
+	SectionCell* previous = NULL;
 	while (tmp != NULL) {
-		if (tmp->levelId == id) {
+		if (tmp->section == section) {
 			if (previous == NULL) {
 				//first iteration
 				*list = tmp->next;
@@ -103,10 +104,10 @@ bool removeSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
 	return false;
 }
 
-bool containsSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
-	SectionLevelIdList* tmp = *list;
+bool containsSectionInSectionList(SectionCell** list, Section* section) {
+	SectionCell* tmp = *list;
 	while (tmp != NULL) {
-		if (tmp->levelId == id) {
+		if (tmp->section == section) {
 			return true;
 		}
 		tmp = tmp->next;
@@ -114,9 +115,9 @@ bool containsSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
 	return false;
 }
 
-void destroySectionLevelIdList(SectionLevelIdList** list) {
-	SectionLevelIdList* tmp = *list;
-	SectionLevelIdList* tmp2 = NULL;
+void destroySectionList(SectionCell** list) {
+	SectionCell* tmp = *list;
+	SectionCell* tmp2 = NULL;
 	while (tmp != NULL) {
 		tmp2 = tmp->next;
 		free(tmp);
@@ -247,7 +248,12 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Acce
 }
 
 void callbackDoNothing(Section* section) {
+}
 
+void callbackAddToParentBlackList(Section* section) {
+	if (containsSectionInSectionList(&section->levelIdBlackList, section->levelId)) {
+		addSectionInSectionList(&section->levelIdBlackList, section->levelId);
+	}
 }
 
 bool getAlwaysTrue(Section* section) {
@@ -258,7 +264,15 @@ bool getAccessOnlyIfNotInBlackList(Section* section) {
 	if (section->parent == NULL) {
 		return true;
 	}
-	return containsSectionLevelIdList(&section->parent->levelIdBlackList, section->levelId) ? false : true;
+
+	SectionCell* tmp = section->levelIdBlackList;
+	while (tmp != NULL) {
+		if (tmp->section->levelId == section->levelId) {
+
+		}
+		tmp = tmp->next;
+	}
+	return containsSectionInSectionList(&section->parent->levelIdBlackList, section->levelId) ? false : true;
 }
 
 bool haveWeRunEverythingInSection(Section* section) {
@@ -334,7 +348,9 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 #define NOCODE ;
 
 #define LOOPER(parent, sectionLevelId, description)																						\
-		CONTAINABLESECTION(parent, sectionLevelId, description, getAlwaysTrue, callbackResetContainer, callbackDoNothing,				\
+		CONTAINABLESECTION(																												\
+				parent, sectionLevelId, description,																					\
+				getAlwaysTrue, callbackResetContainer, callbackDoNothing,																\
 				for (																													\
 						;																												\
 						!haveWeRunEveryChildrenInSection(currentSection)																\
@@ -345,12 +361,18 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 
 #define TESTCASE(description) LOOPER(&rootSection, 1, description)
 
-#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(currentSection, sectionLevelId, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
-//#define ENTER_ONE_PER_LOOP(sectionLevelId, description) CONTAINABLEECTION(currentSection, sectionLevelId, description, )
+#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(																	\
+		currentSection, sectionLevelId, description, 																					\
+		getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, 														\
+		NOCODE																															\
+		)
+//#define ENTER_ONE_PER_LOOP(sectionLevelId, description) CONTAINABLEECTION(																\
+		currentSection, sectionLevelId, description, 																					\
+		getAccessOnlyIfNotInBlackList, callbackGoToParentAndThenToNextSibling, callbackAddToParentBlackList,							\
+		NOCODE																															\
+		)
 
-
-
-#define WHEN(description) CONTAINABLESECTION(currentSection, 5, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
-#define THEN(description) CONTAINABLESECTION(currentSection, 10, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
+#define WHEN(description) ALWAYS_ENTER(5, description)
+#define THEN(description) ALWAYS_ENTER(10, description)
 
 #endif
