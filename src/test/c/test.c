@@ -69,7 +69,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	printf("DONE\n");
-	printSectionData(&rootSection);
+	//printSectionData(&rootSection, true);
 
 	return 0;
 }
