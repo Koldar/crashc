@@ -8,6 +8,11 @@
 
 typedef int SectionLevelId;
 
+typedef struct SectionLevelIdList {
+	SectionLevelId levelId;
+	struct SectionLevelIdList* next;
+} SectionLevelIdList;
+
 typedef struct Section {
 	SectionLevelId levelId;
 	const char* description;
@@ -21,32 +26,104 @@ typedef struct Section {
 	bool loop1;
 	bool loop2;
 
+	SectionLevelIdList* levelIdBlackList;
+
 	struct Section* parent;
 	struct Section* firstChild;
 	struct Section* nextSibling;
 } Section;
 
 typedef bool (*condition_section)(Section*);
-typedef void (*ContainableSectionTerminateCallBack)(Section* parent, Section* child);
+typedef void (*SectionTerminatedCallBack)(Section* parent, Section* child);
+typedef void (*AccessGrantedCallBack)(Section* sectionGranted);
 
 Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
 
 #define MALLOCERRORCALLBACK()
 
+SectionLevelIdList* initSectionLevelIdList();
+void addSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
+bool containsSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
+bool removeSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id);
+void destroySectionLevelIdList(SectionLevelIdList** list);
 Section* addSectionToParent(Section* toAdd, Section* parent);
 Section* getNSection(Section* parent, int nChild);
 Section* initSection(SectionLevelId levelId, const char* description);
 void destroySection(Section* section);
 void printSectionData(Section* section, bool recursive);
 bool areWeComputingChildren(Section* section);
-bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback);
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, AccessGrantedCallBack callback);
+bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, SectionTerminatedCallBack callback);
 bool haveWeRunEverythingInSection(Section* section);
 bool haveWeRunEveryChildrenInSection(Section* section);
 void markSectionAsExecuted(Section* section);
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription);
 
 bool getAlwaysTrue(Section* section);
+
+SectionLevelIdList* initSectionLevelIdList() {
+	return NULL;
+}
+
+void addSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
+	SectionLevelIdList* retVal = malloc(sizeof(SectionLevelIdList));
+	if (retVal == NULL) {
+		MALLOCERRORCALLBACK();
+	}
+
+	retVal->levelId = id;
+	retVal->next = NULL;
+
+	if ((*list) == NULL) {
+		*list = retVal;
+	} else {
+		retVal->next = *list;
+		*list = retVal;
+	}
+}
+
+bool removeSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
+	SectionLevelIdList* tmp = *list;
+	SectionLevelIdList* previous = NULL;
+	while (tmp != NULL) {
+		if (tmp->levelId == id) {
+			if (previous == NULL) {
+				//first iteration
+				*list = tmp->next;
+			} else {
+				previous->next = tmp->next;
+			}
+			free(tmp);
+			return true;
+		}
+		previous = tmp;
+		tmp = tmp->next;
+	}
+	return false;
+}
+
+bool containsSectionLevelIdList(SectionLevelIdList** list, SectionLevelId id) {
+	SectionLevelIdList* tmp = *list;
+	while (tmp != NULL) {
+		if (tmp->levelId == id) {
+			return true;
+		}
+		tmp = tmp->next;
+	}
+	return false;
+}
+
+void destroySectionLevelIdList(SectionLevelIdList** list) {
+	SectionLevelIdList* tmp = *list;
+	SectionLevelIdList* tmp2 = NULL;
+	while (tmp != NULL) {
+		tmp2 = tmp->next;
+		free(tmp);
+		tmp = tmp2;
+	}
+	*list = NULL;
+}
 
 Section* addSectionToParent(Section* toAdd, Section* parent) {
 	Section* r = NULL;
@@ -94,6 +171,7 @@ Section* initSection(SectionLevelId levelId, const char* description) {
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
 	retVal->levelId = levelId;
+	retVal->levelIdBlackList = initSectionLevelIdList();
 	retVal->loop1 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
@@ -135,7 +213,7 @@ bool areWeComputingChildren(Section* section) {
 	return !section->childrenNumberComputed;
 }
 
-bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback) {
+bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, SectionTerminatedCallBack callback) {
 	if (child->loop1) {
 		return true;
 	}
@@ -157,15 +235,30 @@ void callbackResetContainer(Section** parentPointer, Section* child) {
 	child->childrenNumberComputed = true;
 }
 
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs) {
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, AccessGrantedCallBack callback) {
 	if (!section->loop2) {
 		return false;
 	}
-	return cs(section);
+	bool retVal = cs(section);
+	if (retVal) {
+		callback(section);
+	}
+	return retVal;
+}
+
+void callbackDoNothing(Section* section) {
+
 }
 
 bool getAlwaysTrue(Section* section) {
 	return true;
+}
+
+bool getAccessOnlyIfNotInBlackList(Section* section) {
+	if (section->parent == NULL) {
+		return true;
+	}
+	return containsSectionLevelIdList(&section->parent->levelIdBlackList, section->levelId) ? false : true;
 }
 
 bool haveWeRunEverythingInSection(Section* section) {
@@ -207,57 +300,57 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 	return getNSection((parent), (parent)->currentChild);
 }
 
-#define CONTAINABLESECTION(parent, sectionLevelId, description, condition, getBackToParentCallBack, setupCode)		\
+#define CONTAINABLESECTION(parent, sectionLevelId, description, condition, getBackToParentCallBack, accessGrantedCallBack, setupCode)		\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
-		 */																											\
-		 currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description);						\
-		 setupCode																									\
-		 for (																										\
-				 currentSection->loop1 = true																		\
-				 ;																									\
-				 runOnceAndDoWorkAtEnd(currentSection, &currentSection, getBackToParentCallBack)					\
-				 ;																									\
+		 */																																\
+		 currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description);											\
+		 setupCode																														\
+		 for (																															\
+				 currentSection->loop1 = true																							\
+				 ;																														\
+				 runOnceAndDoWorkAtEnd(currentSection, &currentSection, getBackToParentCallBack)										\
+				 ;																														\
 				 /**
 				  *  This code is execute when we have already executed the code
 				  *  inside the container. We assume every post condition of
 				  *  CONTAINABLESECTION is satisfied for its children
 				  *  CONTAINABLESECTION.
-				  */																								\
-				  currentSection->loop1 = false																		\
-		 )																											\
-		 for (																										\
-				 currentSection->loop2 = true																		\
-				 ;																									\
-				 runOnceAndCheckAccessToSection(currentSection, condition)											\
-				 ;																									\
-				 currentSection->loop2 = false,																		\
-				 markSectionAsExecuted(currentSection)																\
+				  */																													\
+				  currentSection->loop1 = false																							\
+		 )																																\
+		 for (																															\
+				 currentSection->loop2 = true																							\
+				 ;																														\
+				 runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
+				 ;																														\
+				 currentSection->loop2 = false,																							\
+				 markSectionAsExecuted(currentSection)																					\
 		 )
 
 #define NOCODE ;
 
-#define LOOPER(parent, sectionLevelId, description)																	\
-		CONTAINABLESECTION(parent, sectionLevelId, description, getAlwaysTrue, callbackResetContainer,					\
-				for (																								\
-						;																							\
-						!haveWeRunEveryChildrenInSection(currentSection)											\
-						;																							\
-				)																									\
+#define LOOPER(parent, sectionLevelId, description)																						\
+		CONTAINABLESECTION(parent, sectionLevelId, description, getAlwaysTrue, callbackResetContainer, callbackDoNothing,				\
+				for (																													\
+						;																												\
+						!haveWeRunEveryChildrenInSection(currentSection)																\
+						;																												\
+				)																														\
 		)
 
 
 #define TESTCASE(description) LOOPER(&rootSection, 1, description)
 
-#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(currentSection, sectionLevelId, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(currentSection, sectionLevelId, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
 //#define ENTER_ONE_PER_LOOP(sectionLevelId, description) CONTAINABLEECTION(currentSection, sectionLevelId, description, )
 
 
 
-#define WHEN(description) CONTAINABLESECTION(currentSection, 5, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
-#define THEN(description) CONTAINABLESECTION(currentSection, 10, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define WHEN(description) CONTAINABLESECTION(currentSection, 5, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
+#define THEN(description) CONTAINABLESECTION(currentSection, 10, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, callbackDoNothing, NOCODE)
 
 #endif
