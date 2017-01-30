@@ -37,7 +37,7 @@ Section* initSection(const char* description);
 void destroySection(Section* section);
 void printSectionData(Section* section, bool recursive);
 bool areWeComputingChildren(Section* section);
-bool runOnceAndDoWork(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback);
+bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback);
 bool haveWeRunEverythingInSection(Section* section);
 bool haveWeRunEveryChildrenInSection(Section* section);
 void markSectionAsExecuted(Section* section);
@@ -131,7 +131,7 @@ bool areWeComputingChildren(Section* section) {
 	return !section->childrenNumberComputed;
 }
 
-bool runOnceAndDoWork(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback) {
+bool runOnceAndDoWorkAtEnd(Section* child, Section** newCurrentSection, ContainableSectionTerminateCallBack callback) {
 	if (child->loop1) {
 		return true;
 	}
@@ -203,21 +203,19 @@ Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
 	return getNSection((parent), (parent)->currentChild);
 }
 
-#define CONTAINABLESECTION(parent, description, condition, callGetSection, setupCode, getBackToParentCallBack)		\
+#define CONTAINABLESECTION(parent, description, condition, getBackToParentCallBack, setupCode)						\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
 		 */																											\
-		 if (callGetSection) {																						\
-			 currentSection = getSectionOrCreateIfNotExist(parent, description);									\
-		 }																											\
+		 currentSection = getSectionOrCreateIfNotExist(parent, description);										\
 		 setupCode																									\
 		 for (																										\
 				 currentSection->loop1 = true																		\
 				 ;																									\
-				 runOnceAndDoWork(currentSection, &currentSection, getBackToParentCallBack)							\
+				 runOnceAndDoWorkAtEnd(currentSection, &currentSection, getBackToParentCallBack)					\
 				 ;																									\
 				 /**
 				  *  This code is execute when we have already executed the code
@@ -239,19 +237,22 @@ Section* getSectionOrCreateIfNotExist(Section* parent, const char* decription) {
 #define NOCODE ;
 
 #define LOOPER(parent, description)																					\
-		CONTAINABLESECTION(parent, description, getAlwaysTrue, true, 												\
+		CONTAINABLESECTION(parent, description, getAlwaysTrue, callbackResetContainer,								\
 				for (																								\
 						;																							\
 						!haveWeRunEveryChildrenInSection(currentSection)											\
 						;																							\
-				),																									\
-				callbackResetContainer																				\
+				)																									\
 		)
 
 
 #define TESTCASE(description) LOOPER(&rootSection, description)
 
-#define WHEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, true, NOCODE, callbackGoToParentAndThenToNextSibling)
-#define THEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, true, NOCODE, callbackGoToParentAndThenToNextSibling)
+#define ALWAYS_ENTER(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+
+
+
+#define WHEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
+#define THEN(description) CONTAINABLESECTION(currentSection, description, getAlwaysTrue, callbackGoToParentAndThenToNextSibling, NOCODE)
 
 #endif
