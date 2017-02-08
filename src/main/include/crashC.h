@@ -118,6 +118,7 @@ void addSectionInTailSectionList(SectionCell** list, Section* section) {
 
 	toAdd->section = section;
 	toAdd->next = NULL;
+	printf("leak %s\n", section->description);
 
 	SectionCell* tmp = *list;
 	SectionCell** position = list;
@@ -153,7 +154,9 @@ Section* popHeadSectionInSectionList(SectionCell** list) {
 		return NULL;
 	}
 	Section* retVal = (*list)->section;
+	SectionCell* tmp = *list;
 	*list = (*list)->next;
+	free(tmp);
 	return retVal;
 }
 
@@ -391,7 +394,6 @@ void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Secti
 		//since childrenNumberComputed is not false, that means that we are executing the cycle at least the second time. Hence
 		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
 		//in order to do it, we pop the end after we executed the last children
-		printf("section next sibling %p\n", section->nextSibling);
 		if (section->nextSibling == NULL) {
 			popHeadSectionInSectionList(&(section->parent->sectionToRunList));
 		}
@@ -431,10 +433,7 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 	if (!section->loop2) {
 		return false;
 	}
-	printf("checking if we can access to \"%s\"... ", section->description);
 	section->accessGranted = cs(section);
-	printf(section->accessGranted ? "yes" : "no");
-	printf("\n");
 	if (section->accessGranted) {
 		callback(section);
 	}
@@ -508,14 +507,6 @@ bool haveWeRunEveryChildrenInSection(Section* section) {
 
 void markSectionAsExecuted(Section* section) {
 	section->executed = true;
-	printf("%s completed\n", section->description);
-	SectionCell* tmp = section->sectionToRunList;
-	printf("sectionToRunList: ");
-	while (tmp != NULL) {
-		printf("%s ", tmp->section->description);
-		tmp = tmp->next;
-	}
-	printf("\n");
 }
 
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
