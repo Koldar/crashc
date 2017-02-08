@@ -9,22 +9,23 @@
 
 int main(int argc, const char* argv[]) {
 
-	//	TESTCASE("testcase", "testcase") {
-	//		printf("before when1\n");
-	//		WHEN("when1", "when1") {
-	//			printf("when1\n");
-	//		}
-	//		printf("when1 -> when2\n");
-	//		WHEN("when2", "when2") {
-	//			printf("when2\n");
-	//		}
-	//		printf("when2 -> when3\n");
-	//		WHEN("when3", "when3") {
-	//			printf("when3\n");
-	//		}
-	//		printf("after when3\n");
-	//	}
-
+//	TESTCASE("testcase") {
+//		printf("before when1\n");
+//		WHEN("when1") {
+//			printf("when1\n");
+//		}
+//		printf("when1 -> when2\n");
+//		WHEN("when2") {
+//			printf("when2\n");
+//		}
+//		printf("when2 -> when3\n");
+//		WHEN("when3") {
+//			printf("when3\n");
+//		}
+//		printf("after when3\n");
+//	}
+//
+//	printf("testcase has ssuccessfully completed\n");
 
 	TESTCASE("testcase 1") {
 		WHEN("when 1") {
@@ -46,10 +47,14 @@ int main(int argc, const char* argv[]) {
 
 			}
 		}
+
+		WHEN("when 3") {
+
+		}
 	}
 
 	TESTCASE("testcase 2") {
-		WHEN("when 3") {
+		WHEN("when 4") {
 			THEN("then 6") {
 
 			}
@@ -57,7 +62,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	TESTCASE("testcase 3") {
-		WHEN("when 4") {
+		WHEN("when 5") {
 
 		}
 	}
