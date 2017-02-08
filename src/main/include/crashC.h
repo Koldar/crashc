@@ -9,6 +9,13 @@
 #include "uthash.h"
 
 /**
+ * the character used to divide tags inside a single string
+ */
+#ifndef CC_TAGS_SEPARATOR
+#	define CC_TAGS_SEPARATOR ' '
+#endif
+
+/**
  * represents a single tag cell inside a ::TagHashTable
  */
 typedef struct Tag {
@@ -263,15 +270,100 @@ Section* currentSection = NULL;
  * @return an instance of section lit
  */
 SectionList* initSectionList();
-void addSectionInHeadSectionList(SectionCell** list, Section* section);
-Section* peekSectionInHeadSectionList(SectionCell** list);
-bool containsSectionInSectionList(SectionCell** list, Section* section);
-bool removeSectionInSectionList(SectionCell** list, Section* section);
+/**
+ * Adds a section inside a section list in the \b head
+ *
+ * @param[in] list the list to update
+ * @param[in] section the section to add
+ */
+void addSectionInHeadSectionList(SectionCell** list, const Section* section);
+/**
+ * like ::popHeadSectionInSectionList but it doesn't remove the head of the list
+ *
+ * @param[in] list the list whose head we need to get
+ * @return
+ * 	\li the section inside the head;
+ * 	\li NULL if the list is empty;
+ */
+Section* peekSectionInHeadSectionList(const SectionCell** list);
+/**
+ * \note
+ * The comparison is done by checking the pointers
+ *
+ * @param[in] list the list to analyze
+ * @param[in] section the section to chekc
+ * @return true if \c section is inside \c list
+ */
+bool containsSectionInSectionList(const SectionCell** list, const Section* section);
+/**
+ * Removes a section inside a list
+ *
+ * \note
+ * The ::Section won't be removed from the memory at all
+ *
+ * the list won't be changed if the section is not inside the \c list to begin with
+ *
+ * @param[in] list the section to update
+ * @param[in] section the section to remove form the list
+ */
+bool removeSectionInSectionList(SectionCell** list, const Section* section);
+/**
+ * Removes the head of the section list
+ *
+ * @param[in] list the list to update
+ * @return
+ * 	\li the section inside the head of the list;
+ * 	\li NULL if the list is empty;
+ */
 Section* popHeadSectionInSectionList(SectionCell** list);
+/**
+ * Removes from the memory the whole list of sections
+ *
+ * \note
+ * The sections pointed by \c list won't be affected at all
+ *
+ * @param[in] the list to free
+ */
 void destroySectionList(SectionCell** list);
-Section* addSectionToParent(Section* toAdd, Section* parent);
-Section* getNSection(Section* parent, int nChild);
+/**
+ * Adds a ::Section inside the children list of a parent section
+ *
+ * @param[in] toAdd the new child \c parent has;
+ * @param[in] parent the parent \c toAdd have from this point on;
+ * @return toAdd
+ */
+Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent);
+/**
+ * get the n-th child of a given ::Section
+ *
+ * @param[in] parent the parent involved
+ * @param[in] the number of the child we want to fetch
+ * @return
+ * 	\li the n-th child of parent;
+ * 	\li NULL if such child does not exist
+ */
+Section* getNSection(const Section* parent, int nChild);
+/**
+ * Creates a new section
+ *
+ * \attention
+ * The function allocates data in the heap. To remove it, call ::destroySection
+ *
+ * @param[in] levelId the level of this section
+ * @param[in] description a text describing briefly the section
+ * @param[in] tags a single string containing all the tags associated to the section. See \ref tags
+ * @return the new ::Section instance jsut created
+ */
 Section* initSection(SectionLevelId levelId, const char* description, const char* tags);
+/**
+ * Destroy a ::Section inside the heap
+ *
+ * \note
+ * The function will destory all the sections which have parent (directly or indirectly) \c section.
+ * Formally, the function will free from the memory the subtree generate by \c section (\c section included).
+ *
+ * @param[in] the section to free
+ */
 void destroySection(Section* section);
 void printSectionData(Section* section, bool recursive);
 bool areWeComputingChildren(Section* section);
@@ -288,31 +380,6 @@ void populateTagsHT(Section* section, const char* tags, char separator);
 
 bool getAlwaysTrue(Section* section);
 bool getAccessOnlyIfNotInBlackList(Section* section);
-
-SectionCell* initSectionList() {
-	return NULL;
-}
-
-void addSectionInHeadSectionList(SectionCell** list, Section* section) {
-	SectionCell* retVal = malloc(sizeof(SectionCell));
-	if (retVal == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	retVal->section = section;
-	retVal->next = NULL;
-
-	if ((*list) == NULL) {
-		*list = retVal;
-	} else {
-		retVal->next = *list;
-		*list = retVal;
-	}
-}
-
-Section* peekSectionInHeadSectionList(SectionCell** list) {
-	return (*list) != NULL ? (*list)->section : NULL;
-}
 
 void addSectionInTailSectionList(SectionCell** list, Section* section) {
 	SectionCell* toAdd = malloc(sizeof(SectionCell));
@@ -333,121 +400,9 @@ void addSectionInTailSectionList(SectionCell** list, Section* section) {
 	*position = toAdd;
 }
 
-bool removeSectionInSectionList(SectionCell** list, Section* section) {
-	SectionCell* tmp = *list;
-	SectionCell* previous = NULL;
-	while (tmp != NULL) {
-		if (tmp->section == section) {
-			if (previous == NULL) {
-				//first iteration
-				*list = tmp->next;
-			} else {
-				previous->next = tmp->next;
-			}
-			free(tmp);
-			return true;
-		}
-		previous = tmp;
-		tmp = tmp->next;
-	}
-	return false;
-}
-
-Section* popHeadSectionInSectionList(SectionCell** list) {
-	if (*list == NULL) {
-		return NULL;
-	}
-	Section* retVal = (*list)->section;
-	SectionCell* tmp = *list;
-	*list = (*list)->next;
-	free(tmp);
-	return retVal;
-}
-
-bool containsSectionInSectionList(SectionCell** list, Section* section) {
-	SectionCell* tmp = *list;
-	while (tmp != NULL) {
-		if (tmp->section == section) {
-			return true;
-		}
-		tmp = tmp->next;
-	}
-	return false;
-}
-
-void destroySectionList(SectionCell** list) {
-	SectionCell* tmp = *list;
-	SectionCell* tmp2 = NULL;
-	while (tmp != NULL) {
-		tmp2 = tmp->next;
-		free(tmp);
-		tmp = tmp2;
-	}
-	*list = NULL;
-}
-
-Section* addSectionToParent(Section* toAdd, Section* parent) {
-	Section* r = NULL;
-	Section* list = NULL;
-
-	toAdd->parent = parent;
-
-	list = parent->firstChild;
-	if (list == NULL) {
-		parent->firstChild = toAdd;
-		return toAdd;
-	}
-	while (true) {
-		if (list->nextSibling != NULL) {
-			list = list->nextSibling;
-		} else {
-			list->nextSibling = toAdd;
-			return toAdd;
-		}
-	}
-}
-
-Section* getNSection(Section* parent, int nChild) {
-	Section* list = parent->firstChild;
-	while(true) {
-		if ((nChild == 0) || (list == NULL)) {
-			return list;
-		} else {
-			list = list->nextSibling;
-			nChild--;
-		}
-	}
-}
-
 void destroyTag(Tag* tag) {
 	free(tag->name);
 	free(tag);
-}
-
-Section* initSection(SectionLevelId levelId, const char* description, const char* tags) {
-	Section* retVal = malloc(sizeof(Section));
-	if (retVal == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	retVal->accessGranted = false;
-	retVal->childrenNumber = 0;
-	retVal->childrenNumberComputed = false;
-	retVal->executed = false;
-	retVal->currentChild = 0;
-	retVal->description = strdup(description);
-	retVal->firstChild = NULL;
-	retVal->levelId = levelId;
-	retVal->loopId = 0;
-	retVal->sectionToRunList = initSectionList();
-	retVal->loop1 = false;
-	retVal->nextSibling = NULL;
-	retVal->parent = NULL;
-	retVal->tags = NULL;
-
-	populateTagsHT(retVal, tags, ' ');
-
-	return retVal;
 }
 
 /**
@@ -515,25 +470,6 @@ int hash(const char* str) {
 	while ((c = *str++))
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 	return hash;
-}
-
-void destroySection(Section* section) {
-	if (section->firstChild != NULL) {
-		destroySection(section->firstChild);
-	}
-	if (section->nextSibling != NULL) {
-		destroySection(section->nextSibling);
-	}
-
-	Tag* current;
-	Tag* tmp;
-	HASH_ITER(hh, section->tags, current, tmp) {
-		HASH_DEL(section->tags, current);
-		destroyTag(current);
-	}
-	destroySectionList(&section->sectionToRunList);
-	free(section->description);
-	free(section);
 }
 
 void printSectionData(Section* section, bool recursive) {

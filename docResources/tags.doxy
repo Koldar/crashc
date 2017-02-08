@@ -1,0 +1,58 @@
+/**
+
+	\page tags
+	
+	TAGS
+	====
+	
+	RATIONALE
+	---------
+	
+	Tags are little strings you can use to create groups of tests. A single section can have multiple tags and a tag
+	can have multiple sections associated with it.
+	
+	Tags are important when you want to filter tests: suppose you have a graph library which can compute the shortest path between 2 nodes.
+	Suppose you have tagged every test involving the shortest path  with "path" tag.
+	If you change the code of the shortest path algorithm, you might want to rerun only the tests that may be afftected by this change (and not
+	the whole bunch; i.e. there might be lots of tests). With the tags you can easily do so
+	
+	HOW TO DEFINE THEM
+	------------------
+	
+	\c TESTCASE, \c WHEN, \c THEN can have several tags associated. To define them, just add as many substrings, separated by ' ', in the second input paramters:
+	
+	@code
+		//test case with only a tag called "long-test"
+		TESTCASE("tc1", "long-test") {
+			//...
+		}
+		
+		//test case with 2 tags, "long-test" and "performance"
+		TESTCASE("tc1", "long-test performance") {
+			//...
+		}
+		
+		//test case with no tags defined
+		TESTCASE("tc1", "") {
+		}
+		
+		//identical to the previous test case
+		EZ_TESTCASE("tc1") {
+		}
+	@endcode
+	
+	Optionally, you can change the separator between tags by compiling with a new definition of \c CC_TAGS_SEPARATOR macro, like this:
+	
+	@code
+		gcc myProgram.c -Ipath/to/your/includes/containing/also/crashc/ -DCC_TAGS_SEPARATOR='#'
+	@endcode
+	
+	Then, you can do:
+	
+	@code
+		//test case with 2 tags, "long-test" and "performance"
+		TESTCASE("tc1", "long-test#performance") {
+			//...
+		}
+	@endcode
+*/
