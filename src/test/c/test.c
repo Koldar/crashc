@@ -6,76 +6,121 @@
  */
 
 #include "crashC.h"
+#include <string.h>
+#include <assert.h>
+
+static bufferId = 0;
+static buffer2[1000];
+
+#define isprintf(buffer, format, ...) {				\
+	sprintf(buffer2, format, ##__VA_ARGS__);		\
+	sprintf(buffer + bufferId, "%s", buffer2);		\
+	bufferId += strlen(buffer2);					\
+}
+
+void resetBuffer() {
+	bufferId = 0;
+}
 
 int main(int argc, const char* argv[]) {
 
-//	TESTCASE("testcase") {
-//		printf("before when1\n");
-//		WHEN("when1") {
-//			printf("when1\n");
-//		}
-//		printf("when1 -> when2\n");
-//		WHEN("when2") {
-//			printf("when2\n");
-//		}
-//		printf("when2 -> when3\n");
-//		WHEN("when3") {
-//			printf("when3\n");
-//		}
-//		printf("after when3\n");
-//	}
-//
-//	printf("testcase has ssuccessfully completed\n");
+	char buffer[1000];
+
+	TESTCASE("testcase") {
+		isprintf(buffer, "a");
+		WHEN("when1") {
+			isprintf(buffer, "b");
+		}
+		isprintf(buffer, "c");
+		WHEN("when2") {
+			isprintf(buffer, "d");
+		}
+		isprintf(buffer, "e");
+		WHEN("when3") {
+			isprintf(buffer, "f");
+		}
+		isprintf(buffer, "g");
+	}
+	assert( strcmp(buffer, "abcegacdegacefg") == 0);
+	resetBuffer();
 
 	TESTCASE("testcase 1") {
+		isprintf(buffer, "a");
 		WHEN("when 1") {
+			isprintf(buffer, "b");
 			THEN("then 1") {
-
+				isprintf(buffer, "c");
 			}
+			isprintf(buffer, "d");
 			THEN("then 2") {
-
+				isprintf(buffer, "e");
 			}
+			isprintf(buffer, "f");
 		}
+		isprintf(buffer, "g");
 		WHEN("when 2") {
+			isprintf(buffer, "h");
 			THEN("then 3") {
-
+				isprintf(buffer, "i");
 			}
+			isprintf(buffer, "j");
 			THEN("then 4") {
-
+				isprintf(buffer, "k");
 			}
+			isprintf(buffer, "l");
 			THEN("then 5") {
-
+				isprintf(buffer, "m");
 			}
+			isprintf(buffer, "n");
 		}
-
+		isprintf(buffer, "o");
 		WHEN("when 3") {
-
+			isprintf(buffer, "p");
 		}
+		isprintf(buffer, "q");
 	}
+	assert( strcmp(buffer, "abcdefgoqaghijklmnoqagopq") == 0);
+	resetBuffer();
 
 	TESTCASE("testcase 2") {
+		isprintf(buffer, "a");
 		WHEN("when 4") {
+			isprintf(buffer, "b");
 			THEN("then 6") {
-
+				isprintf(buffer, "c");
 			}
+			isprintf(buffer, "d");
 		}
+		isprintf(buffer, "e");
 	}
+	assert( strcmp(buffer, "abcde") == 0);
+	resetBuffer();
 
 	TESTCASE("testcase 3") {
+		isprintf(buffer, "a");
 		WHEN("when 5") {
-
+			isprintf(buffer, "b");
 		}
+		isprintf(buffer, "c");
 	}
+	assert( strcmp(buffer, "abc") == 0);
+	resetBuffer();
 
 	TESTCASE("testcase 4") {
+		isprintf(buffer, "a");
 		THEN("then 7") {
-
+			isprintf(buffer, "b");
 		}
+		isprintf(buffer, "c");
 	}
+	assert( strcmp(buffer, "abc") == 0);
+	resetBuffer();
 
 	TESTCASE("testcase 5") {
-
+		isprintf(buffer, "a");
 	}
+	assert( strcmp(buffer, "a") == 0);
+	resetBuffer();
 
 	printf("DONE\n");
 	//printSectionData(&rootSection, true);
