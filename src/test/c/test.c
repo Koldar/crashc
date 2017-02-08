@@ -26,17 +26,17 @@ int main(int argc, const char* argv[]) {
 
 	char buffer[1000];
 
-	TESTCASE("testcase") {
+	TESTCASE("testcase", "") {
 		isprintf(buffer, "a");
-		WHEN("when1") {
+		WHEN("when1", "") {
 			isprintf(buffer, "b");
 		}
 		isprintf(buffer, "c");
-		WHEN("when2") {
+		WHEN("when2", "") {
 			isprintf(buffer, "d");
 		}
 		isprintf(buffer, "e");
-		WHEN("when3") {
+		WHEN("when3", "") {
 			isprintf(buffer, "f");
 		}
 		isprintf(buffer, "g");
@@ -44,37 +44,37 @@ int main(int argc, const char* argv[]) {
 	assert( strcmp(buffer, "abcegacdegacefg") == 0);
 	resetBuffer();
 
-	TESTCASE("testcase 1") {
+	TESTCASE("testcase 1", "") {
 		isprintf(buffer, "a");
-		WHEN("when 1") {
+		WHEN("when 1", "") {
 			isprintf(buffer, "b");
-			THEN("then 1") {
+			THEN("then 1", "") {
 				isprintf(buffer, "c");
 			}
 			isprintf(buffer, "d");
-			THEN("then 2") {
+			THEN("then 2", "") {
 				isprintf(buffer, "e");
 			}
 			isprintf(buffer, "f");
 		}
 		isprintf(buffer, "g");
-		WHEN("when 2") {
+		WHEN("when 2", "") {
 			isprintf(buffer, "h");
-			THEN("then 3") {
+			THEN("then 3", "") {
 				isprintf(buffer, "i");
 			}
 			isprintf(buffer, "j");
-			THEN("then 4") {
+			THEN("then 4", "") {
 				isprintf(buffer, "k");
 			}
 			isprintf(buffer, "l");
-			THEN("then 5") {
+			THEN("then 5", "") {
 				isprintf(buffer, "m");
 			}
 			isprintf(buffer, "n");
 		}
 		isprintf(buffer, "o");
-		WHEN("when 3") {
+		WHEN("when 3", "") {
 			isprintf(buffer, "p");
 		}
 		isprintf(buffer, "q");
@@ -82,11 +82,11 @@ int main(int argc, const char* argv[]) {
 	assert( strcmp(buffer, "abcdefgoqaghijklmnoqagopq") == 0);
 	resetBuffer();
 
-	TESTCASE("testcase 2") {
+	TESTCASE("testcase 2", "") {
 		isprintf(buffer, "a");
-		WHEN("when 4") {
+		WHEN("when 4", "") {
 			isprintf(buffer, "b");
-			THEN("then 6") {
+			THEN("then 6", "") {
 				isprintf(buffer, "c");
 			}
 			isprintf(buffer, "d");
@@ -96,9 +96,9 @@ int main(int argc, const char* argv[]) {
 	assert( strcmp(buffer, "abcde") == 0);
 	resetBuffer();
 
-	TESTCASE("testcase 3") {
+	TESTCASE("testcase 3", "") {
 		isprintf(buffer, "a");
-		WHEN("when 5") {
+		WHEN("when 5", "") {
 			isprintf(buffer, "b");
 		}
 		isprintf(buffer, "c");
@@ -106,9 +106,9 @@ int main(int argc, const char* argv[]) {
 	assert( strcmp(buffer, "abc") == 0);
 	resetBuffer();
 
-	TESTCASE("testcase 4") {
+	TESTCASE("testcase 4", "") {
 		isprintf(buffer, "a");
-		THEN("then 7") {
+		THEN("then 7", "") {
 			isprintf(buffer, "b");
 		}
 		isprintf(buffer, "c");
@@ -116,7 +116,7 @@ int main(int argc, const char* argv[]) {
 	assert( strcmp(buffer, "abc") == 0);
 	resetBuffer();
 
-	TESTCASE("testcase 5") {
+	TESTCASE("testcase 5", "") {
 		isprintf(buffer, "a");
 	}
 	assert( strcmp(buffer, "a") == 0);

@@ -6,12 +6,23 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "uthash.h"
+
+typedef struct Tag {
+	int id;
+	char* name;
+	UT_hash_handle hh;
+} Tag;
+
+typedef Tag TagHashTable;
+
 typedef int SectionLevelId;
 struct SectionCell;
 
 typedef struct Section {
 	SectionLevelId levelId;
 	const char* description;
+	TagHashTable* tags;
 
 	bool childrenNumberComputed;
 	int childrenNumber;
@@ -25,7 +36,6 @@ typedef struct Section {
 	bool accessGranted;
 
 	//STRUCTURE USED ONLY FOR CONTAINABLE SECTION IMPLEMENTATIONS
-	struct SectionCell* sectionBlackList;
 	struct SectionCell* sectionToRunList;
 	//END
 
@@ -57,7 +67,7 @@ Section* popHeadSectionInSectionList(SectionCell** list);
 void destroySectionList(SectionCell** list);
 Section* addSectionToParent(Section* toAdd, Section* parent);
 Section* getNSection(Section* parent, int nChild);
-Section* initSection(SectionLevelId levelId, const char* description);
+Section* initSection(SectionLevelId levelId, const char* description, const char* tags);
 void destroySection(Section* section);
 void printSectionData(Section* section, bool recursive);
 bool areWeComputingChildren(Section* section);
@@ -66,7 +76,11 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 bool haveWeRunEverythingInSection(Section* section);
 bool haveWeRunEveryChildrenInSection(Section* section);
 void markSectionAsExecuted(Section* section);
-Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription);
+Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags);
+void destroyTag(Tag* tag);
+
+int hash(const char* str);
+void populateTagsHT(Section* section, const char* tags, char separator);
 
 bool getAlwaysTrue(Section* section);
 bool getAccessOnlyIfNotInBlackList(Section* section);
@@ -198,7 +212,12 @@ Section* getNSection(Section* parent, int nChild) {
 	}
 }
 
-Section* initSection(SectionLevelId levelId, const char* description) {
+void destroyTag(Tag* tag) {
+	free(tag->name);
+	free(tag);
+}
+
+Section* initSection(SectionLevelId levelId, const char* description, const char* tags) {
 	Section* retVal = malloc(sizeof(Section));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
@@ -213,14 +232,84 @@ Section* initSection(SectionLevelId levelId, const char* description) {
 	retVal->firstChild = NULL;
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
-	retVal->sectionBlackList = initSectionList();
 	retVal->sectionToRunList = initSectionList();
 	retVal->loop1 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
+	retVal->tags = NULL;
+
+	populateTagsHT(retVal, tags, ' ');
 
 	return retVal;
 }
+
+/**
+ * Given a string \c tags, the function will populate the hash table in \c section with all
+ * the tags inside \c tags
+ *
+ * For example if \c separator is ' ', a compliant \c tags string is <tt>tag1 tag2 tag3</tt>
+ *
+ * \note
+ * the strings generated are \b cloned inside the hash table
+ *
+ * @param[in] section the section whose tag hash table will be populated
+ * @param[in] tags a string containing "separator"-separated substring, each of them representing a tag
+ * @param[in] separator a character dividing 2 tags in string \c tags
+ */
+void populateTagsHT(Section* section, const char* tags, char separator) {
+	char token[100];
+	char* positionToWriteInBuffer = NULL;
+	int tokenId;
+	Tag* tag;
+
+	//i don't want to use strtok because it may be used inside the functions to test: i don't want to mess with their strtok starte
+	while(*tags != '\0') {
+
+		//fetch a tag inside tags
+		positionToWriteInBuffer = token;
+		while((*tags != separator) && (*tags != '\0')) {
+			*positionToWriteInBuffer = *tags;
+			positionToWriteInBuffer++;
+			tags++;
+		}
+		*positionToWriteInBuffer = '\0';
+		if (*tags != '\0') {
+			//if we've not reached the end we need to go to the next tag
+			tags++;
+		}
+
+		tokenId = hash(token);
+		HASH_FIND_INT(section->tags, &tokenId, tag);
+		if (tag == NULL) {
+			tag = malloc(sizeof(Tag));
+			if (tag == NULL) {
+				MALLOCERRORCALLBACK();
+			}
+			tag->id = tokenId;
+			tag->name = strdup(token);
+			HASH_ADD_INT(section->tags, id, tag);
+		}
+	}
+}
+
+/**
+ * compute the has of a string
+ *
+ * \note
+ * we use djb2 algorithm, described <a href="http://www.cse.yorku.ca/~oz/hash.html">here</a>
+ *
+ * @param[in] str the string whose has we need to compute
+ * @return the has of the string
+ */
+int hash(const char* str) {
+	unsigned int hash = 5381;
+	int c;
+
+	while ((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	return hash;
+}
+
 void destroySection(Section* section) {
 	if (section->firstChild != NULL) {
 		destroySection(section->firstChild);
@@ -229,7 +318,12 @@ void destroySection(Section* section) {
 		destroySection(section->nextSibling);
 	}
 
-	destroySectionList(&section->sectionBlackList);
+	Tag* current;
+	Tag* tmp;
+	HASH_ITER(hh, section->tags, current, tmp) {
+		HASH_DEL(section->tags, current);
+		destroyTag(current);
+	}
 	destroySectionList(&section->sectionToRunList);
 	free(section->description);
 	free(section);
@@ -357,17 +451,6 @@ bool getAlwaysTrue(Section* section) {
 }
 
 /**
- * Grants access to \c section only if it isn't contained inside parent ::Section::sectionBlackList
- */
-bool getAccessOnlyIfNotInBlackList(Section* section) {
-	if (section->parent == NULL) {
-		return true;
-	}
-
-	return containsSectionInSectionList(&section->parent->sectionBlackList, section) ? false : true;
-}
-
-/**
  * Grant access only if:
  * \li we're still computing the number of children and we are in the fuirst children;
  * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
@@ -393,12 +476,6 @@ bool getAccessSequentially(Section* section) {
 //accessGrantedCallBack callbacks
 
 void callbackDoNothing(Section* section) {
-}
-
-void callbackAddToParentBlackList(Section* section) {
-	if (!containsSectionInSectionList(&section->sectionBlackList, section)) {
-		addSectionInHeadSectionList(&section->sectionBlackList, section);
-	}
 }
 
 //END
@@ -441,22 +518,22 @@ void markSectionAsExecuted(Section* section) {
 	printf("\n");
 }
 
-Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription) {
+Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
-		return addSectionToParent(initSection(sectionLevelId, decription), parent);
+		return addSectionToParent(initSection(sectionLevelId, decription, tags), parent);
 	}
 	return getNSection(parent, parent->currentChild);
 }
 
-#define CONTAINABLESECTION(parent, sectionLevelId, description, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
+#define CONTAINABLESECTION(parent, sectionLevelId, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
 		 */																																\
-		currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description);												\
+		currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description, tags);												\
 		currentSection->loopId += 1;																									\
 		setupCode																														\
 		for (																															\
@@ -472,7 +549,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 				 *  CONTAINABLESECTION is satisfied for its children
 				 *  CONTAINABLESECTION.
 				 */																														\
-				 currentSection->loop1 = false																							\
+		currentSection->loop1 = false																							\
 		)																																\
 		for (																															\
 				currentSection->loop2 = true																							\
@@ -485,37 +562,40 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 
 #define NOCODE
 
-#define LOOPER(parent, sectionLevelId, description)																						\
+#define LOOPER(parent, sectionLevelId, description, tags)																				\
 		CONTAINABLESECTION(																												\
-				parent, sectionLevelId, description,																					\
+				parent, sectionLevelId, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing, doWorkAtEndCallbackDoNothing,							\
 				for (																													\
 						;																												\
 						!haveWeRunEveryChildrenInSection(currentSection)																\
 						;																												\
-																																		\
+						\
 				)																														\
 		)
 
 
-#define TESTCASE(description) LOOPER(&rootSection, 1, description)
+#define TESTCASE(description, tags) LOOPER(&rootSection, 1, description, tags)
+#define EZ_TESTCASE(description) TESTCASE(description, "")
 
-#define ALWAYS_ENTER(sectionLevelId, description) CONTAINABLESECTION(																	\
-		currentSection, sectionLevelId, description, 																					\
+#define ALWAYS_ENTER(sectionLevelId, description, tags) CONTAINABLESECTION(																\
+		currentSection, sectionLevelId, description, tags,																				\
 		getAlwaysTrue, callbackDoNothing,																								\
 		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,					\
 		NOCODE																															\
 )
 
-#define ENTER_ONE_PER_LOOP(sectionLevelId, description) CONTAINABLESECTION(																\
-		currentSection, sectionLevelId, description, 																					\
+#define ENTER_ONE_PER_LOOP(sectionLevelId, description, tags) CONTAINABLESECTION(														\
+		currentSection, sectionLevelId, description, tags,																				\
 		getAccessSequentially, callbackDoNothing, 																						\
 		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,		\
 		NOCODE																															\
 )
 
-#define WHEN(description) ENTER_ONE_PER_LOOP(5, description)
-#define THEN(description) ALWAYS_ENTER(10, description)
+#define WHEN(description, tags) ENTER_ONE_PER_LOOP(5, description, tags)
+#define EZ_WHEN(description) WHEN(description, "")
+#define THEN(description, tags) ALWAYS_ENTER(10, description, tags)
+#define EZ_THEN(description) THEN(description, "")
 
 #endif
