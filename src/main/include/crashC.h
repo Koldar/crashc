@@ -44,6 +44,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "errors.h"
 #include "uthash.h"
 
 /**
@@ -60,13 +61,6 @@
 #	define CC_AUTOMAIN int main(int argc, const char* argv[]){											\
 		return defaultMain(argc, argv);																	\
 }
-#endif
-
-/**
- * Callback executed when a malloc returns NULL
- */
-#ifndef MALLOCERRORCALLBACK
-#	define MALLOCERRORCALLBACK() exit(1)
 #endif
 
 /**

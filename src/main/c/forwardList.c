@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include "forwardList.h"
+#include "errors.h"
 
 ForwardList* initForwardList() {
 	ForwardList* retVal = (ForwardList*) NULL;
@@ -39,10 +40,10 @@ void destroyForwardListWithElements(ForwardList** list, destructor d) {
 }
 
 
-void addHead(ForwardList** list, const void* pointer) {
+void addHeadInForwardList(ForwardList** list, const void* pointer) {
 	ForwardList* newElement = (ForwardList*)malloc(sizeof(ForwardList));
 	if (newElement == NULL) {
-		errorMalloc();
+		MALLOCERRORCALLBACK();
 	}
 
 	newElement->pointer = pointer;
@@ -55,7 +56,7 @@ bool isListEmpty(const ForwardList** list) {
 	return (*list) == NULL;
 }
 
-ForwardList* getTail(const ForwardList** list) {
+ForwardList* getTailInForwardList(const ForwardList** list) {
 	ForwardList* tmp = *list;
 
 	if (tmp == NULL) {
@@ -69,18 +70,11 @@ ForwardList* getTail(const ForwardList** list) {
 	}
 }
 
-void appendListToTail(ForwardList** dest, const ForwardList** src) {
-	ForwardList* destTail = getLastElement(*dest);
+void appendForwardListToTail(ForwardList** dest, const ForwardList** src) {
+	ForwardList* destTail = getTailInForwardList(*dest);
 	ForwardList* tmp = src;
-	while (tmp != NULL) {
-		if (destTail == NULL) {
-			addHeadInForwardList(dest, tmp->pointer);
-			destTail = *dest;
-		} else {
-			addElementAfterForwardList(destTail, tmp->pointer);
-		}
-		tmp = tmp->next;
-	}
+
+	destTail->next = src;
 }
 
 void clearForwardList(ForwardList** toClear) {
@@ -196,6 +190,6 @@ void* popHeadFromList(ForwardList** list) {
 	return retVal;
 }
 
-void* peekHeadFromList(const ForwardList** list) {
+void* peekHeadFromForwardList(const ForwardList** list) {
 	return isForwardListEmpty(*list) ? NULL : (*list)->pointer;
 }

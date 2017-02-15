@@ -22,5 +22,6 @@ void __assert_fail(Section* section, const char* expr, const char* file, const i
 
 
 #define ASSERT(expr) expr ? 0 : __assert_fail(currentSection, #expr, __FILE__, __LINE__)
+#define assert(expr) ASSERT(expr)
 
 #endif /* ASSERTIONS_H_ */
