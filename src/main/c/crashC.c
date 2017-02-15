@@ -5,84 +5,6 @@ Section* currentSection = NULL;
 
 static void printSectionData(const Section* section, bool recursive);
 
-SectionCell* initSectionList() {
-	return NULL;
-}
-
-void addSectionInHeadSectionList(SectionCell** list, const Section* section) {
-	SectionCell* retVal = malloc(sizeof(SectionCell));
-	if (retVal == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	retVal->section = section;
-	retVal->next = NULL;
-
-	if ((*list) == NULL) {
-		*list = retVal;
-	} else {
-		retVal->next = *list;
-		*list = retVal;
-	}
-}
-
-Section* peekSectionInHeadSectionList(const SectionCell** list) {
-	return (*list) != NULL ? (*list)->section : NULL;
-}
-
-bool containsSectionInSectionList(const SectionCell** list, const Section* section) {
-	SectionCell* tmp = *list;
-	while (tmp != NULL) {
-		if (tmp->section == section) {
-			return true;
-		}
-		tmp = tmp->next;
-	}
-	return false;
-}
-
-bool removeSectionInSectionList(SectionCell** list, const Section* section) {
-	SectionCell* tmp = *list;
-	SectionCell* previous = NULL;
-	while (tmp != NULL) {
-		if (tmp->section == section) {
-			if (previous == NULL) {
-				//first iteration
-				*list = tmp->next;
-			} else {
-				previous->next = tmp->next;
-			}
-			free(tmp);
-			return true;
-		}
-		previous = tmp;
-		tmp = tmp->next;
-	}
-	return false;
-}
-
-Section* popHeadSectionInSectionList(SectionCell** list) {
-	if (*list == NULL) {
-		return NULL;
-	}
-	Section* retVal = (*list)->section;
-	SectionCell* tmp = *list;
-	*list = (*list)->next;
-	free(tmp);
-	return retVal;
-}
-
-void destroySectionList(SectionCell** list) {
-	SectionCell* tmp = *list;
-	SectionCell* tmp2 = NULL;
-	while (tmp != NULL) {
-		tmp2 = tmp->next;
-		free(tmp);
-		tmp = tmp2;
-	}
-	*list = NULL;
-}
-
 Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
 	Section* r = NULL;
 	Section* list = NULL;
@@ -132,7 +54,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->firstChild = NULL;
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
-	retVal->sectionToRunList = initSectionList();
+	retVal->sectionToRunList = initForwardList();
 	retVal->loop1 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
@@ -161,7 +83,7 @@ void destroySection(Section* section) {
 		HASH_DEL(section->tags, current);
 		destroyTag(current);
 	}
-	destroySectionList(&section->sectionToRunList);
+	destroyForwardListWithElements(&section->sectionToRunList, destroySection);
 	free(section->description);
 	free(section);
 }
@@ -289,25 +211,6 @@ void populateTagsHT(Section* section, const char* tags, char separator) {
 	}
 }
 
-void addSectionInTailSectionList(SectionCell** list, Section* section) {
-	SectionCell* toAdd = malloc(sizeof(SectionCell));
-	if (toAdd == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	toAdd->section = section;
-	toAdd->next = NULL;
-	printf("leak %s\n", section->description);
-
-	SectionCell* tmp = *list;
-	SectionCell** position = list;
-	while (tmp != NULL) {
-		position = &tmp->next;
-		tmp = tmp->next;
-	}
-	*position = toAdd;
-}
-
 void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {
 	//we finish a section. we return to the parent
 	*pointerToSetAsParent = section->parent;
@@ -351,6 +254,7 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
 	if (!section->parent->childrenNumberComputed) {
 		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
 		if (section->parent->currentChild > 0) {
+
 			addSectionInTailSectionList(&(section->parent->sectionToRunList), section);
 		}
 	}
@@ -371,7 +275,8 @@ bool getAccessSequentially(Section* section) {
 		return (section->parent->currentChild == 0);
 	}
 
-	if (peekSectionInHeadSectionList(&(section->parent->sectionToRunList)) == section) {
+
+	if (peekHeadFromForwardList(&(section->parent->sectionToRunList)) == section) {
 		return true;
 	}
 

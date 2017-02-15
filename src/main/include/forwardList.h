@@ -37,12 +37,12 @@ typedef struct ForwardCell {
 	struct ForwardCell* next;
 } ForwardCell;
 
-typedef ForwardCell ForwardList;
+typedef ForwardCell forward_list;
 
 /**
  * Creates a new empty list
  */
-ForwardList* initForwardList();
+forward_list* initForwardList();
 
 /**
  * remove from the memory every element of the list
@@ -51,14 +51,14 @@ ForwardList* initForwardList();
  *
  * @param[in] list the list to delete
  */
-void destroyForwardList(ForwardList** list);
+void destroyForwardList(forward_list** list);
 /**
  * like ::destroyForwardList(ForwardList*) but it will dete also the pointers
  *
  * @param[inout] list the list to destroy
  * @param[in] d a function that accept an element of the list and removes it from the memory
  */
-void destroyForwardListWithElements(ForwardList** list, destructor d);
+void destroyForwardListWithElements(forward_list** list, destructor d);
 
 /**
  * Adds an element to the head of the list
@@ -69,7 +69,7 @@ void destroyForwardListWithElements(ForwardList** list, destructor d);
  * @param[in] pointer the variable to add to the list
  * @return the new head of \c list
  */
-void addHeadInForwardList(ForwardList** list, const void* pointer);
+void addHeadInForwardList(forward_list** list, const void* pointer);
 
 /**
  * Find an element inside the list
@@ -83,7 +83,7 @@ void addHeadInForwardList(ForwardList** list, const void* pointer);
  * 	\li the element searched;
  * 	\li null otherwise
  */
-void* findInForwardList(ForwardList** list, comparator c);
+void* findInForwardList(forward_list** list, comparator c);
 
 /**
  * like ::find but it removes the element from the list once found
@@ -101,7 +101,7 @@ void* findInForwardList(ForwardList** list, comparator c);
  * @param[in] c the comparator used to search the list. See ::Comparator for further information about the prototype
  * @return true if we have removed something, false otherwise
  */
-bool removeFindInForwardList(ForwardList** list, comparator c);
+bool removeFindInForwardList(forward_list** list, comparator c);
 
 /**
  * like ::removeFind but it removes the element also from the memory
@@ -116,7 +116,7 @@ bool removeFindInForwardList(ForwardList** list, comparator c);
  * @param[in] d the destructor to use to remove the pointer from memory
  * @return true if we have removed something, false otherwise
  */
-bool removeFindWithElementInForwardList(ForwardList** list, comparator c, destructor d);
+bool removeFindWithElementInForwardList(forward_list** list, comparator c, destructor d);
 
 /**
  * like ::removeFind, but it always return the head of the list
@@ -130,7 +130,7 @@ bool removeFindWithElementInForwardList(ForwardList** list, comparator c, destru
  * 	\li the head of the list;
  * 	\li NULL if the list is actually empty;
  */
-void* popHeadFromForwardList(ForwardList** list);
+void* popHeadFromForwardList(forward_list** list);
 
 /**
  * like ::popHeadFromList, but it doesn't remove the head though
@@ -140,7 +140,7 @@ void* popHeadFromForwardList(ForwardList** list);
  * 	\li the head of the list;
  * 	\li NULL if the list is actually empty;
  */
-void* peekHeadFromForwardList(const ForwardList** list);
+void* peekHeadFromForwardList(const forward_list** list);
 
 /**
  * Function used to check if a list is empty or not
@@ -150,7 +150,7 @@ void* peekHeadFromForwardList(const ForwardList** list);
  * 	\li true if list is empty;
  * 	\li false otherwise
  */
-bool isForwardListEmpty(const ForwardList** list);
+bool isForwardListEmpty(const forward_list** list);
 
 /**
  * get the number of elements inside list
@@ -158,7 +158,7 @@ bool isForwardListEmpty(const ForwardList** list);
  * @param[in] list the list involved
  * @return number of elements inside \c list
  */
-int getForwardListSize(const ForwardList** list);
+int getForwardListSize(const forward_list** list);
 
 /**
  * Get the last element of the list
@@ -166,7 +166,7 @@ int getForwardListSize(const ForwardList** list);
  * @param[in] list the list involved
  * @return a ::ForwardList structure representing the last element of the \c list; NULL if the list is actually empty
  */
-ForwardList* getTailInForwardList(const ForwardList** list);
+forward_list* getTailInForwardList(const forward_list** list);
 
 /**
  * Appends \c src list to the tail of \c dest
@@ -181,7 +181,7 @@ ForwardList* getTailInForwardList(const ForwardList** list);
  * @param[in] dest the list whose size will be increased;
  * @param[in] src the list to append to \c dest
  */
-void appendForwardListToTail(ForwardList** dest, const ForwardList** src);
+void appendForwardListToTail(forward_list** dest, const forward_list** src);
 
 /**
  * Removes all the elements in the list
@@ -194,7 +194,7 @@ void appendForwardListToTail(ForwardList** dest, const ForwardList** src);
  *
  * @param[inout] toClear the list to remove
  */
-void clearForwardList(ForwardList** toClear);
+void clearForwardList(forward_list** toClear);
 
 /**
  * like ::clearForwardList but it also removes the elements from the memory
@@ -208,7 +208,7 @@ void clearForwardList(ForwardList** toClear);
  * @param[inout] toClear the list to remove
  * @param[in] d a function used to remove the elements of the list from the memory
  */
-void clearForwardListWithElements(ForwardList** toClear, destructor d);
+void clearForwardListWithElements(forward_list** toClear, destructor d);
 
 #define FL_SAFE_ITER(list, el, supportEl)					\
 	for (													\

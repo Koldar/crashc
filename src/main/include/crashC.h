@@ -46,6 +46,7 @@
 
 #include "errors.h"
 #include "uthash.h"
+#include "forwardList.h"
 
 /**
  * the character used to divide tags inside a single string
@@ -273,17 +274,7 @@ typedef struct Section {
 	struct Section* nextSibling;
 } Section;
 
-/**
- * A cell inside a forward list of Sections
- */
-typedef struct SectionCell {
-	///the section in this cell
-	Section* section;
-	///pointer to the next cell. Can be NULL
-	struct SectionCell* next;
-} SectionCell;
-
-typedef SectionCell SectionList;
+typedef forward_list SectionList;
 
 /**
  * Callback representing a general condition that determine if we can access to a particular section
@@ -312,68 +303,6 @@ extern Section rootSection;
  */
 extern Section* currentSection;
 
-
-/**
- * Initialize a list of sections
- *
- * @return an instance of section lit
- */
-SectionList* initSectionList();
-/**
- * Adds a section inside a section list in the \b head
- *
- * @param[in] list the list to update
- * @param[in] section the section to add
- */
-void addSectionInHeadSectionList(SectionCell** list, const Section* section);
-/**
- * like ::popHeadSectionInSectionList but it doesn't remove the head of the list
- *
- * @param[in] list the list whose head we need to get
- * @return
- * 	\li the section inside the head;
- * 	\li NULL if the list is empty;
- */
-Section* peekSectionInHeadSectionList(const SectionCell** list);
-/**
- * \note
- * The comparison is done by checking the pointers
- *
- * @param[in] list the list to analyze
- * @param[in] section the section to chekc
- * @return true if \c section is inside \c list
- */
-bool containsSectionInSectionList(const SectionCell** list, const Section* section);
-/**
- * Removes a section inside a list
- *
- * \note
- * The ::Section won't be removed from the memory at all
- *
- * the list won't be changed if the section is not inside the \c list to begin with
- *
- * @param[in] list the section to update
- * @param[in] section the section to remove form the list
- */
-bool removeSectionInSectionList(SectionCell** list, const Section* section);
-/**
- * Removes the head of the section list
- *
- * @param[in] list the list to update
- * @return
- * 	\li the section inside the head of the list;
- * 	\li NULL if the list is empty;
- */
-Section* popHeadSectionInSectionList(SectionCell** list);
-/**
- * Removes from the memory the whole list of sections
- *
- * \note
- * The sections pointed by \c list won't be affected at all
- *
- * @param[in] the list to free
- */
-void destroySectionList(SectionCell** list);
 /**
  * Adds a ::Section inside the children list of a parent section
  *
@@ -531,7 +460,6 @@ bool getAccessSequentially(Section* section);
 ///@}
 
 int defaultMain(int argc, const char* argv[]);
-void addSectionInTailSectionList(SectionCell** list, Section* section);
 
 ///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
 ///@{

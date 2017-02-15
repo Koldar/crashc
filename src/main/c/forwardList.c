@@ -9,14 +9,14 @@
 #include "forwardList.h"
 #include "errors.h"
 
-ForwardList* initForwardList() {
-	ForwardList* retVal = (ForwardList*) NULL;
+forward_list* initForwardList() {
+	forward_list* retVal = (forward_list*) NULL;
 	return retVal;
 }
 
-void destroyForwardList(ForwardList** list) {
-	ForwardList* tmp = NULL;
-	ForwardList* tmp2 = NULL;
+void destroyForwardList(forward_list** list) {
+	forward_list* tmp = NULL;
+	forward_list* tmp2 = NULL;
 
 	tmp = *list;
 	while (tmp != NULL) {
@@ -26,9 +26,9 @@ void destroyForwardList(ForwardList** list) {
 	}
 }
 
-void destroyForwardListWithElements(ForwardList** list, destructor d) {
-	ForwardList* tmp = NULL;
-	ForwardList* tmp2 = NULL;
+void destroyForwardListWithElements(forward_list** list, destructor d) {
+	forward_list* tmp = NULL;
+	forward_list* tmp2 = NULL;
 
 	tmp = *list;
 	while (tmp != NULL) {
@@ -40,8 +40,8 @@ void destroyForwardListWithElements(ForwardList** list, destructor d) {
 }
 
 
-void addHeadInForwardList(ForwardList** list, const void* pointer) {
-	ForwardList* newElement = (ForwardList*)malloc(sizeof(ForwardList));
+void addHeadInForwardList(forward_list** list, const void* pointer) {
+	forward_list* newElement = (forward_list*)malloc(sizeof(forward_list));
 	if (newElement == NULL) {
 		MALLOCERRORCALLBACK();
 	}
@@ -52,55 +52,7 @@ void addHeadInForwardList(ForwardList** list, const void* pointer) {
 	*list = newElement;
 }
 
-bool isListEmpty(const ForwardList** list) {
-	return (*list) == NULL;
-}
-
-ForwardList* getTailInForwardList(const ForwardList** list) {
-	ForwardList* tmp = *list;
-
-	if (tmp == NULL) {
-		return NULL;
-	}
-	while (true) {
-		if (tmp->next == NULL) {
-			return tmp;
-		}
-		tmp = tmp->next;
-	}
-}
-
-void appendForwardListToTail(ForwardList** dest, const ForwardList** src) {
-	ForwardList* destTail = getTailInForwardList(*dest);
-	ForwardList* tmp = src;
-
-	destTail->next = src;
-}
-
-void clearForwardList(ForwardList** toClear) {
-	ForwardList* tmp = *toClear;
-	ForwardList* tmp2 = NULL;
-	while (tmp != NULL) {
-		tmp2 = tmp->next;
-		free(tmp);
-		tmp = tmp2;
-	}
-	*toClear = NULL;
-}
-
-void clearForwardListWithElements(ForwardList** toClear, destructor d) {
-	ForwardList* tmp = *toClear;
-	ForwardList* tmp2 = NULL;
-	while (tmp != NULL) {
-		tmp2 = tmp->next;
-		d(tmp->pointer);
-		free(tmp);
-		tmp = tmp2;
-	}
-	*toClear = NULL;
-}
-
-void* find(ForwardList** list, comparator c) {
+void* findInForwardList(forward_list** list, comparator c) {
 	ForwardCell* tmp = *list;
 	while (tmp != NULL) {
 		if (c(tmp->pointer) == true) {
@@ -111,18 +63,8 @@ void* find(ForwardList** list, comparator c) {
 	return NULL;
 }
 
-/**
- * like ::find but it removes the element from the list once found
- *
- * \todo create a double pointer
- *
- * \note if the element is not found, the function does nothing
- *
- * @param[in] list the list involved
- * @param[in] c the comparator used to search the list
- */
-bool removeFind(ForwardList** list, comparator c) {
-	ForwardList* prevComponent = NULL;
+bool removeFindInForwardList(forward_list** list, comparator c) {
+	forward_list* prevComponent = NULL;
 	ForwardCell* tmp = *list;
 
 	while (tmp != NULL) {
@@ -142,8 +84,8 @@ bool removeFind(ForwardList** list, comparator c) {
 	return false;
 }
 
-bool removeFindWithElement(ForwardList** list, comparator c, destructor d) {
-	ForwardList* prevComponent = NULL;
+bool removeFindWithElementInForwardList(forward_list** list, comparator c, destructor d) {
+	forward_list* prevComponent = NULL;
 	ForwardCell* tmp = *list;
 
 	while (tmp != NULL) {
@@ -164,12 +106,28 @@ bool removeFindWithElement(ForwardList** list, comparator c, destructor d) {
 	return false;
 }
 
-bool isForwardListEmpty(const ForwardList** list) {
+void* popHeadFromForwardList(forward_list** list) {
+	if (isForwardListEmpty(*list)) {
+		return NULL;
+	}
+	forward_list* tmp = (*list);
+
+	void* retVal = (*list)->pointer;
+	*list = (*list)->next;
+	free(tmp);
+	return retVal;
+}
+
+void* peekHeadFromForwardList(const forward_list** list) {
+	return isForwardListEmpty(*list) ? NULL : (*list)->pointer;
+}
+
+bool isForwardListEmpty(const forward_list** list) {
 	return (*list) == NULL;
 }
 
-int getForwardListSize(const ForwardList** list) {
-	ForwardList* tmp = *list;
+int getForwardListSize(const forward_list** list) {
+	forward_list* tmp = *list;
 	int retVal = 0;
 	while (tmp != NULL) {
 		retVal++;
@@ -178,18 +136,46 @@ int getForwardListSize(const ForwardList** list) {
 	return retVal;
 }
 
-void* popHeadFromList(ForwardList** list) {
-	if (isForwardListEmpty(*list)) {
+forward_list* getTailInForwardList(const forward_list** list) {
+	forward_list* tmp = *list;
+
+	if (tmp == NULL) {
 		return NULL;
 	}
-	ForwardList* tmp = (*list);
-
-	void* retVal = (*list)->pointer;
-	*list = (*list)->next;
-	free(tmp);
-	return retVal;
+	while (true) {
+		if (tmp->next == NULL) {
+			return tmp;
+		}
+		tmp = tmp->next;
+	}
 }
 
-void* peekHeadFromForwardList(const ForwardList** list) {
-	return isForwardListEmpty(*list) ? NULL : (*list)->pointer;
+void appendForwardListToTail(forward_list** dest, const forward_list** src) {
+	forward_list* destTail = getTailInForwardList(*dest);
+	forward_list* tmp = src;
+
+	destTail->next = src;
+}
+
+void clearForwardList(forward_list** toClear) {
+	forward_list* tmp = *toClear;
+	forward_list* tmp2 = NULL;
+	while (tmp != NULL) {
+		tmp2 = tmp->next;
+		free(tmp);
+		tmp = tmp2;
+	}
+	*toClear = NULL;
+}
+
+void clearForwardListWithElements(forward_list** toClear, destructor d) {
+	forward_list* tmp = *toClear;
+	forward_list* tmp2 = NULL;
+	while (tmp != NULL) {
+		tmp2 = tmp->next;
+		d(tmp->pointer);
+		free(tmp);
+		tmp = tmp2;
+	}
+	*toClear = NULL;
 }
