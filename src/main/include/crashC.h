@@ -1,3 +1,41 @@
+/**
+ * \file crashC.h
+ *
+ * TEST CASE
+ * ---------
+ *
+ * Test cases are particularly important sections: they serve as entry points for all our tests. They need:
+ * 	\li a cycle: if there multiple WHEN clauses, we need to rerun their body until all the when clauses are run. This requires a cycle;
+ * 	\li a function definition: test cases are not defined inside the main, so the only alternative is that they are functions. Why they can't be inside the main?
+ * 		Because otherwise we would need to have "}" at the end of all the test cases. But with macro programming you can't simply do that (we may tell the user
+ * 		to write the "}" by himself, but that would add boilerplate code to the test case, code that we do not want to add.
+ *
+ * Ok, how can we add a function definition that compiles? Remember: you can't add anything after you put the "{ ... }" of the test case.
+ * The idea is simple: the test is a function and the "{ ... }" is its body. However in this way we can't have the cycle, cycle that we need to deal
+ * with the when clauses. The solution is to have for every test, <b>2 functions</b>: "{...}" is  the body of the second function whilst the first function
+ * is defined before the second one, like this:
+ *
+ * @code
+ *
+ * TESTCASE ("tc1", "important") {
+ * 	//our beatiful tests
+ * }
+ *
+ * //this becomes
+ *
+ * void test_1a() {
+ * 	LOOPER(...) {
+ * 		test_1b();
+ * 	}
+ * }
+ *
+ * void test_1b() {
+ * 	//our beatiful tests
+ * }
+ *
+ * @endcode
+ */
+
 #ifndef CRASHC_H_
 #define CRASHC_H_
 
@@ -13,6 +51,22 @@
  */
 #ifndef CC_TAGS_SEPARATOR
 #	define CC_TAGS_SEPARATOR ' '
+#endif
+
+/**
+ * Represents a default test main you can use to quickly run your tests with default functionalities
+ */
+#ifndef CC_AUTOMAIN
+#	define CC_AUTOMAIN int main(int argc, const char* argv[]){											\
+		return defaultMain(argc, argv);																	\
+}
+#endif
+
+/**
+ * Callback executed when a malloc returns NULL
+ */
+#ifndef MALLOCERRORCALLBACK
+#	define MALLOCERRORCALLBACK() exit(1)
 #endif
 
 /**
@@ -185,7 +239,6 @@ typedef struct Section {
 	 */
 	bool accessGranted;
 
-	//STRUCTURE USED ONLY FOR CONTAINABLE SECTION IMPLEMENTATIONS
 	/**
 	 * queue used to check which child section has to be executed next.
 	 *
@@ -216,7 +269,7 @@ typedef struct Section {
 	 * \todo however, the structure will fail if inside the test case there are 2 different section level (ie. 2 whens and 1 then)
 	 */
 	struct SectionCell* sectionToRunList;
-	//END
+
 
 	///the parent of this section in the tree. May be NULL
 	struct Section* parent;
@@ -238,6 +291,12 @@ typedef struct SectionCell {
 
 typedef SectionCell SectionList;
 
+/**
+ * Callback representing a general condition that determine if we can access to a particular section
+ *
+ * the parameter is the section to check whilst the return value is
+ * true if the software grant us access to the section, false otherwise
+ */
 typedef bool (*condition_section)(Section*);
 typedef void (*AfterExecutedSectionCallBack)(Section** parentPosition, Section* child);
 typedef void (*BeforeStartingSectionCallBack)(Section* sectionGranted);
@@ -245,7 +304,7 @@ typedef void (*BeforeStartingSectionCallBack)(Section* sectionGranted);
 /**
  * global variable representing the root of the section tree
  */
-Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
+extern Section rootSection;
 /**
  * global variable representing what is the section we're analyzing right now.
  *
@@ -257,12 +316,8 @@ Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
  * this variable is reset to point then 1 ::Section. Then, when you return to when2 to execute the code between then1 and then2, this variable
  * is set again in a way to point "when2".
  */
-Section* currentSection = NULL;
+extern Section* currentSection;
 
-/**
- * Callback executed when a malloc returns NULL
- */
-#define MALLOCERRORCALLBACK() exit(1)
 
 /**
  * Initialize a list of sections
@@ -362,49 +417,90 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
  * The function will destory all the sections which have parent (directly or indirectly) \c section.
  * Formally, the function will free from the memory the subtree generate by \c section (\c section included).
  *
+ * There is only a ::Section that won't be freed by this functions: all the sections with ::Section::levelId set to 0 won't be touched.
+ * Normally this isn't a problem because there is only one ::Section with such an id: ::rootSection. The rationale is that such variable is global one
+ * allocated in the \b stack, so freeing such a variable is illegal.
+ *
  * @param[in] the section to free
  */
 void destroySection(Section* section);
-void printSectionData(Section* section, bool recursive);
-bool areWeComputingChildren(Section* section);
+/**
+ * @param[in] section the section to analyze
+ * @return true if we're still computing the number of children of \c section, false otheriwse
+ */
+bool areWeComputingChildren(const Section* section);
+/**
+ * Function to run in the access cycle
+ *
+ * ::CONTAINABLESECTION is composed by 2 loops: the most inner one is the <b>access cycle</b> that checks if we can actually enter in the section
+ * or not. The for is implementing an "if" condition with the added feature to execute call code at the end. This function has to be called inside
+ * the condition check of the for loop and ensures the loop behaves like an if: this is necessary because for loops condition has to be checked twice: one
+ * to check if we can access to the section and one (if we have entered inside the loop) to exit from the loop itself
+ *
+ * @param[in] section the section we want to access in
+ * @param[in] cs the condition we need to satisfy in order to access the section
+ * @param[in] callback the code to execute if the system grant us access to the section. Note that in this way the code is called \b before entering in the section
+ */
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback);
+/**
+ * Function supposed to run in the parentSwitcher cycle
+ *
+ * ::CONTAINABLESECTION is a 2 nested cycle. The outermost is the <b>parent switcher</b>, allowing you to return to the section parent
+ * after you have analyzed the section (analyzed doesn't mean access to the section, but merely check the access).
+ * Just like ::runOnceAndCheckAccessToSection, we model the if with a for loop. Since the for loop condition is run twice, we need to ensure the
+ * first call is always true whilst the second one is always false (this ensure the "if" behaviour"). Moreover we want to perform additional
+ * code.
+ *
+ * @param[in] section the section we want to fetch the associated parent from
+ * @param[in] pointerToSetAsParent a pointer that we has to set to <tt>section->parent</tt> in this call. <b>This has to be done by exactly one of the callbacks</b>
+ * @param[in] callback function always called after we have check the access to the section: if we have access, this function is called \b after we entered inside the section source code
+ * @param[in] accessGrantedCallback function called \b afrer \c callback if the software has entered in the section source code
+ * @param[in] accessDeniedCallback function called \b afrer \c callback if the software hasn't entered in the section source code
+ */
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback);
-bool haveWeRunEverythingInSection(Section* section);
+/**
+ * @param[in] section involved
+ * @return True if the source code section has been executed at least once
+ */
+bool haveWeRunEverythingInSection(const Section* section);
+/**
+ * @param[in] section the section involved
+ * @return true if we have executed at least once every <b>direct</b> children of this section
+ */
 bool haveWeRunEveryChildrenInSection(Section* section);
+/**
+ * Mark the section as \b executed
+ *
+ * @param[in] section the section to mark
+ */
 void markSectionAsExecuted(Section* section);
+/**
+ * @param[in] parent the section containing the one we're creating. For example if we're in the test code of <tt>TESTCASE</tt> and we see a  <tt>WHEN</tt> clause
+ * 				this attribute is set to the metadata representing <tt>TESTCASE</tt>.
+ * @param[in] sectionLevelId the level the children is located
+ * @param[in] decription a brief string explaining what this section is and does
+ * @param[in] tags a list of tags. See \ref tags for further information
+ * @return
+ * 	\li a newly created section if we're still computing the children of \c parent
+ * 	\li the ::Section::currentChild -th child of \c parent otherwise
+ */
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags);
+/**
+ * Removed from memory a previously created tag
+ *
+ * @param[in] tag the tag to destroy
+ */
 void destroyTag(Tag* tag);
-
+/**
+ * compute the has of a string
+ *
+ * \note
+ * we use djb2 algorithm, described <a href="http://www.cse.yorku.ca/~oz/hash.html">here</a>
+ *
+ * @param[in] str the string whose has we need to compute
+ * @return the has of the string
+ */
 int hash(const char* str);
-void populateTagsHT(Section* section, const char* tags, char separator);
-
-bool getAlwaysTrue(Section* section);
-bool getAccessOnlyIfNotInBlackList(Section* section);
-
-void addSectionInTailSectionList(SectionCell** list, Section* section) {
-	SectionCell* toAdd = malloc(sizeof(SectionCell));
-	if (toAdd == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	toAdd->section = section;
-	toAdd->next = NULL;
-	printf("leak %s\n", section->description);
-
-	SectionCell* tmp = *list;
-	SectionCell** position = list;
-	while (tmp != NULL) {
-		position = &tmp->next;
-		tmp = tmp->next;
-	}
-	*position = toAdd;
-}
-
-void destroyTag(Tag* tag) {
-	free(tag->name);
-	free(tag);
-}
-
 /**
  * Given a string \c tags, the function will populate the hash table in \c section with all
  * the tags inside \c tags
@@ -418,245 +514,59 @@ void destroyTag(Tag* tag) {
  * @param[in] tags a string containing "separator"-separated substring, each of them representing a tag
  * @param[in] separator a character dividing 2 tags in string \c tags
  */
-void populateTagsHT(Section* section, const char* tags, char separator) {
-	char token[100];
-	char* positionToWriteInBuffer = NULL;
-	int tokenId;
-	Tag* tag;
+void populateTagsHT(Section* section, const char* tags, char separator);
 
-	//i don't want to use strtok because it may be used inside the functions to test: i don't want to mess with their strtok starte
-	while(*tags != '\0') {
-
-		//fetch a tag inside tags
-		positionToWriteInBuffer = token;
-		while((*tags != separator) && (*tags != '\0')) {
-			*positionToWriteInBuffer = *tags;
-			positionToWriteInBuffer++;
-			tags++;
-		}
-		*positionToWriteInBuffer = '\0';
-		if (*tags != '\0') {
-			//if we've not reached the end we need to go to the next tag
-			tags++;
-		}
-
-		tokenId = hash(token);
-		HASH_FIND_INT(section->tags, &tokenId, tag);
-		if (tag == NULL) {
-			tag = malloc(sizeof(Tag));
-			if (tag == NULL) {
-				MALLOCERRORCALLBACK();
-			}
-			tag->id = tokenId;
-			tag->name = strdup(token);
-			HASH_ADD_INT(section->tags, id, tag);
-		}
-	}
-}
+///\defgroup accessConditions function that can be used as ::condition_section
+///@{
 
 /**
- * compute the has of a string
+ * Grants always access
  *
- * \note
- * we use djb2 algorithm, described <a href="http://www.cse.yorku.ca/~oz/hash.html">here</a>
+ * @param[in] section the section involved
+ */
+bool getAlwaysTrue(Section* section);
+/**
+ * Grant access only to one section type per ::LOOPER loop
  *
- * @param[in] str the string whose has we need to compute
- * @return the has of the string
- */
-int hash(const char* str) {
-	unsigned int hash = 5381;
-	int c;
-
-	while ((c = *str++))
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-	return hash;
-}
-
-void printSectionData(Section* section, bool recursive) {
-	fprintf(stdout, "****************\ndescription=%s\nparent=%s\nchildrenNumber=%d\nchildrenNumberComputed=%s\nexecuted=%s\ncurrentChild=%d\nloop1=%s\n",
-			section->description,
-			(section->parent != NULL ? section->parent->description : "<none>"),
-			section->childrenNumber,
-			(section->childrenNumberComputed ? "yes" : "no"),
-			(section->executed ? "yes" : "no"),
-			section->currentChild,
-			(section->loop1 ? "yes" : "no")
-	);
-
-	if (recursive && section->firstChild != NULL)
-		printSectionData(section->firstChild, recursive);
-
-	if (recursive && section->nextSibling != NULL) {
-		printSectionData(section->nextSibling, recursive);
-	}
-}
-
-bool areWeComputingChildren(Section* section) {
-	return !section->childrenNumberComputed;
-}
-
-bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
-	if (section->loop1) {
-		return true;
-	}
-	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).
-	//in order to use the previously pointed structure we copy the child pointer. As for pointerToSetAsParent, we can do nothing since it will be changed nonetheless
-	Section* _child = section;
-	callback(pointerToSetAsParent, section);
-	if (section->accessGranted) {
-		accessGrantedCallback(pointerToSetAsParent, _child);
-	} else {
-		accessDeniedCallback(pointerToSetAsParent, _child);
-	}
-	return false;
-}
-
-//possible ::runOnceAndDoWorkAtEnd callbacks
-
-void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {
-	//we finish a section. we return to the parent
-	*pointerToSetAsParent = section->parent;
-	//we go to the next sibling of child
-	(*pointerToSetAsParent)->currentChild += 1;
-}
-
-void doWorkAtEndCallbackChildrenNumberComputed(Section** pointerToSetAsParent, Section* section) {
-	//we executed the section. Hence we can safely say we know the child number of such section
-	if (!section->childrenNumberComputed) {
-		section->childrenNumberComputed = true;
-	}
-	section->currentChild = 0;
-}
-
-void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Section* section) {
-	//we executed the section. Hence we can safely say we know the child number of such section
-	if (section->parent->childrenNumberComputed) {
-		//since childrenNumberComputed is not false, that means that we are executing the cycle at least the second time. Hence
-		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
-		//in order to do it, we pop the end after we executed the last children
-		if (section->nextSibling == NULL) {
-			popHeadSectionInSectionList(&(section->parent->sectionToRunList));
-		}
-	}
-}
-
-void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(Section** pointerToSetAsParent, Section* section) {
-	doWorkAtEndCallbackUpdateSectionToRun(pointerToSetAsParent, section);
-	doWorkAtEndCallbackChildrenNumberComputed(pointerToSetAsParent, section);
-}
-
-void doWorkAtEndCallbackResetContainer(Section** pointerToSetAsParent, Section* child) {
-	//we finished a section. Hence now we know the number of children that section have
-	child->childrenNumberComputed = true;
-	child->currentChild = 0;
-}
-
-void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {
-	//in the first cycle, when we're trying to compute the number of children of the parent, we also initialize the sectionToRunList
-	if (!section->parent->childrenNumberComputed) {
-		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
-		if (section->parent->currentChild > 0) {
-			addSectionInTailSectionList(&(section->parent->sectionToRunList), section);
-		}
-	}
-
-	doWorkAtEndCallbackGoToParentAndThenToNextSibling(pointerToSetAsParent, section);
-}
-
-void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section) {
-
-}
-
-//END
-
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
-	if (!section->loop2) {
-		return false;
-	}
-	section->accessGranted = cs(section);
-	if (section->accessGranted) {
-		callback(section);
-	}
-	return section->accessGranted;
-}
-
-//possible condition_section filters
-
-/**
- * Grants always access to \c section
- */
-bool getAlwaysTrue(Section* section) {
-	return true;
-}
-
-/**
  * Grant access only if:
- * \li we're still computing the number of children and we are in the fuirst children;
+ * \li we're still computing the number of children and we are in the first children;
  * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
  */
-bool getAccessSequentially(Section* section) {
-	if (section->parent == NULL) {
-		return true;
-	}
+bool getAccessSequentially(Section* section);
 
-	if (section->parent->childrenNumberComputed == false) {
-		return (section->parent->currentChild == 0);
-	}
+///@}
 
-	if (peekSectionInHeadSectionList(&(section->parent->sectionToRunList)) == section) {
-		return true;
-	}
+int defaultMain(int argc, const char* argv[]);
+void addSectionInTailSectionList(SectionCell** list, Section* section);
 
-	return false;
-}
+///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
+///@{
+
+void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackChildrenNumberComputed(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackResetContainer(Section** pointerToSetAsParent, Section* child);
+void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section);
+
+///@}
+
+///\defgroup accessGrantedCallBack callbacks that can be used as accessGrantedCallBack in ::BeforeStartingSectionCallBack
+///@{
+
+/**
+ * Does nothing
+ */
+void callbackDoNothing(Section* section);
+
+///@}
 
 //END
 
-//accessGrantedCallBack callbacks
-
-void callbackDoNothing(Section* section) {
-}
-
-//END
-
-bool haveWeRunEverythingInSection(Section* section) {
-	return section->executed;
-}
-
-bool haveWeRunEveryChildrenInSection(Section* section) {
-	if (areWeComputingChildren(section)) {
-		return false;
-	}
-	if (section->firstChild == NULL) {
-		return true;
-	}
-
-	if (!haveWeRunEverythingInSection(section->firstChild)) {
-		return false;
-	}
-
-	Section* tmp = section->firstChild->nextSibling;
-	while (tmp != NULL) {
-		if (!haveWeRunEverythingInSection(tmp)) {
-			return false;
-		}
-		tmp = tmp->nextSibling;
-	}
-	return true;
-}
-
-void markSectionAsExecuted(Section* section) {
-	section->executed = true;
-}
-
-Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
-	if (areWeComputingChildren(parent)) {
-		parent->childrenNumber += 1;
-		return addSectionToParent(initSection(sectionLevelId, decription, tags), parent);
-	}
-	return getNSection(parent, parent->currentChild);
-}
-
+/**
+ * Main macro of the test suite
+ */
 #define CONTAINABLESECTION(parent, sectionLevelId, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
@@ -693,6 +603,20 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 
 #define NOCODE
 
+/**
+ * Represents a macro that defines a function
+ */
+#define TEST_FUNCTION(testFunctionName)																							\
+	void testFunctionName()
+
+/**
+ * Register a function defined by ::TEST_FUNCTION
+ *
+ * In my knowledge, it's impossible to auto register a function in C with macro programming.
+ * From this assumption, we need to register in some way a function. This macro allows to mask the register itself.
+ */
+#define REGISTER_FUNCTION(testFunctionName)
+
 #define LOOPER(parent, sectionLevelId, description, tags)																				\
 		CONTAINABLESECTION(																												\
 				parent, sectionLevelId, description, tags,																				\
@@ -709,6 +633,9 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 
 #define TESTCASE(description, tags) LOOPER(&rootSection, 1, description, tags)
 #define EZ_TESTCASE(description) TESTCASE(description, "")
+
+//#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
+//#define EZ_TESTCASE(description) TESTCASE(description, "")
 
 #define ALWAYS_ENTER(sectionLevelId, description, tags) CONTAINABLESECTION(																\
 		currentSection, sectionLevelId, description, tags,																				\
