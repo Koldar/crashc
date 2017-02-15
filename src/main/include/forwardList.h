@@ -32,12 +32,12 @@ typedef void (*destructor)(void*);
 /**
  * A structure representing a generic list
  */
-typedef struct ForwardCell {
+typedef struct forward_cell {
 	void* pointer;
-	struct ForwardCell* next;
-} ForwardCell;
+	struct forward_cell* next;
+} forward_cell;
 
-typedef ForwardCell forward_list;
+typedef forward_cell forward_list;
 
 /**
  * Creates a new empty list
@@ -63,13 +63,18 @@ void destroyForwardListWithElements(forward_list** list, destructor d);
 /**
  * Adds an element to the head of the list
  *
- * \todo make it accept ForwardList**
+ * @param[inout] list the list invovled
+ * @param[in] pointer the variable to add to the list
+ */
+void addHeadInForwardList(forward_list** list, const void* pointer);
+
+/**
+ * Adds an element to the tail of the list
  *
  * @param[inout] list the list invovled
  * @param[in] pointer the variable to add to the list
- * @return the new head of \c list
  */
-void addHeadInForwardList(forward_list** list, const void* pointer);
+void addTailInForwardList(forward_list** list, const void* pointer);
 
 /**
  * Find an element inside the list
@@ -166,7 +171,7 @@ int getForwardListSize(const forward_list** list);
  * @param[in] list the list involved
  * @return a ::ForwardList structure representing the last element of the \c list; NULL if the list is actually empty
  */
-forward_list* getTailInForwardList(const forward_list** list);
+void* getTailInForwardList(const forward_list** list);
 
 /**
  * Appends \c src list to the tail of \c dest

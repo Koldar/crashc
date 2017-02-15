@@ -9,6 +9,8 @@
 #include "forwardList.h"
 #include "errors.h"
 
+static forward_cell* getTailCellInForwardList(const forward_list** list);
+
 forward_list* initForwardList() {
 	forward_list* retVal = (forward_list*) NULL;
 	return retVal;
@@ -52,8 +54,31 @@ void addHeadInForwardList(forward_list** list, const void* pointer) {
 	*list = newElement;
 }
 
+void addTailInForwardList(forward_list** list, const void* pointer) {
+	forward_list* newElement = (forward_list*)malloc(sizeof(forward_list));
+	if (newElement == NULL) {
+		MALLOCERRORCALLBACK();
+	}
+
+	newElement->pointer = pointer;
+	newElement->next = NULL;
+
+	forward_list* tmp = *list;
+	if (tmp == NULL) {
+		*list = newElement;
+		return;
+	}
+	while (true) {
+		if (tmp->next == NULL) {
+			tmp->next = newElement;
+			return;
+		}
+		tmp = tmp->next;
+	}
+}
+
 void* findInForwardList(forward_list** list, comparator c) {
-	ForwardCell* tmp = *list;
+	forward_cell* tmp = *list;
 	while (tmp != NULL) {
 		if (c(tmp->pointer) == true) {
 			return tmp->pointer;
@@ -65,7 +90,7 @@ void* findInForwardList(forward_list** list, comparator c) {
 
 bool removeFindInForwardList(forward_list** list, comparator c) {
 	forward_list* prevComponent = NULL;
-	ForwardCell* tmp = *list;
+	forward_cell* tmp = *list;
 
 	while (tmp != NULL) {
 		if (c(tmp->pointer) == true) {
@@ -86,7 +111,7 @@ bool removeFindInForwardList(forward_list** list, comparator c) {
 
 bool removeFindWithElementInForwardList(forward_list** list, comparator c, destructor d) {
 	forward_list* prevComponent = NULL;
-	ForwardCell* tmp = *list;
+	forward_cell* tmp = *list;
 
 	while (tmp != NULL) {
 		if (c(tmp->pointer) == true) {
@@ -136,22 +161,13 @@ int getForwardListSize(const forward_list** list) {
 	return retVal;
 }
 
-forward_list* getTailInForwardList(const forward_list** list) {
-	forward_list* tmp = *list;
-
-	if (tmp == NULL) {
-		return NULL;
-	}
-	while (true) {
-		if (tmp->next == NULL) {
-			return tmp;
-		}
-		tmp = tmp->next;
-	}
+void* getTailInForwardList(const forward_list** list) {
+	forward_cell* tail = getTailCellInForwardList(list);
+	return tail != NULL ? tail->pointer : NULL;
 }
 
 void appendForwardListToTail(forward_list** dest, const forward_list** src) {
-	forward_list* destTail = getTailInForwardList(*dest);
+	forward_list* destTail = getTailCellInForwardList(*dest);
 	forward_list* tmp = src;
 
 	destTail->next = src;
@@ -178,4 +194,18 @@ void clearForwardListWithElements(forward_list** toClear, destructor d) {
 		tmp = tmp2;
 	}
 	*toClear = NULL;
+}
+
+static forward_cell* getTailCellInForwardList(const forward_list** list) {
+	forward_list* tmp = *list;
+
+	if (tmp == NULL) {
+		return NULL;
+	}
+	while (true) {
+		if (tmp->next == NULL) {
+			return tmp;
+		}
+		tmp = tmp->next;
+	}
 }
