@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void __assert_fail(Section* section, const char* expr, const char* file, const int line) {
-	fprintf(stderr, "%s:%d the expression \"%s\" failed.", file, line, expr);
+void __assert(Section* section, const char* expr, const char* file, const int line, const bool outcome) {
+	//TODO add stop at first error
+	addTailInForwardList(&(section->assertionReportList), initTestReport(file, line, expr, outcome));
+	if (!outcome) {
+		fprintf(stderr, "%s:%d the expression \"%s\" failed.\n", file, line, expr);
+	}
 }

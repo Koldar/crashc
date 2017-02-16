@@ -3,94 +3,7 @@
 Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
 
-static void printSectionData(const Section* section, bool recursive);
 
-Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
-	Section* r = NULL;
-	Section* list = NULL;
-
-	toAdd->parent = parent;
-
-	list = parent->firstChild;
-	if (list == NULL) {
-		parent->firstChild = toAdd;
-		return toAdd;
-	}
-	while (true) {
-		if (list->nextSibling != NULL) {
-			list = list->nextSibling;
-		} else {
-			list->nextSibling = toAdd;
-			return toAdd;
-		}
-	}
-}
-
-Section* getNSection(const Section* parent, int nChild) {
-	Section* list = parent->firstChild;
-	while(true) {
-		if ((nChild == 0) || (list == NULL)) {
-			return list;
-		} else {
-			list = list->nextSibling;
-			nChild--;
-		}
-	}
-}
-
-
-Section* initSection(SectionLevelId levelId, const char* description, const char* tags) {
-	Section* retVal = malloc(sizeof(Section));
-	if (retVal == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	retVal->accessGranted = false;
-	retVal->childrenNumber = 0;
-	retVal->childrenNumberComputed = false;
-	retVal->executed = false;
-	retVal->currentChild = 0;
-	retVal->description = strdup(description);
-	retVal->firstChild = NULL;
-	retVal->levelId = levelId;
-	retVal->loopId = 0;
-	retVal->sectionToRunList = initForwardList();
-	retVal->loop1 = false;
-	retVal->nextSibling = NULL;
-	retVal->parent = NULL;
-	retVal->tags = NULL;
-
-	populateTagsHT(retVal, tags, ' ');
-
-	return retVal;
-}
-
-void destroySection(Section* section) {
-	if (section->firstChild != NULL) {
-		destroySection(section->firstChild);
-	}
-	if (section->nextSibling != NULL) {
-		destroySection(section->nextSibling);
-	}
-	if (section->levelId <= 0) {
-		//root section shouldn't be removed at all
-		return;
-	}
-
-	Tag* current;
-	Tag* tmp;
-	HASH_ITER(hh, section->tags, current, tmp) {
-		HASH_DEL(section->tags, current);
-		destroyTag(current);
-	}
-	destroyForwardListWithElements(&section->sectionToRunList, destroySection);
-	free(section->description);
-	free(section);
-}
-
-bool areWeComputingChildren(const Section* section) {
-	return !section->childrenNumberComputed;
-}
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
 	if (!section->loop2) {
@@ -119,47 +32,12 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 	return false;
 }
 
-bool haveWeRunEverythingInSection(const Section* section) {
-	return section->executed;
-}
-
-bool haveWeRunEveryChildrenInSection(Section* section) {
-	if (areWeComputingChildren(section)) {
-		return false;
-	}
-	if (section->firstChild == NULL) {
-		return true;
-	}
-
-	if (!haveWeRunEverythingInSection(section->firstChild)) {
-		return false;
-	}
-
-	Section* tmp = section->firstChild->nextSibling;
-	while (tmp != NULL) {
-		if (!haveWeRunEverythingInSection(tmp)) {
-			return false;
-		}
-		tmp = tmp->nextSibling;
-	}
-	return true;
-}
-
-void markSectionAsExecuted(Section* section) {
-	section->executed = true;
-}
-
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
 		return addSectionToParent(initSection(sectionLevelId, decription, tags), parent);
 	}
 	return getNSection(parent, parent->currentChild);
-}
-
-void destroyTag(Tag* tag) {
-	free(tag->name);
-	free(tag);
 }
 
 int hash(const char* str) {
@@ -173,42 +51,6 @@ int hash(const char* str) {
 
 bool getAlwaysTrue(Section* section) {
 	return true;
-}
-
-void populateTagsHT(Section* section, const char* tags, char separator) {
-	char token[100];
-	char* positionToWriteInBuffer = NULL;
-	int tokenId;
-	Tag* tag;
-
-	//i don't want to use strtok because it may be used inside the functions to test: i don't want to mess with their strtok starte
-	while(*tags != '\0') {
-
-		//fetch a tag inside tags
-		positionToWriteInBuffer = token;
-		while((*tags != separator) && (*tags != '\0')) {
-			*positionToWriteInBuffer = *tags;
-			positionToWriteInBuffer++;
-			tags++;
-		}
-		*positionToWriteInBuffer = '\0';
-		if (*tags != '\0') {
-			//if we've not reached the end we need to go to the next tag
-			tags++;
-		}
-
-		tokenId = hash(token);
-		HASH_FIND_INT(section->tags, &tokenId, tag);
-		if (tag == NULL) {
-			tag = malloc(sizeof(Tag));
-			if (tag == NULL) {
-				MALLOCERRORCALLBACK();
-			}
-			tag->id = tokenId;
-			tag->name = strdup(token);
-			HASH_ADD_INT(section->tags, id, tag);
-		}
-	}
 }
 
 void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {

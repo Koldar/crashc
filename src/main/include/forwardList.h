@@ -26,8 +26,8 @@
  * The function has 1 parameter:
  * \li the pointer we're currently testing and it changes every time we fetch a new value from the list we're currently searching in;
  */
-typedef bool (*comparator)(void*);
-typedef void (*destructor)(void*);
+typedef bool comparator(void*);
+typedef void destructor(void*);
 
 /**
  * A structure representing a generic list
@@ -215,15 +215,19 @@ void clearForwardList(forward_list** toClear);
  */
 void clearForwardListWithElements(forward_list** toClear, destructor d);
 
-#define FL_SAFE_ITER(list, el, supportEl)					\
-	for (													\
-			el=*list,										\
-			supportEl = (el != NULL ? el->next : NULL)		\
-			;												\
-			el != NULL										\
-			;												\
-			el=supportEl,									\
-			supportEl = (el != NULL ? el->next : NULL)		\
+#define EL_VARNAME(prefix, el) prefix ## el ## __func__ ## __LINE__
+#define FL_SAFE_ITER(list, el)																\
+	for (																					\
+			forward_list																	\
+			*EL_VARNAME(fl, el) = *(list),														\
+			*EL_VARNAME(flsp, el) = (EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->next : NULL),							\
+			el = (*(list)) != NULL ? (*(list))->pointer : NULL									\
+			;																				\
+			EL_VARNAME(fl, el) != NULL															\
+			;																				\
+			EL_VARNAME(fl, el) = EL_VARNAME(flsp, el),											\
+			EL_VARNAME(flsp, el) = EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->next : NULL,		\
+			el = VARNAME(fl, el)->pointer													\
 	)
 
 #endif /* FORWARDLIST_H_ */
