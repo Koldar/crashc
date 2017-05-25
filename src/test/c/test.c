@@ -7,6 +7,7 @@
 
 #include "crashC.h"
 #include "assertions.h"
+#include "reportProducer.h"
 #include <string.h>
 
 
@@ -177,6 +178,8 @@ int main(int argc, const char* argv[]) {
 
 	printf("DONE\n");
 	//printSectionData(&rootSection, true);
+
+	produceReport(consoleProducer, &rootSection);
 
 	destroySection(&rootSection);
 	return 0;

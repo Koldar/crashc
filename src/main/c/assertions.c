@@ -12,8 +12,10 @@
 
 void __assert(Section* section, const char* expr, const char* file, const int line, const bool outcome) {
 	//TODO add stop at first error
-	addTailInForwardList(&(section->assertionReportList), initTestReport(file, line, expr, outcome));
+	TestReport* tr = initTestReport(file, line, expr, outcome);
+	addTailInForwardList(&(section->assertionReportList), tr);
 	if (!outcome) {
+		addTailInForwardList(&(section->failureReportList), tr);
 		fprintf(stderr, "%s:%d the expression \"%s\" failed.\n", file, line, expr);
 	}
 }

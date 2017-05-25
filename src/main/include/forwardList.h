@@ -216,18 +216,18 @@ void clearForwardList(forward_list** toClear);
 void clearForwardListWithElements(forward_list** toClear, destructor d);
 
 #define EL_VARNAME(prefix, el) prefix ## el ## __func__ ## __LINE__
-#define FL_SAFE_ITER(list, el)																\
-	for (																					\
-			forward_list																	\
-			*EL_VARNAME(fl, el) = *(list),														\
-			*EL_VARNAME(flsp, el) = (EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->next : NULL),							\
-			el = (*(list)) != NULL ? (*(list))->pointer : NULL									\
-			;																				\
-			EL_VARNAME(fl, el) != NULL															\
-			;																				\
-			EL_VARNAME(fl, el) = EL_VARNAME(flsp, el),											\
+#define FL_SAFE_ITER(list, el)																			\
+	el = (*(list)) != NULL ? (*(list))->pointer : NULL;													\
+	for (																								\
+																										\
+			forward_list *EL_VARNAME(fl, el) = *(list),													\
+			*EL_VARNAME(flsp, el) = (EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->next : NULL)		\
+			;																							\
+			EL_VARNAME(fl, el) != NULL																	\
+			;																							\
+			EL_VARNAME(fl, el) = EL_VARNAME(flsp, el),													\
 			EL_VARNAME(flsp, el) = EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->next : NULL,		\
-			el = VARNAME(fl, el)->pointer													\
+			el = EL_VARNAME(fl, el) != NULL ? EL_VARNAME(fl, el)->pointer : el							\
 	)
 
 #endif /* FORWARDLIST_H_ */

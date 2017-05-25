@@ -201,6 +201,10 @@ typedef struct Section {
 	 * A list containing all the assertions inside this section
 	 */
 	TestReportList* assertionReportList;
+	/**
+	 * A list containing all the failures inside ::Section::assertionReportList
+	 */
+	TestReportList* failureReportList;
 
 
 	///the parent of this section in the tree. May be NULL

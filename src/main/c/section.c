@@ -57,6 +57,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
+	retVal->failureReportList = initForwardList();
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
 	retVal->sectionToRunList = initForwardList();
@@ -88,6 +89,7 @@ void destroySection(Section* section) {
 		HASH_DEL(section->tags, current);
 		destroyTag(current);
 	}
+	destroyForwardList(&section->failureReportList);
 	destroyForwardListWithElements(&section->sectionToRunList, destroySection);
 	destroyForwardListWithElements(&section->assertionReportList, destroyTestReport);
 	free(section->description);
