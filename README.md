@@ -3,9 +3,9 @@
 Building
 --------
 
-    mkdir -p build/Debug
-    cd build/Debug
-    cmake ../..
+    mkdir -p build
+    cd build
+    cmake ..
     make
     #launch tests
     ./Test
