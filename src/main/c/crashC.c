@@ -32,6 +32,11 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 	return false;
 }
 
+/** If we are still computing the children of the given parent section the function
+ *  creates a new section with the given levelId, description,tags and adds it to its
+ *  parent section and returns a pointer to the new section.
+ *  Else, the function returns a pointer to the currentChild of the given section.
+ */
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;

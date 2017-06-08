@@ -9,8 +9,14 @@
 
 static void printSectionData(const Section* section, bool recursive);
 
+
+/** Adds the given section as a children to the specified parent section.
+ *  The function also automatically reorganize the internal sections tree
+ *  by properly updating the involved nodes pointers.
+ *  Returns a pointer to the added section.
+ */
 Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
-	Section* r = NULL;
+	//NEVER USED - Section* r = NULL;
 	Section* list = NULL;
 
 	toAdd->parent = parent;
@@ -30,6 +36,8 @@ Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
 	}
 }
 
+/** Returns the n-th child of the given section or NULL if it has none.
+ */
 Section* getNSection(const Section* parent, int nChild) {
 	Section* list = parent->firstChild;
 	while(true) {
@@ -42,7 +50,10 @@ Section* getNSection(const Section* parent, int nChild) {
 	}
 }
 
-
+/** Initializes a new Section struct given its levelId, description and tags.
+ *  Other values are initialized to their default.
+ *  Returns a pointes to the newly created Section.
+ */
 Section* initSection(SectionLevelId levelId, const char* description, const char* tags) {
 	Section* retVal = malloc(sizeof(Section));
 	if (retVal == NULL) {
@@ -96,6 +107,9 @@ void destroySection(Section* section) {
 	free(section);
 }
 
+/** Checks whether we are still computing the number of a section's children and returns
+ *  true in this case, false otherwise.
+ */
 bool areWeComputingChildren(const Section* section) {
 	return !section->childrenNumberComputed;
 }
@@ -126,6 +140,9 @@ bool haveWeRunEveryChildrenInSection(Section* section) {
 	return true;
 }
 
+/** Marks the given section as already executed by setting
+ *  the struct appropriate boolean flag.
+ */
 void markSectionAsExecuted(Section* section) {
 	section->executed = true;
 }
@@ -165,4 +182,3 @@ void populateTagsHT(Section* section, const char* tags, char separator) {
 		}
 	}
 }
-

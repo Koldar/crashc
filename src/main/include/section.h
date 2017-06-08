@@ -155,7 +155,7 @@ typedef struct Section {
 	 *
 	 * The for loop is an excellent way to have, after a macro, "{ }" and to execute code after the actual "{ }" code content.
 	 * However, we need to call the for content only once. Since section are nested, we cannot define a counter to loop over otherwise
-	 * 2 nested section will generate a <c>varaible redefinition</b> compiler error. Hence we store the loop varaible inside the section itself.
+	 * 2 nested section will generate a <c>variable redefinition</c> compiler error. Hence we store the loop variable inside the section itself.
 	 */
 	bool loop1;
 	/**
