@@ -73,6 +73,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->loopId = 0;
 	retVal->sectionToRunList = initForwardList();
 	retVal->loop1 = false;
+	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
 	retVal->tags = NULL;

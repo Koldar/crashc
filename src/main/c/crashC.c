@@ -2,8 +2,19 @@
 
 Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
+test_pointer tests_array[MAX_TESTS];
+int suites_array_index = 0;
 
-
+/**
+ * This function registers a testsuite by storing its function pointer into
+ * the global array. The function automatically updates the variable used to
+ * keep track of the array dimension.
+ * TODO: Add control on duplicates testsuites
+ */
+void update_test_array(int id, test_pointer func) {
+    tests_array[array_index] = func;
+    array_index++;
+}
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
 	if (!section->loop2) {
