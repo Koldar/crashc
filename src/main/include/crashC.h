@@ -46,7 +46,6 @@
 
 #include "errors.h"
 #include "uthash.h"
-#include "forwardList.h"
 #include "section.h"
 
 /**
@@ -200,6 +199,9 @@ void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Secti
 void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(Section** pointerToSetAsParent, Section* section);
 void doWorkAtEndCallbackResetContainer(Section** pointerToSetAsParent, Section* child);
 void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section);
+/**
+ * Do absolutely nothing
+ */
 void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section);
 
 ///@}

@@ -10,10 +10,16 @@ int suites_array_index = 0;
  * the global array. The function automatically updates the variable used to
  * keep track of the array dimension.
  * TODO: Add control on duplicates testsuites
+ *
+ * TODO
+ * 	Understand why id is useful
+ *
+ * @param[in] id ignored parameter
+ * @param[in] func the function to register
  */
 void update_test_array(int id, test_pointer func) {
-    tests_array[array_index] = func;
-    array_index++;
+    tests_array[suites_array_index] = func;
+    suites_array_index++;
 }
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {

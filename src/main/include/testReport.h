@@ -11,7 +11,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "forwardList.h"
 #include "errors.h"
 
 typedef struct TestReport {
@@ -20,8 +19,6 @@ typedef struct TestReport {
 	const char* expr;
 	bool outcome;
 } TestReport;
-
-typedef forward_list TestReportList;
 
 /**
  * Creates a new test report

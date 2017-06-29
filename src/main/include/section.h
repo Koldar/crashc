@@ -9,7 +9,6 @@
 #define SECTION_H_
 
 #include <stdbool.h>
-#include "forwardList.h"
 #include "tag.h"
 #include "testReport.h"
 
@@ -200,11 +199,11 @@ typedef struct Section {
 	/**
 	 * A list containing all the assertions inside this section
 	 */
-	TestReportList* assertionReportList;
+	//TODO readd this TestReportList* assertionReportList;
 	/**
 	 * A list containing all the failures inside ::Section::assertionReportList
 	 */
-	TestReportList* failureReportList;
+	//TODO readd this TestReportList* failureReportList;
 
 
 	///the parent of this section in the tree. May be NULL
@@ -214,8 +213,6 @@ typedef struct Section {
 	///the next sibling this section has in the tree. May be NULL
 	struct Section* nextSibling;
 } Section;
-
-typedef forward_list SectionList;
 
 
 /**
