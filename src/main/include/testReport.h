@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
-
+#include "list.h"
 #include "errors.h"
 
 typedef struct TestReport {
@@ -19,6 +19,8 @@ typedef struct TestReport {
 	const char* expr;
 	bool outcome;
 } TestReport;
+
+typedef list TestReportList;
 
 /**
  * Creates a new test report

@@ -46,11 +46,10 @@ static void reportProducerRecursive(ReportProducerImplementation rpi, Section* s
 	}
 	if (sectionToDraw != root) {
 		//we print on the console only if the section involved is not the root (the root is a dummy section)
-		TestReport* el;
 		int i;
 
 		rpi.handleSectionStarted(sectionToDraw, depth);
-		FL_SAFE_ITER(&sectionToDraw->assertionReportList, el) {
+		ITERATE_ON_LIST(sectionToDraw->assertionReportList, cell, el, TestReport) {
 			rpi.handleAssertionStarted(el, depth);
 			rpi.handleAssertion(el, depth);
 			rpi.handleAssertionFinished(el, depth);
@@ -123,8 +122,7 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 		return;
 	}
 	if (sectionToDraw != root) {
-		//we print on the console only if the section involved is not the root (the root is a dummy section)
-		TestReport* el;
+		//we print on the console only if the section involved is not the root (the root is a dummy section
 		int i;
 
 
@@ -138,7 +136,7 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 						"%s:\n",
 						sectionToDraw->description
 		);
-		FL_SAFE_ITER(&sectionToDraw->failureReportList, el) {
+		ITERATE_ON_LIST(sectionToDraw->failureReportList, cell, el, TestReport) {
 			//TODO customize colors
 			fcprintf(stdout,
 					ANSI_COLOR_RED

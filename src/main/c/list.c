@@ -19,7 +19,7 @@ typedef struct list_cell {
 	void* payload;
 	///a pointer to the next element of the list. Can be NULL
 	struct list_cell* next;
-} list_cell;
+};
 
 typedef struct list {
 	///number of elements inside the list. Allows count operation to be O(1)
@@ -29,6 +29,18 @@ typedef struct list {
 	///pointer to the last element of the list. Can be NULL
 	list_cell* tail;
 };
+
+list_cell* getNextInListCell(const list_cell* cell) {
+	return cell->next;
+}
+
+void* getPayloadInListCell(const list_cell* cell) {
+	return cell->payload;
+}
+
+list_cell* getHeadInListCell(const list* l) {
+	return l->head;
+}
 
 list* initList() {
 	list* retVal = malloc(sizeof(list));

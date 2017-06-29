@@ -25,15 +25,23 @@
 
 #include "stdbool.h"
 #include <stdlib.h>
+#include "macros.h"
 
 
 typedef struct list list;
+typedef struct list_cell list_cell;
 
 /**
  * a list of integers.
  * Integers are stored inside the pointer to a structure itself
  */
 typedef list int_list;
+
+list_cell* getNextInListCell(const list_cell* cell);
+
+void* getPayloadInListCell(const list_cell* cell);
+
+list_cell* getHeadInListCell(const list* l);
 
 /**
  * Initialize a new list inside the memory.
@@ -169,21 +177,21 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
  */
 #define ITERATE_ON_LIST(_l, cell, _payload, type) \
 		list* UV(l) = (_l);\
-		list_cell* cell = UV(l)->head;\
+		list_cell* cell = getHeadInListCell(UV(l)); \
 		list_cell* UV(next) = NULL;\
 		type* _payload = NULL;\
-		if (UV(l)->head != NULL) {\
-			_payload = UV(l)->head->payload;\
-			if (UV(l)->head->next != NULL) {\
-				UV(next) = UV(l)->head->next;\
+		if (cell != NULL) {\
+			_payload = getPayloadInListCell(cell);\
+			if (getNextInListCell(cell) != NULL) {\
+				UV(next) = getNextInListCell(cell);\
 			}\
 		}\
 		for (\
 				;\
 				cell != NULL;\
 				cell = UV(next), \
-				UV(next) = (cell != NULL) ? cell->next : NULL, \
-				_payload = (cell != NULL) ? cell->payload : NULL\
+				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, \
+				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL\
 		)
 
 /**
@@ -212,25 +220,25 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
 		list* UV(l) = (_l);\
 		list_cell* UV(next) = NULL;\
 		type* _payload = NULL;\
-		if (UV(l)->head != NULL) {\
-			_payload = UV(l)->head->payload;\
-			if (UV(l)->head->next != NULL) {\
-				UV(next) = UV(l)->head->next;\
+		if (getHeadInListCell(UV(l)) != NULL) {\
+			_payload = getPayloadInListCell(getHeadInListCell(UV(l)));\
+			if (getNextInListCell(getHeadInListCell(UV(l))) != NULL) {\
+				UV(next) = getNextInListCell(getHeadInListCell(UV(l)));\
 			}\
 		}\
 		for (\
 				list_cell \
 				*previousCell = NULL, \
 				*UV(previousCellTmp) = NULL, \
-				*cell = UV(l)->head \
+				*cell = getHeadInListCell(UV(l)) \
 				; \
 				cell != NULL \
 				; \
 				UV(previousCellTmp) = previousCell == NULL ? UV(previousCellTmp) : cell, \
 				previousCell = UV(previousCellTmp), \
 				cell = UV(next), \
-				UV(next) = (cell != NULL) ? cell->next : NULL, \
-				_payload = (cell != NULL) ? cell->payload : NULL\
+				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, \
+				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL\
 		)
 
 
