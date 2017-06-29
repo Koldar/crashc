@@ -41,7 +41,7 @@ list_cell* getNextInListCell(const list_cell* cell);
 
 void* getPayloadInListCell(const list_cell* cell);
 
-list_cell* getHeadInListCell(const list* l);
+list_cell* getHeadInList(const list* l);
 
 /**
  * Initialize a new list inside the memory.
@@ -177,7 +177,7 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
  */
 #define ITERATE_ON_LIST(_l, cell, _payload, type) \
 		list* UV(l) = (_l);\
-		list_cell* cell = getHeadInListCell(UV(l)); \
+		list_cell* cell = getHeadInList(UV(l)); \
 		list_cell* UV(next) = NULL;\
 		type* _payload = NULL;\
 		if (cell != NULL) {\
@@ -220,17 +220,17 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
 		list* UV(l) = (_l);\
 		list_cell* UV(next) = NULL;\
 		type* _payload = NULL;\
-		if (getHeadInListCell(UV(l)) != NULL) {\
-			_payload = getPayloadInListCell(getHeadInListCell(UV(l)));\
-			if (getNextInListCell(getHeadInListCell(UV(l))) != NULL) {\
-				UV(next) = getNextInListCell(getHeadInListCell(UV(l)));\
+		if (getHeadInList(UV(l)) != NULL) {\
+			_payload = getPayloadInListCell(getHeadInList(UV(l)));\
+			if (getNextInListCell(getHeadInList(UV(l))) != NULL) {\
+				UV(next) = getNextInListCell(getHeadInList(UV(l)));\
 			}\
 		}\
 		for (\
 				list_cell \
 				*previousCell = NULL, \
 				*UV(previousCellTmp) = NULL, \
-				*cell = getHeadInListCell(UV(l)) \
+				*cell = getHeadInList(UV(l)) \
 				; \
 				cell != NULL \
 				; \

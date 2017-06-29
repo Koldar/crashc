@@ -8,7 +8,7 @@
 #define _GNU_SOURCE
 #include "list.h"
 #include "macros.h"
-#include "log.h"
+#include "errors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,14 +38,14 @@ void* getPayloadInListCell(const list_cell* cell) {
 	return cell->payload;
 }
 
-list_cell* getHeadInListCell(const list* l) {
+list_cell* getHeadInList(const list* l) {
 	return l->head;
 }
 
 list* initList() {
 	list* retVal = malloc(sizeof(list));
 	if (retVal == NULL) {
-		ERROR_MALLOC();
+		MALLOCERRORCALLBACK();
 	}
 
 	retVal->head = NULL;
@@ -64,8 +64,7 @@ void destroyList(list* lst) {
 
 void destroyListWithElement(list* lst, void(*destructor)(void*)) {
 	ITERATE_ON_LIST(lst, cell, value, void) {
-		debug("deleting payload!!!!");
-		d(cell->payload);
+		destructor(cell->payload);
 		free(cell);
 	}
 	free(lst);
@@ -83,7 +82,7 @@ void clearList(list* l) {
 void addHeadInList(list* l, void* el) {
 	list_cell* new_cell = malloc(sizeof(list_cell));
 	if (new_cell == NULL) {
-		ERROR_MALLOC();
+		MALLOCERRORCALLBACK();
 	}
 
 	new_cell->payload = el;
@@ -99,7 +98,7 @@ void addHeadInList(list* l, void* el) {
 void addTailInList(list* l, void* el) {
 	list_cell* new_cell = malloc(sizeof(list_cell));
 	if (new_cell == NULL) {
-		ERROR_MALLOC();
+		MALLOCERRORCALLBACK();
 	}
 
 	new_cell->payload = el;
@@ -194,18 +193,14 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
 
 	if (previous == NULL) {
 		//we're removing the head
-		info("removing head");
 		popFromList(l);
 	} else if (cellToRemove->next == NULL){
 		//we're removing the tail
-		info("removing tail");
 		previous->next = NULL;
 		lst->size--;
 		lst->tail = previous;
 		free(cellToRemove);
 	} else {
-		info("removing middle element %p %p", previous, cellToRemove);
-		info("nexts are %p %p", previous->next, cellToRemove->next);
 		//we're removing an element inside the list
 		previous->next = cellToRemove->next;
 		lst->size--;

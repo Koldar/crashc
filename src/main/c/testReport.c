@@ -6,6 +6,7 @@
  */
 
 #include "testReport.h"
+#include "errors.h"
 
 TestReport* initTestReport(const char* file, const int lineNo, const char* expr, const bool outcome) {
 	TestReport* retVal = malloc(sizeof(TestReport));

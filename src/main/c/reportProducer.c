@@ -81,7 +81,7 @@ static void handleConsoleSectionStarted(Section* s, int depth) {
 	}
 	fcprintf(
 			stdout,
-			getForwardListSize(&s->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
+			getLengthOfList(s->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
 					"%s:\n",
 					s->description
 	);
@@ -132,7 +132,7 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 
 		fcprintf(
 				stdout,
-				getForwardListSize(&sectionToDraw->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
+				getLengthOfList(sectionToDraw->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
 						"%s:\n",
 						sectionToDraw->description
 		);

@@ -97,7 +97,7 @@ void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Secti
 		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
 		//in order to do it, we pop the end after we executed the last children
 		if (section->nextSibling == NULL) {
-			popHeadFromForwardList(&(section->parent->sectionToRunList));
+			popFromList(section->parent->sectionToRunList);
 		}
 	}
 }
@@ -118,7 +118,7 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
 	if (!section->parent->childrenNumberComputed) {
 		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
 		if (section->parent->currentChild > 0) {
-			addTailInForwardList(&(section->parent->sectionToRunList), section);
+			addTailInList(section->parent->sectionToRunList, section);
 		}
 	}
 
@@ -139,7 +139,7 @@ bool getAccessSequentially(Section* section) {
 	}
 
 
-	if (peekHeadFromForwardList(&(section->parent->sectionToRunList)) == section) {
+	if (getHeadOfList(section->parent->sectionToRunList) == section) {
 		return true;
 	}
 
