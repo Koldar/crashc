@@ -92,11 +92,13 @@ static void handleConsoleAssertionStarted(TestReport* tr,int depth) {
 }
 
 static void handleConsoleAssertion(TestReport* tr, int depth) {
-	if (!tr->outcome) {
+	if (!getOutcomeFromTestReport(tr)) {
 		fcprintf(stdout,
 				ANSI_COLOR_RED,
 				"%s[%d]: %s\n",
-				tr->file, tr->lineNo, tr->expr
+				getFileTestedOfTestReport(tr),
+				getLineNoOfTestReport(tr),
+				getExprTestedOfTestReport(tr)
 		);
 	}
 }
@@ -141,7 +143,9 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 			fcprintf(stdout,
 					ANSI_COLOR_RED
 					"file=%s, lineno=%d, assert=%s\n",
-					el->file, el->lineNo, el->expr
+					getFileTestedOfTestReport(el),
+					getLineNoOfTestReport(el),
+					getExprTestedOfTestReport(el)
 			);
 		}
 	}
