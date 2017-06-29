@@ -199,11 +199,11 @@ typedef struct Section {
 	/**
 	 * A list containing all the assertions inside this section
 	 */
-	//TODO readd this TestReportList* assertionReportList;
+	TestReportList* assertionReportList;
 	/**
 	 * A list containing all the failures inside ::Section::assertionReportList
 	 */
-	//TODO readd this TestReportList* failureReportList;
+	TestReportList* failureReportList;
 
 
 	///the parent of this section in the tree. May be NULL
