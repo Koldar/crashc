@@ -327,7 +327,7 @@ void callbackDoNothing(Section* section);
  * of the registered testsuites
  */
 #define TESTS_END \
-    for (int i = 0; i < array_index; i++) { \
+    for (int i = 0; i < suites_array_index; i++) { \
         tests_array[i](); \
     } \
 } //main function closing bracket

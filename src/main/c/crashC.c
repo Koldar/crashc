@@ -12,8 +12,8 @@ int suites_array_index = 0;
  * TODO: Add control on duplicates testsuites
  */
 void update_test_array(int id, test_pointer func) {
-    tests_array[array_index] = func;
-    array_index++;
+    tests_array[suites_array_index] = func;
+    suites_array_index++;
 }
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
