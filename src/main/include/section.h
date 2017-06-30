@@ -9,7 +9,6 @@
 #define SECTION_H_
 
 #include <stdbool.h>
-#include "forwardList.h"
 #include "tag.h"
 #include "testReport.h"
 
@@ -214,8 +213,6 @@ typedef struct Section {
 	///the next sibling this section has in the tree. May be NULL
 	struct Section* nextSibling;
 } Section;
-
-typedef forward_list SectionList;
 
 
 /**
