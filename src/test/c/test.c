@@ -193,7 +193,7 @@ int main(int argc, const char* argv[]) {
 
 TESTS_START
 
-REGTESTS(1, 2)
+REGTESTS(1);
 
 TESTS_END
 

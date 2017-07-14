@@ -47,6 +47,7 @@
 #include "errors.h"
 #include "uthash.h"
 #include "section.h"
+#include "sigHandling.h"
 
 /**
  * the character used to divide tags inside a single string
@@ -113,7 +114,7 @@ extern Section* currentSection;
 /**
  * Function used to update the tests_array[] array when registering a new testsuite
  */
-void update_test_array(int, test_pointer);
+void update_test_array(test_pointer);
 
 /**
  * Function to run in the access cycle
@@ -158,7 +159,7 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags);
 
 /**
- * compute the has of a string
+ * Compute the hash of a string
  *
  * \note
  * we use djb2 algorithm, described <a href="http://www.cse.yorku.ca/~oz/hash.html">here</a>
@@ -188,6 +189,7 @@ bool getAccessSequentially(Section* section);
 
 ///@}
 
+//Maybe became obsolete?
 int defaultMain(int argc, const char* argv[]);
 
 ///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
@@ -203,6 +205,9 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
  * Do absolutely nothing
  */
 void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section);
+
+
+bool haveWeRunEveryChildrenAndSetJmp(Section * section);
 
 ///@}
 
@@ -244,7 +249,7 @@ void callbackDoNothing(Section* section);
 				 *  CONTAINABLESECTION is satisfied for its children
 				 *  CONTAINABLESECTION.
 				 */																														\
-		currentSection->loop1 = false																							\
+				 currentSection->loop1 = false																							\
 		)																																\
 		for (																															\
 				currentSection->loop2 = true																							\
@@ -275,10 +280,10 @@ void callbackDoNothing(Section* section);
 		CONTAINABLESECTION(																												\
 				parent, sectionLevelId, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
-				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing, doWorkAtEndCallbackDoNothing,							\
+				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing, doWorkAtEndCallbackDoNothing, 																						\
 				for (																													\
 						;																												\
-						!haveWeRunEveryChildrenInSection(currentSection)																\
+						!haveWeRunEveryChildrenAndSetJmp(currentSection)																\
 						;																												\
 						\
 				)																														\
@@ -302,7 +307,8 @@ void callbackDoNothing(Section* section);
 		currentSection, sectionLevelId, description, tags,																				\
 		getAccessSequentially, callbackDoNothing, 																						\
 		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,		\
-		NOCODE																															\
+		signal(SIGSEGV, failsig_handler);																		    \
+		signal(SIGFPE, failsig_handler);																		\
 )
 
 #define WHEN(description, tags) ENTER_ONE_PER_LOOP(5, description, tags)
@@ -346,69 +352,69 @@ void callbackDoNothing(Section* section);
 //FOREACH macros, used to iterate on the arguments passed to the REGTESTS macro
 #define FE_0
 #define FE_1(WHAT, X) WHAT(X)
-#define FE_2(WHAT, X, ...) WHAT(X) FE_1(WHAT, __VA_ARGS__)
-#define FE_3(WHAT, X, ...) WHAT(X) FE_2(WHAT, __VA_ARGS__)
-#define FE_4(WHAT, X, ...) WHAT(X) FE_3(WHAT, __VA_ARGS__)
-#define FE_5(WHAT, X, ...) WHAT(X) FE_4(WHAT, __VA_ARGS__)
-#define FE_6(WHAT, X, ...) WHAT(X) FE_5(WHAT, __VA_ARGS__)
-#define FE_7(WHAT, X, ...) WHAT(X) FE_6(WHAT, __VA_ARGS__)
-#define FE_8(WHAT, X, ...) WHAT(X) FE_7(WHAT, __VA_ARGS__)
-#define FE_9(WHAT, X, ...) WHAT(X) FE_8(WHAT, __VA_ARGS__)
-#define FE_10(WHAT, X, ...) WHAT(X) FE_9(WHAT, __VA_ARGS__)
-#define FE_11(WHAT, X, ...) WHAT(X) FE_10(WHAT, __VA_ARGS__)
-#define FE_12(WHAT, X, ...) WHAT(X) FE_11(WHAT, __VA_ARGS__)
-#define FE_13(WHAT, X, ...) WHAT(X) FE_12(WHAT, __VA_ARGS__)
-#define FE_14(WHAT, X, ...) WHAT(X) FE_13(WHAT, __VA_ARGS__)
-#define FE_15(WHAT, X, ...) WHAT(X) FE_14(WHAT, __VA_ARGS__)
-#define FE_16(WHAT, X, ...) WHAT(X) FE_15(WHAT, __VA_ARGS__)
-#define FE_17(WHAT, X, ...) WHAT(X) FE_16(WHAT, __VA_ARGS__)
-#define FE_18(WHAT, X, ...) WHAT(X) FE_17(WHAT, __VA_ARGS__)
-#define FE_19(WHAT, X, ...) WHAT(X) FE_18(WHAT, __VA_ARGS__)
-#define FE_20(WHAT, X, ...) WHAT(X) FE_19(WHAT, __VA_ARGS__)
-#define FE_21(WHAT, X, ...) WHAT(X) FE_20(WHAT, __VA_ARGS__)
-#define FE_22(WHAT, X, ...) WHAT(X) FE_21(WHAT, __VA_ARGS__)
-#define FE_23(WHAT, X, ...) WHAT(X) FE_22(WHAT, __VA_ARGS__)
-#define FE_24(WHAT, X, ...) WHAT(X) FE_23(WHAT, __VA_ARGS__)
-#define FE_25(WHAT, X, ...) WHAT(X) FE_24(WHAT, __VA_ARGS__)
-#define FE_26(WHAT, X, ...) WHAT(X) FE_25(WHAT, __VA_ARGS__)
-#define FE_27(WHAT, X, ...) WHAT(X) FE_26(WHAT, __VA_ARGS__)
-#define FE_28(WHAT, X, ...) WHAT(X) FE_27(WHAT, __VA_ARGS__)
-#define FE_29(WHAT, X, ...) WHAT(X) FE_28(WHAT, __VA_ARGS__)
-#define FE_30(WHAT, X, ...) WHAT(X) FE_29(WHAT, __VA_ARGS__)
-#define FE_31(WHAT, X, ...) WHAT(X) FE_30(WHAT, __VA_ARGS__)
-#define FE_32(WHAT, X, ...) WHAT(X) FE_31(WHAT, __VA_ARGS__)
-#define FE_33(WHAT, X, ...) WHAT(X) FE_32(WHAT, __VA_ARGS__)
-#define FE_34(WHAT, X, ...) WHAT(X) FE_33(WHAT, __VA_ARGS__)
-#define FE_35(WHAT, X, ...) WHAT(X) FE_34(WHAT, __VA_ARGS__)
-#define FE_36(WHAT, X, ...) WHAT(X) FE_35(WHAT, __VA_ARGS__)
-#define FE_37(WHAT, X, ...) WHAT(X) FE_36(WHAT, __VA_ARGS__)
-#define FE_38(WHAT, X, ...) WHAT(X) FE_37(WHAT, __VA_ARGS__)
-#define FE_39(WHAT, X, ...) WHAT(X) FE_38(WHAT, __VA_ARGS__)
-#define FE_40(WHAT, X, ...) WHAT(X) FE_39(WHAT, __VA_ARGS__)
-#define FE_41(WHAT, X, ...) WHAT(X) FE_40(WHAT, __VA_ARGS__)
-#define FE_42(WHAT, X, ...) WHAT(X) FE_41(WHAT, __VA_ARGS__)
-#define FE_43(WHAT, X, ...) WHAT(X) FE_42(WHAT, __VA_ARGS__)
-#define FE_44(WHAT, X, ...) WHAT(X) FE_43(WHAT, __VA_ARGS__)
-#define FE_45(WHAT, X, ...) WHAT(X) FE_44(WHAT, __VA_ARGS__)
-#define FE_46(WHAT, X, ...) WHAT(X) FE_45(WHAT, __VA_ARGS__)
-#define FE_47(WHAT, X, ...) WHAT(X) FE_46(WHAT, __VA_ARGS__)
-#define FE_48(WHAT, X, ...) WHAT(X) FE_47(WHAT, __VA_ARGS__)
-#define FE_49(WHAT, X, ...) WHAT(X) FE_48(WHAT, __VA_ARGS__)
-#define FE_50(WHAT, X, ...) WHAT(X) FE_49(WHAT, __VA_ARGS__)
-#define FE_51(WHAT, X, ...) WHAT(X) FE_50(WHAT, __VA_ARGS__)
-#define FE_52(WHAT, X, ...) WHAT(X) FE_51(WHAT, __VA_ARGS__)
-#define FE_53(WHAT, X, ...) WHAT(X) FE_52(WHAT, __VA_ARGS__)
-#define FE_54(WHAT, X, ...) WHAT(X) FE_53(WHAT, __VA_ARGS__)
-#define FE_55(WHAT, X, ...) WHAT(X) FE_54(WHAT, __VA_ARGS__)
-#define FE_56(WHAT, X, ...) WHAT(X) FE_55(WHAT, __VA_ARGS__)
-#define FE_57(WHAT, X, ...) WHAT(X) FE_56(WHAT, __VA_ARGS__)
-#define FE_58(WHAT, X, ...) WHAT(X) FE_57(WHAT, __VA_ARGS__)
-#define FE_59(WHAT, X, ...) WHAT(X) FE_58(WHAT, __VA_ARGS__)
-#define FE_60(WHAT, X, ...) WHAT(X) FE_59(WHAT, __VA_ARGS__)
-#define FE_61(WHAT, X, ...) WHAT(X) FE_60(WHAT, __VA_ARGS__)
-#define FE_62(WHAT, X, ...) WHAT(X) FE_61(WHAT, __VA_ARGS__)
-#define FE_63(WHAT, X, ...) WHAT(X) FE_62(WHAT, __VA_ARGS__)
-#define FE_64(WHAT, X, ...) WHAT(X) FE_63(WHAT, __VA_ARGS__)
+#define FE_2(WHAT, X, ...) WHAT(X); FE_1(WHAT, __VA_ARGS__)
+#define FE_3(WHAT, X, ...) WHAT(X); FE_2(WHAT, __VA_ARGS__)
+#define FE_4(WHAT, X, ...) WHAT(X); FE_3(WHAT, __VA_ARGS__)
+#define FE_5(WHAT, X, ...) WHAT(X); FE_4(WHAT, __VA_ARGS__)
+#define FE_6(WHAT, X, ...) WHAT(X); FE_5(WHAT, __VA_ARGS__)
+#define FE_7(WHAT, X, ...) WHAT(X); FE_6(WHAT, __VA_ARGS__)
+#define FE_8(WHAT, X, ...) WHAT(X); FE_7(WHAT, __VA_ARGS__)
+#define FE_9(WHAT, X, ...) WHAT(X); FE_8(WHAT, __VA_ARGS__)
+#define FE_10(WHAT, X, ...) WHAT(X); FE_9(WHAT, __VA_ARGS__)
+#define FE_11(WHAT, X, ...) WHAT(X); FE_10(WHAT, __VA_ARGS__)
+#define FE_12(WHAT, X, ...) WHAT(X); FE_11(WHAT, __VA_ARGS__)
+#define FE_13(WHAT, X, ...) WHAT(X); FE_12(WHAT, __VA_ARGS__)
+#define FE_14(WHAT, X, ...) WHAT(X); FE_13(WHAT, __VA_ARGS__)
+#define FE_15(WHAT, X, ...) WHAT(X); FE_14(WHAT, __VA_ARGS__)
+#define FE_16(WHAT, X, ...) WHAT(X); FE_15(WHAT, __VA_ARGS__)
+#define FE_17(WHAT, X, ...) WHAT(X); FE_16(WHAT, __VA_ARGS__)
+#define FE_18(WHAT, X, ...) WHAT(X); FE_17(WHAT, __VA_ARGS__)
+#define FE_19(WHAT, X, ...) WHAT(X); FE_18(WHAT, __VA_ARGS__)
+#define FE_20(WHAT, X, ...) WHAT(X); FE_19(WHAT, __VA_ARGS__)
+#define FE_21(WHAT, X, ...) WHAT(X); FE_20(WHAT, __VA_ARGS__)
+#define FE_22(WHAT, X, ...) WHAT(X); FE_21(WHAT, __VA_ARGS__)
+#define FE_23(WHAT, X, ...) WHAT(X); FE_22(WHAT, __VA_ARGS__)
+#define FE_24(WHAT, X, ...) WHAT(X); FE_23(WHAT, __VA_ARGS__)
+#define FE_25(WHAT, X, ...) WHAT(X); FE_24(WHAT, __VA_ARGS__)
+#define FE_26(WHAT, X, ...) WHAT(X); FE_25(WHAT, __VA_ARGS__)
+#define FE_27(WHAT, X, ...) WHAT(X); FE_26(WHAT, __VA_ARGS__)
+#define FE_28(WHAT, X, ...) WHAT(X); FE_27(WHAT, __VA_ARGS__)
+#define FE_29(WHAT, X, ...) WHAT(X); FE_28(WHAT, __VA_ARGS__)
+#define FE_30(WHAT, X, ...) WHAT(X); FE_29(WHAT, __VA_ARGS__)
+#define FE_31(WHAT, X, ...) WHAT(X); FE_30(WHAT, __VA_ARGS__)
+#define FE_32(WHAT, X, ...) WHAT(X); FE_31(WHAT, __VA_ARGS__)
+#define FE_33(WHAT, X, ...) WHAT(X); FE_32(WHAT, __VA_ARGS__)
+#define FE_34(WHAT, X, ...) WHAT(X); FE_33(WHAT, __VA_ARGS__)
+#define FE_35(WHAT, X, ...) WHAT(X); FE_34(WHAT, __VA_ARGS__)
+#define FE_36(WHAT, X, ...) WHAT(X); FE_35(WHAT, __VA_ARGS__)
+#define FE_37(WHAT, X, ...) WHAT(X); FE_36(WHAT, __VA_ARGS__)
+#define FE_38(WHAT, X, ...) WHAT(X); FE_37(WHAT, __VA_ARGS__)
+#define FE_39(WHAT, X, ...) WHAT(X); FE_38(WHAT, __VA_ARGS__)
+#define FE_40(WHAT, X, ...) WHAT(X); FE_39(WHAT, __VA_ARGS__)
+#define FE_41(WHAT, X, ...) WHAT(X); FE_40(WHAT, __VA_ARGS__)
+#define FE_42(WHAT, X, ...) WHAT(X); FE_41(WHAT, __VA_ARGS__)
+#define FE_43(WHAT, X, ...) WHAT(X); FE_42(WHAT, __VA_ARGS__)
+#define FE_44(WHAT, X, ...) WHAT(X); FE_43(WHAT, __VA_ARGS__)
+#define FE_45(WHAT, X, ...) WHAT(X); FE_44(WHAT, __VA_ARGS__)
+#define FE_46(WHAT, X, ...) WHAT(X); FE_45(WHAT, __VA_ARGS__)
+#define FE_47(WHAT, X, ...) WHAT(X); FE_46(WHAT, __VA_ARGS__)
+#define FE_48(WHAT, X, ...) WHAT(X); FE_47(WHAT, __VA_ARGS__)
+#define FE_49(WHAT, X, ...) WHAT(X); FE_48(WHAT, __VA_ARGS__)
+#define FE_50(WHAT, X, ...) WHAT(X); FE_49(WHAT, __VA_ARGS__)
+#define FE_51(WHAT, X, ...) WHAT(X); FE_50(WHAT, __VA_ARGS__)
+#define FE_52(WHAT, X, ...) WHAT(X); FE_51(WHAT, __VA_ARGS__)
+#define FE_53(WHAT, X, ...) WHAT(X); FE_52(WHAT, __VA_ARGS__)
+#define FE_54(WHAT, X, ...) WHAT(X); FE_53(WHAT, __VA_ARGS__)
+#define FE_55(WHAT, X, ...) WHAT(X); FE_54(WHAT, __VA_ARGS__)
+#define FE_56(WHAT, X, ...) WHAT(X); FE_55(WHAT, __VA_ARGS__)
+#define FE_57(WHAT, X, ...) WHAT(X); FE_56(WHAT, __VA_ARGS__)
+#define FE_58(WHAT, X, ...) WHAT(X); FE_57(WHAT, __VA_ARGS__)
+#define FE_59(WHAT, X, ...) WHAT(X); FE_58(WHAT, __VA_ARGS__)
+#define FE_60(WHAT, X, ...) WHAT(X); FE_59(WHAT, __VA_ARGS__)
+#define FE_61(WHAT, X, ...) WHAT(X); FE_60(WHAT, __VA_ARGS__)
+#define FE_62(WHAT, X, ...) WHAT(X); FE_61(WHAT, __VA_ARGS__)
+#define FE_63(WHAT, X, ...) WHAT(X); FE_62(WHAT, __VA_ARGS__)
+#define FE_64(WHAT, X, ...) WHAT(X); FE_63(WHAT, __VA_ARGS__)
 
 /**
  * Used by REGTESTS() to get the name of the FE_n macro that is
@@ -429,7 +435,7 @@ void callbackDoNothing(Section* section);
  */
  #define REG_TEST(id) \
      void suite_ ## id(); \
-     update_test_array(id, suite_ ## id);
+     update_test_array(suite_ ## id)
 
 /**
  * Registers all the TESTSUITES whose ID is specified in the macro arguments.

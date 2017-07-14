@@ -11,15 +11,26 @@ int suites_array_index = 0;
  * keep track of the array dimension.
  * TODO: Add control on duplicates testsuites
  *
- * TODO
- * 	Understand why id is useful
  *
- * @param[in] id ignored parameter
  * @param[in] func the function to register
  */
-void update_test_array(int id, test_pointer func) {
+void update_test_array(test_pointer func) {
     tests_array[suites_array_index] = func;
     suites_array_index++;
+}
+
+/**
+ * This function is used inside the TESTCASE, aka LOOPER, in the boolean condition section
+ * to install the jump point used by the fail signal handling routines to abort the current
+ * test and go on with the others
+ */
+bool haveWeRunEveryChildrenAndSetJmp(Section * section) {
+    //We need to call the function in a if condition due to its compiler-magic nature
+    //  but we dont need to discriminate the 2 cases of execution:
+    //  the actual set of the non-local exit or the actual jump return
+    if (setjmp(signal_jump_point))
+        ;
+    return haveWeRunEveryChildrenInSection(section);
 }
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
