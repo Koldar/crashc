@@ -206,9 +206,6 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
  */
 void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section);
 
-
-bool haveWeRunEveryChildrenAndSetJmp(Section * section);
-
 ///@}
 
 ///\defgroup accessGrantedCallBack callbacks that can be used as accessGrantedCallBack in ::BeforeStartingSectionCallBack
@@ -257,7 +254,7 @@ void callbackDoNothing(Section* section);
 				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
 				;																														\
 				currentSection->loop2 = false,																							\
-				markSectionAsExecuted(currentSection)																					\
+				markSectionAsExecuted(currentSection)  																					\
 		)
 
 #define NOCODE
@@ -280,12 +277,14 @@ void callbackDoNothing(Section* section);
 		CONTAINABLESECTION(																												\
 				parent, sectionLevelId, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
-				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing, doWorkAtEndCallbackDoNothing, 																						\
-				for (																													\
+				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 																						    \
+				if (setjmp(signal_jump_point)) {                                                                                        \
+					markSectionAsExecuted(currentSection);                                                                              \
+				}                                                                                                                       \
+				for (    																												\
 						;																												\
-						!haveWeRunEveryChildrenAndSetJmp(currentSection)																\
+						!haveWeRunEveryChildrenAndSignalHandlingSetup(currentSection)                                                   \
 						;																												\
-						\
 				)																														\
 		)
 
@@ -306,9 +305,8 @@ void callbackDoNothing(Section* section);
 #define ENTER_ONE_PER_LOOP(sectionLevelId, description, tags) CONTAINABLESECTION(														\
 		currentSection, sectionLevelId, description, tags,																				\
 		getAccessSequentially, callbackDoNothing, 																						\
-		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,		\
-		signal(SIGSEGV, failsig_handler);																		    \
-		signal(SIGFPE, failsig_handler);																		\
+		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
+		NOCODE 																															\
 )
 
 #define WHEN(description, tags) ENTER_ONE_PER_LOOP(5, description, tags)

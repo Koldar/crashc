@@ -19,20 +19,6 @@ void update_test_array(test_pointer func) {
     suites_array_index++;
 }
 
-/**
- * This function is used inside the TESTCASE, aka LOOPER, in the boolean condition section
- * to install the jump point used by the fail signal handling routines to abort the current
- * test and go on with the others
- */
-bool haveWeRunEveryChildrenAndSetJmp(Section * section) {
-    //We need to call the function in a if condition due to its compiler-magic nature
-    //  but we dont need to discriminate the 2 cases of execution:
-    //  the actual set of the non-local exit or the actual jump return
-    if (setjmp(signal_jump_point))
-        ;
-    return haveWeRunEveryChildrenInSection(section);
-}
-
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
 	if (!section->loop2) {
 		return false;
@@ -45,7 +31,8 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 }
 
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
-	if (section->loop1) {
+    //The second condition is needed due to signal handling
+	if (section->loop1 && !section->executed) {
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).

@@ -15,31 +15,56 @@
  *
  *
  */
-#include "crashC.h" //Mi serve davvero
 #include "sigHandling.h"
-
-/**
- * These macros represent the fail messages associated to CrashC-handled
- * bad signals test termination. Since they are to be used only by this
- * source file, they are not included in sigHandling.h
- */
- #define SIGSEGV_FAIL_MSG "SIGSEGV received: test caused segmentation fault"
- #define SIGFPE_FAIL_MSG "SIGFPE received: test caused a floating point exception"
-
-
-/**
- * This variable is used to keep track of whenever we are handling a fatal
- * signal. It needs to be an atomic type as we must be sure that the
- * update of the variable cannot be interrupted
- */
- volatile sig_atomic_t handling_fatal_signal = 0;
 
  /**
   * This variable is used to store the execution state to be restored thanks to
   * setjmp and longjmp when needed during faulty test execution.
   * By faulty test we mean tests which generate SIGSEGV or SIGFPE.
   */
-  jmp_buf signal_jump_point;
+jmp_buf signal_jump_point;
+
+/**
+ * This function is used inside the TESTCASE, aka LOOPER, in the boolean condition section
+ * to install the jump point used by the fail signal handling routines to abort the current
+ * test and go on with the others
+ * The functions also checks if the user installed any custom signal handler and, if not,
+ * installs CrashC handler for SIGSEGV, SIGFPE and SIGBUS
+ */
+bool haveWeRunEveryChildrenAndSignalHandlingSetup(Section * section) {
+    //Here we set out signal handler if the user didn't set any
+    sigset_t blocked_signals;
+    struct sigaction old_action;
+    struct sigaction crashc_action;
+
+    //Initializes sigaction structure for our handler
+    sigemptyset(&blocked_signals);
+    crashc_action = (struct sigaction) {
+        failsig_handler,
+        blocked_signals,
+        NO_FLAGS
+    };
+
+    //Check if SIGSEGV handler was changed
+    sigaction(SIGSEGV, NULL, &old_action);
+    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+        sigaction(SIGSEGV, &crashc_action, NULL);
+    }
+
+    //Check if SIGFPE handler was changed
+    sigaction(SIGFPE, NULL, &old_action);
+    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+        sigaction(SIGFPE, &crashc_action, NULL);
+    }
+
+    //Check if SIGBUS handler was changed
+    sigaction(SIGBUS, NULL, &old_action);
+    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+        sigaction(SIGBUS, &crashc_action, NULL);
+    }
+
+    return haveWeRunEveryChildrenInSection(section);
+}
 
 /**
  * This handler is used for every signal whose delivery is considered by CrashC to
@@ -49,16 +74,9 @@
  * in order that it is not run again on the next LOOPER iteration.
  *
  */
-void failsig_handler() {
-    //We check wheter or not we were already handling the signal in case that
-    //other fatal signals are delivered during the previous handling of the
-    //signal
-    if (!handling_fatal_signal) {
-        handling_fatal_signal = 1;
+void failsig_handler(int signum) {
 
-        //We mark the currently executed section as executed and jump back to LOOPER
-        markSectionAsExecuted(currentSection);
-        //Mark test as failed?
-        longjmp(signal_jump_point, JMP_CODE);
-    }
+    //Mark test as failed code//
+
+    longjmp(signal_jump_point, JMP_CODE);
 }

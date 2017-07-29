@@ -2,10 +2,18 @@
 
 TESTSUITE(1) {
     TESTCASE("testcase1", "") {
-        int array[10];
-        WHEN("test", "") {
-            array[100000] = 7;
+        WHEN("when 1", "") {
             printf("WHEN 1\n");
+            int i = 0;
+            if (i == 0) {
+                i++;
+                int a[19];
+                a[100043278] = 7;
+            }
+            else {
+                int a = 7 / 0;
+                printf("-- %d --\n", a);
+            }
         }
         THEN("test", "") {
             printf("THEN 1\n");
