@@ -46,11 +46,10 @@ static void reportProducerRecursive(ReportProducerImplementation rpi, Section* s
 	}
 	if (sectionToDraw != root) {
 		//we print on the console only if the section involved is not the root (the root is a dummy section)
-		TestReport* el;
 		int i;
 
 		rpi.handleSectionStarted(sectionToDraw, depth);
-		FL_SAFE_ITER(&sectionToDraw->assertionReportList, el) {
+		ITERATE_ON_LIST(sectionToDraw->assertionReportList, cell, el, TestReport) {
 			rpi.handleAssertionStarted(el, depth);
 			rpi.handleAssertion(el, depth);
 			rpi.handleAssertionFinished(el, depth);
@@ -82,7 +81,7 @@ static void handleConsoleSectionStarted(Section* s, int depth) {
 	}
 	fcprintf(
 			stdout,
-			getForwardListSize(&s->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
+			getLengthOfList(s->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
 					"%s:\n",
 					s->description
 	);
@@ -93,11 +92,13 @@ static void handleConsoleAssertionStarted(TestReport* tr,int depth) {
 }
 
 static void handleConsoleAssertion(TestReport* tr, int depth) {
-	if (!tr->outcome) {
+	if (!getOutcomeFromTestReport(tr)) {
 		fcprintf(stdout,
 				ANSI_COLOR_RED,
 				"%s[%d]: %s\n",
-				tr->file, tr->lineNo, tr->expr
+				getFileTestedOfTestReport(tr),
+				getLineNoOfTestReport(tr),
+				getExprTestedOfTestReport(tr)
 		);
 	}
 }
@@ -123,8 +124,7 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 		return;
 	}
 	if (sectionToDraw != root) {
-		//we print on the console only if the section involved is not the root (the root is a dummy section)
-		TestReport* el;
+		//we print on the console only if the section involved is not the root (the root is a dummy section
 		int i;
 
 
@@ -134,16 +134,18 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 
 		fcprintf(
 				stdout,
-				getForwardListSize(&sectionToDraw->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
+				getLengthOfList(sectionToDraw->failureReportList) == 0 ? ANSI_COLOR_GREEN: ANSI_COLOR_RED,
 						"%s:\n",
 						sectionToDraw->description
 		);
-		FL_SAFE_ITER(&sectionToDraw->failureReportList, el) {
+		ITERATE_ON_LIST(sectionToDraw->failureReportList, cell, el, TestReport) {
 			//TODO customize colors
 			fcprintf(stdout,
 					ANSI_COLOR_RED
 					"file=%s, lineno=%d, assert=%s\n",
-					el->file, el->lineNo, el->expr
+					getFileTestedOfTestReport(el),
+					getLineNoOfTestReport(el),
+					getExprTestedOfTestReport(el)
 			);
 		}
 	}

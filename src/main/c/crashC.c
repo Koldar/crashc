@@ -2,8 +2,22 @@
 
 Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
+test_pointer tests_array[MAX_TESTS];
+int suites_array_index = 0;
 
-
+/**
+ * This function registers a testsuite by storing its function pointer into
+ * the global array. The function automatically updates the variable used to
+ * keep track of the array dimension.
+ * TODO: Add control on duplicates testsuites
+ *
+ *
+ * @param[in] func the function to register
+ */
+void update_test_array(test_pointer func) {
+    tests_array[suites_array_index] = func;
+    suites_array_index++;
+}
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
 	if (!section->loop2) {
@@ -17,7 +31,8 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 }
 
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
-	if (section->loop1) {
+    //The second condition is needed due to signal handling
+	if (section->loop1 && !section->executed) {
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).
@@ -80,7 +95,7 @@ void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Secti
 		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
 		//in order to do it, we pop the end after we executed the last children
 		if (section->nextSibling == NULL) {
-			popHeadFromForwardList(&(section->parent->sectionToRunList));
+			popFromList(section->parent->sectionToRunList);
 		}
 	}
 }
@@ -101,7 +116,7 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
 	if (!section->parent->childrenNumberComputed) {
 		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
 		if (section->parent->currentChild > 0) {
-			addTailInForwardList(&(section->parent->sectionToRunList), section);
+			addTailInList(section->parent->sectionToRunList, section);
 		}
 	}
 
@@ -122,7 +137,7 @@ bool getAccessSequentially(Section* section) {
 	}
 
 
-	if (peekHeadFromForwardList(&(section->parent->sectionToRunList)) == section) {
+	if (getHeadOfList(section->parent->sectionToRunList) == section) {
 		return true;
 	}
 

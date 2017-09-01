@@ -61,18 +61,19 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	}
 
 	retVal->accessGranted = false;
-	retVal->assertionReportList = initForwardList();
+	retVal->assertionReportList = initList();
 	retVal->childrenNumber = 0;
 	retVal->childrenNumberComputed = false;
 	retVal->executed = false;
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
-	retVal->failureReportList = initForwardList();
+	retVal->failureReportList = initList();
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
-	retVal->sectionToRunList = initForwardList();
+	retVal->sectionToRunList = initList();
 	retVal->loop1 = false;
+	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
 	retVal->tags = NULL;
@@ -100,9 +101,9 @@ void destroySection(Section* section) {
 		HASH_DEL(section->tags, current);
 		destroyTag(current);
 	}
-	destroyForwardList(&section->failureReportList);
-	destroyForwardListWithElements(&section->sectionToRunList, destroySection);
-	destroyForwardListWithElements(&section->assertionReportList, destroyTestReport);
+	destroyList(section->failureReportList);
+	destroyListWithElement(section->sectionToRunList, destroySection);
+	destroyListWithElement(section->assertionReportList, destroyTestReport);
 	free(section->description);
 	free(section);
 }

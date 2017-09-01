@@ -34,6 +34,8 @@
 //	}
 //}
 
+#ifdef TEST_1
+
 static bufferId = 0;
 static buffer2[1000];
 
@@ -184,3 +186,15 @@ int main(int argc, const char* argv[]) {
 	destroySection(&rootSection);
 	return 0;
 }
+
+#endif //ifdef test_1
+
+#ifndef TEST_1
+
+TESTS_START
+
+REGTESTS(1);
+
+TESTS_END
+
+#endif
