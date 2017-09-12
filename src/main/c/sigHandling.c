@@ -23,6 +23,7 @@
   * By faulty test we mean tests which generate SIGSEGV or SIGFPE.
   */
 jmp_buf signal_jump_point;
+struct sigaction _crashc_sigaction;
 
 /**
  * This function is used inside the TESTCASE, aka LOOPER, in the boolean condition section
@@ -32,38 +33,57 @@ jmp_buf signal_jump_point;
  * installs CrashC handler for SIGSEGV, SIGFPE and SIGBUS
  */
 bool haveWeRunEveryChildrenAndSignalHandlingSetup(Section * section) {
-    //Here we set out signal handler if the user didn't set any
-    sigset_t blocked_signals;
-    struct sigaction old_action;
-    struct sigaction crashc_action;
-
-    //Initializes sigaction structure for our handler
-    sigemptyset(&blocked_signals);
-    crashc_action = (struct sigaction) {
-        failsig_handler,
-        blocked_signals,
-        NO_FLAGS
-    };
-
-    //Check if SIGSEGV handler was changed
-    sigaction(SIGSEGV, NULL, &old_action);
-    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
-        sigaction(SIGSEGV, &crashc_action, NULL);
-    }
-
-    //Check if SIGFPE handler was changed
-    sigaction(SIGFPE, NULL, &old_action);
-    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
-        sigaction(SIGFPE, &crashc_action, NULL);
-    }
-
-    //Check if SIGBUS handler was changed
-    sigaction(SIGBUS, NULL, &old_action);
-    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
-        sigaction(SIGBUS, &crashc_action, NULL);
-    }
+//    //Here we set out signal handler if the user didn't set any
+//    sigset_t blocked_signals;
+//    struct sigaction old_action;
+//    struct sigaction crashc_action;
+//
+//    //Initializes sigaction structure for our handler
+//    sigemptyset(&blocked_signals);
+//    crashc_action = (struct sigaction) {
+//        failsig_handler,
+//        blocked_signals,
+//        NO_FLAGS
+//    };
+//
+//    //Check if SIGSEGV handler was changed
+//    sigaction(SIGSEGV, NULL, &old_action);
+//    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+//        sigaction(SIGSEGV, &crashc_action, NULL);
+//    }
+//
+//    //Check if SIGFPE handler was changed
+//    sigaction(SIGFPE, NULL, &old_action);
+//    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+//        sigaction(SIGFPE, &crashc_action, NULL);
+//    }
+//
+//    //Check if SIGBUS handler was changed
+//    sigaction(SIGBUS, NULL, &old_action);
+//    if (old_action.sa_handler == SIG_DFL || old_action.sa_handler == SIG_IGN) {
+//        sigaction(SIGBUS, &crashc_action, NULL);
+//    }
 
     return haveWeRunEveryChildrenInSection(section);
+}
+
+void registerSignalHandlerForSignals() {
+	//register signals
+	//TODO add even this signals
+//	if (sigaction(SIGHUP, &sa, NULL) == -1) {
+//		perror("Error: cannot handle SIGHUP"); //Should not happen
+//	}
+//
+//	if (sigaction(SIGUSR1, &sa, NULL) == -1) {
+//		perror("Error: cannot handle SIGUSR1"); //should not happen
+//	}
+//
+//	if (sigaction(SIGINT, &sa, NULL) == -1) {
+//		perror("Error: cannot handle SIGUSR1"); //should not happen
+//	}
+	if (sigaction(SIGFPE, &_crashc_sigaction, NULL) == -1) {
+		perror("Error: cannot handle SIGUSR1"); //should not happen
+	}
 }
 
 /**

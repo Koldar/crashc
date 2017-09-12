@@ -277,8 +277,9 @@ void callbackDoNothing(Section* section);
 		CONTAINABLESECTION(																												\
 				parent, sectionLevelId, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
-				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 																						    \
-				if (setjmp(signal_jump_point)) {                                                                                        \
+				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
+				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
+					/*we have caught a signal*/																							\
 					markSectionAsExecuted(currentSection);                                                                              \
 				}                                                                                                                       \
 				for (    																												\
@@ -326,7 +327,9 @@ void callbackDoNothing(Section* section);
  * Macro used to contain all test declarations and to generate the main function for the
  * execution of the various tests
  */
-#define TESTS_START int main(void) {
+#define TESTS_START int main(void) { \
+		_crashc_sigaction.sa_handler = &failsig_handler;  \
+		registerSignalHandlerForSignals();
 
 /**
  * This macro is used to complete the mainfile main function and to start the execution
