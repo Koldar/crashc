@@ -98,5 +98,5 @@ void failsig_handler(int signum) {
 
     //Mark test as failed code//
 
-    longjmp(signal_jump_point, JMP_CODE);
+    siglongjmp(signal_jump_point, 1);
 }

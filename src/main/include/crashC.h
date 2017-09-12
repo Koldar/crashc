@@ -280,7 +280,7 @@ void callbackDoNothing(Section* section);
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
 				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
 					/*we have caught a signal*/																							\
-					markSectionAsExecuted(currentSection);                                                                              \
+					markSectionAsExecuted(currentSection);                                                                             \
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
