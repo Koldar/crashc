@@ -127,7 +127,21 @@ typedef struct Section {
 	 * For example, in the graph inside ::Section, section "when 2" has 2 children
 	 */
 	int childrenNumber;
-	bool executed;
+
+	/**
+	 * This field is very important, as it holds information about the current state of the section.
+	 * It can assume different values:
+	 * -SECTION_UNEXEC:		means that the section has never been executed before
+	 * -SECTION_EXEC  :		means that the section has been executed at least once but needs to be executed again for some reason
+	 * -SECTION_DONE  :		means that the section has been fully visited and needs not to be executed anymore
+	 * By definition, we consider a section to be done when is has no child and has been executed at least once or when all of
+	 * its children are done themselves.
+	 */
+	enum {
+		SECTION_UNEXEC,
+		SECTION_EXEC,
+		SECTION_DONE
+	} status;
 
 	/**
 	 * The number of the child we're currently analyzing

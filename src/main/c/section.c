@@ -64,7 +64,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->assertionReportList = initList();
 	retVal->childrenNumber = 0;
 	retVal->childrenNumberComputed = false;
-	retVal->executed = false;
+	retVal->status = SECTION_UNEXEC;
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
@@ -116,7 +116,7 @@ bool areWeComputingChildren(const Section* section) {
 }
 
 bool haveWeRunEverythingInSection(const Section* section) {
-	return section->executed;
+	return (section->status == SECTION_DONE);
 }
 
 bool haveWeRunEveryChildrenInSection(Section* section) {
@@ -145,7 +145,7 @@ bool haveWeRunEveryChildrenInSection(Section* section) {
  *  the struct appropriate boolean flag.
  */
 void markSectionAsExecuted(Section* section) {
-	section->executed = true;
+	section->status = SECTION_EXEC;
 }
 
 void populateTagsHT(Section* section, const char* tags, char separator) {

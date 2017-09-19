@@ -32,7 +32,7 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
     //The second condition is needed due to signal handling
-	if (section->loop1 && !section->executed) {
+	if (section->loop1 && !section->status == SECTION_DONE) {
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).
@@ -164,7 +164,7 @@ static void printSectionData(const Section* section, bool recursive) {
 			(section->parent != NULL ? section->parent->description : "<none>"),
 			section->childrenNumber,
 			(section->childrenNumberComputed ? "yes" : "no"),
-			(section->executed ? "yes" : "no"),
+			(section->status == SECTION_DONE ? "yes" : "no"),
 			section->currentChild,
 			(section->loop1 ? "yes" : "no")
 	);
