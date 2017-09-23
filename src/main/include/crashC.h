@@ -172,6 +172,13 @@ int hash(const char* str);
 ///\defgroup accessConditions function that can be used as ::condition_section
 ///@{
 
+
+/**
+ * We use this function to check whether or not we need to enter in the
+ * given WHEN section
+ */
+bool getAccess_When(Section * section);
+
 /**
  * Grants always access
  *
@@ -188,6 +195,8 @@ bool getAlwaysTrue(Section* section);
 bool getAccessSequentially(Section* section);
 
 ///@}
+
+void callbackSetAlreadyFoundWhen(Section * section);
 
 //Maybe became obsolete?
 int defaultMain(int argc, const char* argv[]);
@@ -304,7 +313,7 @@ void callbackDoNothing(Section* section);
 
 #define ENTER_ONE_PER_LOOP(sectionLevelId, description, tags) CONTAINABLESECTION(														\
 		currentSection, sectionLevelId, description, tags,																				\
-		getAccessSequentially, callbackDoNothing, 																						\
+		getAccess_When, callbackSetAlreadyFoundWhen, 																						\
 		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
 		NOCODE 																															\
 )

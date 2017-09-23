@@ -61,6 +61,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	}
 
 	retVal->accessGranted = false;
+	retVal->alreadyFoundWhen = false;
 	retVal->assertionReportList = initList();
 	retVal->childrenNumber = 0;
 	retVal->childrenNumberComputed = false;
@@ -71,7 +72,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->failureReportList = initList();
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
-	retVal->sectionToRunList = initList();
+	//retVal->sectionToRunList = initList();
 	retVal->loop1 = false;
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
@@ -102,7 +103,7 @@ void destroySection(Section* section) {
 		destroyTag(current);
 	}
 	destroyList(section->failureReportList);
-	destroyListWithElement(section->sectionToRunList, destroySection);
+	//destroyListWithElement(section->sectionToRunList, destroySection);
 	destroyListWithElement(section->assertionReportList, destroyTestReport);
 	free(section->description);
 	free(section);
@@ -146,6 +147,37 @@ bool haveWeRunEveryChildrenInSection(Section* section) {
  */
 void markSectionAsExecuted(Section* section) {
 	section->status = SECTION_EXEC;
+}
+
+/*
+ * We use this function to determine wheter we can set a section as
+ * fully visited, thus we don't need to execute it anymore.
+ * A section is considered fully executed in two cases:
+ * 1- When it has no child
+ * 2- When every child of the section is fully visited itself
+ *
+ * Note that we first check if the section has been executed at least once, as
+ * if a given section has never been executed it surely can not be fully visited.
+ */
+bool isSectionFullyVisited(Section * section) {
+	if (section->status == SECTION_UNEXEC) {
+		return false;
+	}
+
+	if (section->childrenNumber == 0) {
+		return true;
+	}
+	else {
+		Section * next_child = section->firstChild;
+
+		while (next_child != NULL) {
+			if (!isSectionFullyVisited(next_child)) {
+				return false;
+			}
+			next_child = next_child->nextSibling;
+		}
+		return true;
+	}
 }
 
 void populateTagsHT(Section* section, const char* tags, char separator) {
