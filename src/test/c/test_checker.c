@@ -50,6 +50,8 @@ void assertTestCheckerAndReset(const char* expected) {
 	if (!checkTestChecker(expected)) {
 		fprintf(stderr, "EXPECTED: %s\nACTUAL:   %s\n", expected, __TEST_CHECKER_BUFFER);
 		assert(false);
+	} else {
+		fprintf(stdout, "OK!\n");
 	}
 	clearTestChecker();
 }
