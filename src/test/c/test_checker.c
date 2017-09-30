@@ -48,6 +48,7 @@ bool checkTestCheckerAndReset(const char* expected) {
 
 void assertTestCheckerAndReset(const char* expected) {
 	if (!checkTestChecker(expected)) {
+		fprintf(stdout, "KO!\n");
 		fprintf(stderr, "EXPECTED: %s\nACTUAL:   %s\n", expected, __TEST_CHECKER_BUFFER);
 		assert(false);
 	} else {

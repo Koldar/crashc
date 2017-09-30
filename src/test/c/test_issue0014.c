@@ -5,7 +5,7 @@
  *      Author: koldar
  */
 
-#ifdef TEST_00014_000
+#ifdef TEST_0014_000
 
 #include "crashC.h"
 #include "test_checker.h"
