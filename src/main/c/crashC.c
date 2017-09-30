@@ -31,8 +31,7 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 }
 
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
-    //The second condition is needed due to signal handling
-	if (section->loop1 && !section->executed) {
+	if (section->loop1) {
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).
@@ -40,6 +39,16 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 	Section* _child = section;
 	callback(pointerToSetAsParent, section);
 	if (section->accessGranted) {
+
+		//If we executed the section we check if this execution made the section
+		//fully visited and update its status consequently
+		if (isSectionFullyVisited(section)) {
+			section->status = SECTION_DONE;
+		}
+
+		//We reset the WHEN found tag
+		section->alreadyFoundWhen = false;
+
 		accessGrantedCallback(pointerToSetAsParent, _child);
 	} else {
 		accessDeniedCallback(pointerToSetAsParent, _child);
@@ -95,7 +104,7 @@ void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Secti
 		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
 		//in order to do it, we pop the end after we executed the last children
 		if (section->nextSibling == NULL) {
-			popFromList(section->parent->sectionToRunList);
+			//popFromList(section->parent->sectionToRunList);
 		}
 	}
 }
@@ -116,7 +125,7 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
 	if (!section->parent->childrenNumberComputed) {
 		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
 		if (section->parent->currentChild > 0) {
-			addTailInList(section->parent->sectionToRunList, section);
+			//addTailInList(section->parent->sectionToRunList, section);
 		}
 	}
 
@@ -127,6 +136,18 @@ void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* secti
 
 }
 
+bool getAccess_When(Section * section) {
+	if (section->parent->alreadyFoundWhen) {
+		return false;
+	}
+
+	if (section->status == SECTION_DONE) {
+		return false;
+	}
+
+	return true;
+}
+/*
 bool getAccessSequentially(Section* section) {
 	if (section->parent == NULL) {
 		return true;
@@ -142,10 +163,14 @@ bool getAccessSequentially(Section* section) {
 	}
 
 	return false;
-}
+}*/
 
 void callbackDoNothing(Section* section) {
 
+}
+
+void callbackSetAlreadyFoundWhen(Section * section) {
+	section->parent->alreadyFoundWhen = true;
 }
 
 int defaultMain(int argc, const char* argv[]) {
@@ -164,7 +189,7 @@ static void printSectionData(const Section* section, bool recursive) {
 			(section->parent != NULL ? section->parent->description : "<none>"),
 			section->childrenNumber,
 			(section->childrenNumberComputed ? "yes" : "no"),
-			(section->executed ? "yes" : "no"),
+			(section->status == SECTION_DONE ? "yes" : "no"),
 			section->currentChild,
 			(section->loop1 ? "yes" : "no")
 	);

@@ -127,7 +127,21 @@ typedef struct Section {
 	 * For example, in the graph inside ::Section, section "when 2" has 2 children
 	 */
 	int childrenNumber;
-	bool executed;
+
+	/**
+	 * This field is very important, as it holds information about the current state of the section.
+	 * It can assume different values:
+	 * -SECTION_UNEXEC:		means that the section has never been executed before
+	 * -SECTION_EXEC  :		means that the section has been executed at least once but needs to be executed again for some reason
+	 * -SECTION_DONE  :		means that the section has been fully visited and needs not to be executed anymore
+	 * By definition, we consider a section to be done when is has no child and has been executed at least once or when all of
+	 * its children are done themselves.
+	 */
+	enum {
+		SECTION_UNEXEC,
+		SECTION_EXEC,
+		SECTION_DONE
+	} status;
 
 	/**
 	 * The number of the child we're currently analyzing
@@ -167,6 +181,15 @@ typedef struct Section {
 	bool accessGranted;
 
 	/**
+	 * This field is used to ensure that WHEN sections are executed in the proper order.
+	 * Since only a single WHEN needs to be executed during a given testcase loop, we use
+	 * this field in the parent section to know if during this cycle we already found and
+	 * executed a WHEN section. This implies that this field needs to be reset at every cycle.
+	 *
+	 */
+	bool alreadyFoundWhen;
+
+	/**
 	 * queue used to check which child section has to be executed next.
 	 *
 	 * \attention
@@ -194,8 +217,8 @@ typedef struct Section {
 	 * The head of this list tell us exactly this.
 	 *
 	 * \todo however, the structure will fail if inside the test case there are 2 different section level (ie. 2 whens and 1 then)
-	 */
-	struct SectionCell* sectionToRunList;
+	 *
+	struct SectionCell* sectionToRunList;*/ //I dont think this is really needed
 	/**
 	 * A list containing all the assertions inside this section
 	 */
@@ -282,6 +305,9 @@ bool haveWeRunEveryChildrenInSection(Section* section);
  * @param[in] section the section to mark
  */
 void markSectionAsExecuted(Section* section);
+
+//Documentation in .c file, TODO: move it here
+bool isSectionFullyVisited(Section * section);
 
 /**
  * Given a string \c tags, the function will populate the hash table in \c section with all
