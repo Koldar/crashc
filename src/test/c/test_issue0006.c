@@ -1,4 +1,4 @@
-#ifdef TEST_0006_000
+#ifdef TEST_0006
 
 #include "crashC.h"
 #include "test_checker.h"
