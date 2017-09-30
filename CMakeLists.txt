@@ -9,7 +9,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
-add_definitions(-Wfatal-errors -DTEST_0001_000)
+add_definitions(-Wfatal-errors)
+add_definitions(-DTEST_0020)
 
 add_subdirectory(src/main/c)
 add_subdirectory(src/test/c)
