@@ -137,7 +137,9 @@ typedef struct Section {
 	 */
 	SectionLevelId levelId;
 	/**
-	 * Represents the type of this section
+	 * Represents the type of this section.
+	 *
+	 * For example you can use this field to get whether the section is a WHEN, a THEN or something else
 	 */
 	section_type type;
 	/**
