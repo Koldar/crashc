@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <setjmp.h>
 #include "section.h"
+#include "crashC.h"
 
 //Used by longjmp, no special meaning at the moment
 #define JMP_CODE 1
@@ -17,7 +18,6 @@ bool haveWeRunEveryChildrenAndSignalHandlingSetup(Section * section);
  * Represents the structure used by crashc to handle signals
  */
 extern struct sigaction _crashc_sigaction;
-extern Section * currentSection;
 extern jmp_buf signal_jump_point;
 
 /**

@@ -109,6 +109,13 @@ extern Section rootSection;
  * is set again in a way to point "when2".
  */
 extern Section* currentSection;
+/**
+ * global variable representing the test case crashC is handling right now.
+ * Crash C can handle at most 1 test case per time
+ *
+ * \ingroup globalVariables
+ */
+extern Section* testCaseInvolved;
 
 
 /**
@@ -157,6 +164,22 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
  * 	\li the ::Section::currentChild -th child of \c parent otherwise
  */
 Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags);
+
+/**
+ * Reset the ::currentSection global variable to the given one
+ *
+ * Sometimes it happens that we need to abrutely break the flow of ::currentSection.
+ * For example when we detect an unhandled signal in one of the sections, we don't need to return to the parent of the section involved,
+ * but immediately go to the ::TESTCASE.
+ *
+ * This function allows you to set all the metadata to ensure that such "unorthodox" flow is valid.
+ *
+ * \post
+ * 	\li ::currentSection is valid and refers to \c s
+ *
+ * @param[in] s the section ::currentSection will be moved to
+ */
+void resetCurrentSectionTo(const Section* s);
 
 /**
  * Compute the hash of a string
@@ -231,6 +254,7 @@ void callbackDoNothing(Section* section);
 
 /**
  * Main macro of the test suite
+ *
  */
 #define CONTAINABLESECTION(parent, sectionLevelId, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
@@ -287,13 +311,16 @@ void callbackDoNothing(Section* section);
 				parent, sectionLevelId, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
+				testCaseInvolved = currentSection;																						\
 				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
-					/*we have caught a signal*/																							\
-					markSectionAsExecuted(currentSection);                                                                             \
+					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
+					markSectionAsSignalDetected(currentSection);                                                                        \
+					/*we reset the currentSection to the test case*/																	\
+					resetCurrentSectionTo(testCaseInvolved);																							\
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
-						!haveWeRunEveryChildrenAndSignalHandlingSetup(currentSection)                                                   \
+						!haveWeRunWholeTreeSection(currentSection)                                                   \
 						;																												\
 				)																														\
 		)

@@ -81,22 +81,31 @@ void registerSignalHandlerForSignals() {
 //	if (sigaction(SIGINT, &sa, NULL) == -1) {
 //		perror("Error: cannot handle SIGUSR1"); //should not happen
 //	}
+	//TODO do not register signal if it  is already registers by the program under test itself
 	if (sigaction(SIGFPE, &_crashc_sigaction, NULL) == -1) {
 		perror("Error: cannot handle SIGUSR1"); //should not happen
 	}
 }
 
 /**
+ * Code to be run when a signal was not handled by the program under test itself
+ *
  * This handler is used for every signal whose delivery is considered by CrashC to
  * imply a failure in the running test. This handler is used only if the programmer
  * does not register any other signal handler for the particular signal being considered.
  * What we need to do is mark the current running test as failed and update its status
  * in order that it is not run again on the next LOOPER iteration.
  *
+ * @param signum an ID representing the signal detected
+ *
  */
 void failsig_handler(int signum) {
 
-    //Mark test as failed code//
+	printf("marking section \"%s\" as signal detected!\n", currentSection->description);
+    //Mark test as failed code
+	markSectionAsSignalDetected(currentSection);
+	currentSection->signalDetected = signum;
 
+	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
     siglongjmp(signal_jump_point, 1);
 }

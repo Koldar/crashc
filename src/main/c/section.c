@@ -132,24 +132,47 @@ bool areWeComputingChildren(const Section* section) {
 }
 
 bool haveWeRunEverythingInSection(const Section* section) {
-	return (section->status == SECTION_DONE);
+	return (section->status == SECTION_DONE) || (section->status == SECTION_SIGNAL_DETECTED);
 }
 
-bool haveWeRunEveryChildrenInSection(Section* section) {
+bool haveWeRunWholeTreeSection(const Section* rootSection) {
+	printf("checking whether we have run the whole tree...\n");
+	return haveWeRunEveryChildrenInSection(rootSection);
+}
+
+bool haveWeRunEveryChildrenInSection(const Section* section) {
+	// ****************** CHECKING IF WE HAVE RUN EVERYTHING IN THE GIVEN SECTION *****************************
+
+	char buffer[300];
+	printf("%s\n", (populateBufferStringOfSection(section, 300, buffer), buffer));
+	//this section had raised a signal in the past. So we ignore it as far as running is concerned
+	//note that we ignore a section which raised signals even if we're still computing children on it. It doesn't matter
+	if (section->status == SECTION_SIGNAL_DETECTED) {
+		return true;
+	}
+	if (section->status == SECTION_DONE) {
+		return true;
+	}
+
+	//We still don't know how many children this section has, so we can't tell if we have completely run this section or not
 	if (areWeComputingChildren(section)) {
 		return false;
 	}
+
+	// ***************** CHECKING DIRECT CHILDREN OF THE GIVEN SECTION RECURSIVELY ******************************
+
+	//the section has no children. So of course we have run everything in this section!
 	if (section->firstChild == NULL) {
 		return true;
 	}
 
-	if (!haveWeRunEverythingInSection(section->firstChild)) {
+	//otherwise, we repeat the question to each children of the section:
+	if (!haveWeRunEveryChildrenInSection(section->firstChild)) {
 		return false;
 	}
-
 	Section* tmp = section->firstChild->nextSibling;
 	while (tmp != NULL) {
-		if (!haveWeRunEverythingInSection(tmp)) {
+		if (!haveWeRunEveryChildrenInSection(tmp)) {
 			return false;
 		}
 		tmp = tmp->nextSibling;
@@ -161,6 +184,7 @@ int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer)
 	int i = 0;
 	i += snprintf(&buffer[i], spaceLeft - i, "[%d: %s; status:", s->levelId, s->description);
 	i += populateBufferStringOfSectionStatus(s->status, spaceLeft - i, &buffer[i]);
+	i += snprintf(&buffer[i], spaceLeft - i, "; when found: %s", s->alreadyFoundWhen ? "yes" : "no");
 	i += snprintf(&buffer[i], spaceLeft - i, "]");
 	return i;
 }

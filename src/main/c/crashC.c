@@ -1,7 +1,8 @@
 #include "crashC.h"
 
-Section rootSection = {0, "root", false, 0, 0, false, NULL, NULL, NULL};
+Section rootSection = {0, 0, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
+Section* testCaseInvolved = NULL;
 test_pointer tests_array[MAX_TESTS];
 int suites_array_index = 0;
 
@@ -67,6 +68,10 @@ Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLev
 		return addSectionToParent(initSection(sectionLevelId, decription, tags), parent);
 	}
 	return getNSection(parent, parent->currentChild);
+}
+
+void resetCurrentSectionTo(const Section* s) {
+	currentSection = s;
 }
 
 int hash(const char* str) {
