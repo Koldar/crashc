@@ -95,6 +95,12 @@ struct SectionCell;
  */
 typedef struct Section {
 	/**
+	 * An id that uniquely identifies a prticular section.
+	 *
+	 * Like the pointer of the section, but more easy to read. Used internally
+	 */
+	int id;
+	/**
 	 * The id of the level of the section
 	 *
 	 * Sections on the same level in the tree will share the same level id.
@@ -323,5 +329,39 @@ bool isSectionFullyVisited(Section * section);
  * @param[in] separator a character dividing 2 tags in string \c tags
  */
 void populateTagsHT(Section* section, const char* tags, char separator);
+
+/**
+ * Populated a buffer containing a string representation of the section
+ *
+ * @param[in] s the section whose string representation we want to retrieve
+ * @param[in] spaceLeft the size of the buffer
+ * @param[inout] the buffer itself
+ * @return the number of characters added in the buffer. So after this operation, the space left in the buffer will be \f$ spaceLeft - retVal \f$;
+ */
+int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer);
+
+/**
+ * Populated a buffer containing a string representastion of the section status
+ *
+ * @param[in] ss the section status to print
+ * @param[in] spaceLeft the size of the buffer
+ * @param[inout] the buffer to populate
+ * @return number of characters filled in the buffer
+ */
+int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer);
+
+/**
+ * Generates an image of the section tree useful for debugging purposes
+ *
+ * \pre
+ * 	\li graphviz installed on your system and available in your PATH;
+ * \post
+ * 	\li a png file named like \c format will be present. The path is relative to the CWD
+ *
+ * @param[in] section the section tree where you want to start drawing
+ * @param[in] format a `printf` like format string with all the formatter strings
+ * @param[in] ... variadic components of `printf`
+ */
+void drawSectionTree(const Section* section, const char* format, ...);
 
 #endif /* SECTION_H_ */

@@ -6,8 +6,21 @@
  */
 
 #include "section.h"
+#include <stdio.h>
+#include <stdarg.h>
+
+/**
+ * The id the next section created with ::initSection will have.
+ *
+ * It goes from 1 and not from0 because 0 is **manually** set to the root section, created **statically**.
+ * See ::rootSection
+ */
+static int nextSectionId = 1;
 
 static void printSectionData(const Section* section, bool recursive);
+static void computeDotFileOfSectionTree(FILE* fout, const Section* section);
+static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section);
+static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section* section);
 
 
 /** Adds the given section as a children to the specified parent section.
@@ -60,6 +73,8 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 		MALLOCERRORCALLBACK();
 	}
 
+	retVal->id = nextSectionId;
+	nextSectionId += 1;
 	retVal->accessGranted = false;
 	retVal->alreadyFoundWhen = false;
 	retVal->assertionReportList = initList();
@@ -142,6 +157,34 @@ bool haveWeRunEveryChildrenInSection(Section* section) {
 	return true;
 }
 
+int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer) {
+	int i = 0;
+	i += snprintf(&buffer[i], spaceLeft - i, "[%d: %s; status:", s->levelId, s->description);
+	i += populateBufferStringOfSectionStatus(s->status, spaceLeft - i, &buffer[i]);
+	i += snprintf(&buffer[i], spaceLeft - i, "]");
+	return i;
+}
+
+int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer) {
+	int i = 0;
+	switch (ss) {
+	case SECTION_DONE: { i += snprintf(&buffer[i], spaceLeft - i, "DONE"); break; }
+	case SECTION_EXEC: { i += snprintf(&buffer[i], spaceLeft - i, "EXECUTED"); break; }
+	case SECTION_UNEXEC: { i += snprintf(&buffer[i], spaceLeft - i, "UNEXECUTED"); break; }
+	case SECTION_SIGNAL_DETECTED: { i += snprintf(&buffer[i], spaceLeft - i, "SIGNAL DETECTED"); break; }
+	default: {
+		fprintf(stderr, "invalid section status %d\n", ss);
+		exit(1);
+	}
+	}
+
+	return i;
+}
+
+void markSectionAsSignalDetected(Section* section) {
+	section->status = SECTION_SIGNAL_DETECTED;
+}
+
 /** Marks the given section as already executed by setting
  *  the struct appropriate boolean flag.
  */
@@ -179,6 +222,106 @@ bool isSectionFullyVisited(Section * section) {
 		return true;
 	}
 }
+
+void drawSectionTree(const Section* section, const char* format, ...) {
+	//create image name
+	va_list ap;
+	char imageTemplate[300];
+	va_start(ap, format);
+	vsnprintf(imageTemplate, 300, format, ap);
+	va_end(ap);
+
+	char dotFilename[300];
+	strcpy(dotFilename, imageTemplate);
+	strcat(dotFilename, ".dot");
+
+	FILE* dotFile = fopen(dotFilename, "w");
+	if (dotFile == NULL) {
+		fprintf(stderr, "Can't create dotFile %s! Exiting...", dotFilename);
+		exit(1);
+	}
+	computeDotFileOfSectionTree(dotFile, section);
+	fclose(dotFile);
+
+	char pngFilename[300];
+	strcpy(pngFilename, imageTemplate);
+	strcat(pngFilename, ".png");
+
+	char command[300];
+	snprintf(command, 300, "dot -Tpng -o%s %s", pngFilename, dotFilename);
+	system(command);
+	unlink(dotFilename);
+}
+
+static void computeDotFileOfSectionTree(FILE* fout, const Section* section) {
+	fprintf(fout, "digraph {\n");
+
+	// ******************* define nodes **********************
+	updateDotFileOfSectionTreeWithSectionInfo(fout, section);
+	// ******************* create edges **********************
+	updateDotFileOfSectionTreeWithSectionEdges(fout, section);
+
+	fprintf(fout, "}\n");
+}
+
+/**
+ * Adds inside a *.dot file the lists of all the nodes inside the section tree starting from a given one
+ *
+ * \pre
+ * 	\li \c fout open in "w" mode;
+ * \post
+ * 	\li \c fout contains node whose names patterns are "SECTION%5d" ("%05d" refers to a given section id)
+ *
+ * @param[inout] fout the file to write on
+ * @param[in] section the section where we start writing information from
+ */
+static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section) {
+	char buffer[300];
+	populateBufferStringOfSectionStatus(section->status, 300, buffer);
+	fprintf(fout, "\tSECTION%05d [label=\"%s\\nlevel=%d;\\nstatus=%s\", shape=\"box\"];\n", section->id, section->description, section->levelId, buffer);
+
+	if (section->firstChild == NULL) {
+		return;
+	}
+
+	updateDotFileOfSectionTreeWithSectionInfo(fout, section->firstChild);
+
+	Section* tmp = section->firstChild->nextSibling;
+	while (tmp != NULL) {
+		updateDotFileOfSectionTreeWithSectionInfo(fout, tmp);
+		tmp = tmp->nextSibling;
+	}
+
+}
+
+/**
+ * Adds inside a "*.dot" file all the edges between the nodes
+ *
+ * \pre
+ * 	\li \c fout open in "w" mode;
+ * 	\li ::updateDotFileOfSectionTreeWithSectionInfo called;
+ * \post
+ * 	\li \c fout contains all the edges;
+ *
+ * @param[inout] fout the file to write on
+ * @param[in] section the section where we need to start adding edges from
+ */
+static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section* section) {
+	if (section->firstChild == NULL) {
+		return;
+	}
+
+	updateDotFileOfSectionTreeWithSectionEdges(fout, section->firstChild);
+
+	fprintf(fout, "\tSECTION%05d -> SECTION%05d;\n", section->id, section->firstChild->id);
+	Section* tmp = section->firstChild->nextSibling;
+	while (tmp != NULL) {
+		fprintf(fout, "SECTION%05d -> SECTION%05d;\n", section->id, tmp->id);
+		tmp = tmp->nextSibling;
+	}
+
+}
+
 
 void populateTagsHT(Section* section, const char* tags, char separator) {
 	char token[100];
