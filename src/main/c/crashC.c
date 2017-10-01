@@ -1,6 +1,6 @@
 #include "crashC.h"
 
-Section rootSection = {0, 0, "root", false, 0, 0, false, NULL, NULL, NULL};
+Section rootSection = {0, 0, ST_ROOT, "root", false, 0, 0, false, NULL, NULL, NULL};
 Section* currentSection = NULL;
 Section* testCaseInvolved = NULL;
 test_pointer tests_array[MAX_TESTS];
@@ -61,11 +61,14 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
  *  creates a new section with the given levelId, description,tags and adds it to its
  *  parent section and returns a pointer to the new section.
  *  Else, the function returns a pointer to the currentChild of the given section.
+ *
+ *  @param[in] type the kind of section we're getting.
+ *  @see ::section_type
  */
-Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags) {
+Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
-		return addSectionToParent(initSection(sectionLevelId, decription, tags), parent);
+		return addSectionToParent(initSection(type, parent->levelId + 1, decription, tags), parent);
 	}
 	return getNSection(parent, parent->currentChild);
 }
@@ -142,11 +145,15 @@ void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* secti
 }
 
 bool getAccess_When(Section * section) {
+	//section is the WHEN we're considering right now
+
+	//we don't enter in this WHEN if we have already entered in another WHEN of the parent
 	if (section->parent->alreadyFoundWhen) {
 		return false;
 	}
 
-	if (section->status == SECTION_DONE) {
+	//we don't access to this WHEN if we have already completed it or if it generated a SECTION_SIGNAL
+	if (section->status == SECTION_DONE || section->status == SECTION_SIGNAL_DETECTED) {
 		return false;
 	}
 

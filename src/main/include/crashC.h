@@ -163,7 +163,7 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
  * 	\li a newly created section if we're still computing the children of \c parent
  * 	\li the ::Section::currentChild -th child of \c parent otherwise
  */
-Section* getSectionOrCreateIfNotExist(Section* parent, SectionLevelId sectionLevelId, const char* decription, const char* tags);
+Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags);
 
 /**
  * Reset the ::currentSection global variable to the given one
@@ -256,14 +256,14 @@ void callbackDoNothing(Section* section);
  * Main macro of the test suite
  *
  */
-#define CONTAINABLESECTION(parent, sectionLevelId, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
+#define CONTAINABLESECTION(parent, sectionType, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
 		 */																																\
-		currentSection = getSectionOrCreateIfNotExist(parent, sectionLevelId, description, tags);												\
+		currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);												\
 		currentSection->loopId += 1;																									\
 		setupCode																														\
 		for (																															\
@@ -306,11 +306,12 @@ void callbackDoNothing(Section* section);
  */
 #define REGISTER_FUNCTION(testFunctionName)
 
-#define LOOPER(parent, sectionLevelId, description, tags)																				\
+#define LOOPER(parent, sectionType, description, tags)																				\
 		CONTAINABLESECTION(																												\
-				parent, sectionLevelId, description, tags,																				\
+				parent, sectionType, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
+																																		\
 				testCaseInvolved = currentSection;																						\
 				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
@@ -332,15 +333,15 @@ void callbackDoNothing(Section* section);
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
 //#define EZ_TESTCASE(description) TESTCASE(description, "")
 
-#define ALWAYS_ENTER(sectionLevelId, description, tags) CONTAINABLESECTION(																\
-		currentSection, sectionLevelId, description, tags,																				\
+#define ALWAYS_ENTER(sectionType, description, tags) CONTAINABLESECTION(																\
+		currentSection, sectionType, description, tags,																				\
 		getAlwaysTrue, callbackDoNothing,																								\
 		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,					\
 		NOCODE																															\
 )
 
-#define ENTER_ONE_PER_LOOP(sectionLevelId, description, tags) CONTAINABLESECTION(														\
-		currentSection, sectionLevelId, description, tags,																				\
+#define ENTER_ONE_PER_LOOP(sectionType, description, tags) CONTAINABLESECTION(														\
+		currentSection, sectionType, description, tags,																				\
 		getAccess_When, callbackSetAlreadyFoundWhen, 																						\
 		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
 		NOCODE 																															\

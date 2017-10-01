@@ -67,7 +67,7 @@ Section* getNSection(const Section* parent, int nChild) {
  *  Other values are initialized to their default.
  *  Returns a pointes to the newly created Section.
  */
-Section* initSection(SectionLevelId levelId, const char* description, const char* tags) {
+Section* initSection(section_type type, SectionLevelId levelId, const char* description, const char* tags) {
 	Section* retVal = malloc(sizeof(Section));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
@@ -85,6 +85,7 @@ Section* initSection(SectionLevelId levelId, const char* description, const char
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
 	retVal->failureReportList = initList();
+	retVal->type = type;
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
 	//retVal->sectionToRunList = initList();

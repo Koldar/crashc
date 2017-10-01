@@ -19,6 +19,34 @@ typedef int SectionLevelId;
 struct SectionCell;
 
 /**
+ * Represents the type of this section
+ *
+ * secton type can be used to uniquely determine the behaviour of the section itself
+ */
+typedef enum section_type {
+	/**
+	 * The section is the root of the tree
+	 */
+	ST_ROOT,
+	/**
+	 * The section is a suite case
+	 */
+	ST_SUITECASE,
+	/**
+	 * The section is a testcase
+	 */
+	ST_TESTCASE,
+	/**
+	 * The section is a when
+	 */
+	ST_WHEN,
+	/**
+	 * The section is a then
+	 */
+	ST_THEN
+} section_type;
+
+/**
  * Main structure representing a piece of testable code
  *
  * Examples of sections may be \c TESTCASE, \c WHEN, \c THEN and so on. Whilst this structure <b>does not contain</b>
@@ -108,6 +136,10 @@ typedef struct Section {
 	 * will have ids near +infinity
 	 */
 	SectionLevelId levelId;
+	/**
+	 * Represents the type of this section
+	 */
+	section_type type;
 	/**
 	 * Decription of the section
 	 */
@@ -290,12 +322,13 @@ Section* getNSection(const Section* parent, int nChild);
  * \attention
  * The function allocates data in the heap. To remove it, call ::destroySection
  *
+ * @param[in] type the type of this section
  * @param[in] levelId the level of this section
  * @param[in] description a text describing briefly the section
  * @param[in] tags a single string containing all the tags associated to the section. See \ref tags
  * @return the new ::Section instance jsut created
  */
-Section* initSection(SectionLevelId levelId, const char* description, const char* tags);
+Section* initSection(section_type type, SectionLevelId levelId, const char* description, const char* tags);
 /**
  * Destroy a ::Section inside the heap
  *
