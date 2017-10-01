@@ -9,7 +9,7 @@
 # so, we fetch all the issues in side src/test/c; then, for each of them, we compile
 
 cd .
-if test `basename $(dirname $(realpath .))` != "crashc"
+if test `basename $(realpath .)` != "crashc"
 then
 	echo "You are not in 'crashc' folder! I won't execute this script because I'm not sure this will work!"
 	exit 2
@@ -26,7 +26,7 @@ then
 fi
 CRASHC_TEST_C=`pwd`
 cd "${CRASHC_MAINFOLDER}/build/Debug"
-if test $? -eq 0
+if test $? -ne 0
 then
 	echo "going into build/Debug has failed. Exiting!"
 	exit 2
@@ -40,13 +40,15 @@ OLDPWD=`pwd`
 cd ${CRASHC_BUILD_DEBUG}
 	for issueID in `ls -l ${CRASHC_TEST_C}| grep -E "issue[0-9]+\." | sed 's/  */ /g' | cut -d" " -f9 | sed 's/test_issue\([0-9][0-9]*\)\.c/\1/g'`
 	do
+		printf "testing issue #%04d\n" "${issueID}"
 		#alter CMakeFiles.txt in the main directory
-		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-DTEST_0020)/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
+		printf -v define_value 'TEST_%04d' "${issueID}"
+		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 	
-		cmake ../.. && make && clear && ./Test > output.${issueId}.txt
+		cmake ../.. && make && clear && ./Test > output.${issueID}.txt
 		#we ensure the just created output has no KO
-		if test `cat output.txt | grep "KO" | wc -l` -gt 0
+		if test `cat output.${issueID}.txt | grep "KO" | wc -l` -gt 0
 		then
 			echo "Error while executing test ${issueID}!"
 			cd ${CRASHC_MAIN_FOLDER}
