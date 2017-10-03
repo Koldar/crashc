@@ -45,9 +45,6 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 		if (isSectionFullyVisited(section)) {
 			markSectionAsDone(section);
 		}
-		else {
-			markSectionAsExecuted(section);
-		}
 
 		//We reset the WHEN found tag
 		section->alreadyFoundWhen = false;

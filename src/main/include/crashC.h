@@ -241,6 +241,7 @@ void callbackDoNothing(Section* section);
 				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
 				;																														\
 				currentSection->loop2 = false,																							\
+				markSectionAsExecuted(currentSection)																					\
 		)
 
 #define NOCODE
