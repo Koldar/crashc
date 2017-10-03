@@ -93,6 +93,13 @@ struct SectionCell;
  *
  * Note that the code inside when2 (for example, is all the code between the thens plus the THENs themselves
  */
+
+typedef enum {
+	SECTION_UNEXEC,
+	SECTION_EXEC,
+	SECTION_DONE
+} section_status_enum;
+
 typedef struct Section {
 	/**
 	 * The id of the level of the section
@@ -137,11 +144,7 @@ typedef struct Section {
 	 * By definition, we consider a section to be done when is has no child and has been executed at least once or when all of
 	 * its children are done themselves.
 	 */
-	enum {
-		SECTION_UNEXEC,
-		SECTION_EXEC,
-		SECTION_DONE
-	} status;
+	 section_status_enum status;
 
 	/**
 	 * The number of the child we're currently analyzing
@@ -305,6 +308,13 @@ bool haveWeRunEveryChildrenInSection(Section* section);
  * @param[in] section the section to mark
  */
 void markSectionAsExecuted(Section* section);
+
+/**
+ * Mark the section as \b fully visited
+ *
+ * @param[in] section the section to mark
+ */
+void markSectionAsDone(Section* section);
 
 //Documentation in .c file, TODO: move it here
 bool isSectionFullyVisited(Section * section);

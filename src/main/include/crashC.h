@@ -57,17 +57,6 @@
 #endif
 
 /**
- * Represents a default test main you can use to quickly run your tests with default functionalities
- */
-#ifndef CC_AUTOMAIN
-#	define CC_AUTOMAIN int main(int argc, const char* argv[]){											\
-		return defaultMain(argc, argv);																	\
-}
-#endif
-
-
-
-/**
  * Callback representing a general condition that determine if we can access to a particular section
  *
  * the parameter is the section to check whilst the return value is
@@ -185,21 +174,10 @@ bool getAccess_When(Section * section);
  * @param[in] section the section involved
  */
 bool getAlwaysTrue(Section* section);
-/**
- * Grant access only to one section type per ::LOOPER loop
- *
- * Grant access only if:
- * \li we're still computing the number of children and we are in the first children;
- * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
- */
-bool getAccessSequentially(Section* section);
 
 ///@}
 
 void callbackSetAlreadyFoundWhen(Section * section);
-
-//Maybe became obsolete?
-int defaultMain(int argc, const char* argv[]);
 
 ///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
 ///@{
@@ -263,7 +241,6 @@ void callbackDoNothing(Section* section);
 				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
 				;																														\
 				currentSection->loop2 = false,																							\
-				markSectionAsExecuted(currentSection)  																					\
 		)
 
 #define NOCODE
@@ -273,14 +250,6 @@ void callbackDoNothing(Section* section);
  */
 #define TEST_FUNCTION(testFunctionName)																							\
 	void testFunctionName()
-
-/**
- * Register a function defined by ::TEST_FUNCTION
- *
- * In my knowledge, it's impossible to auto register a function in C with macro programming.
- * From this assumption, we need to register in some way a function. This macro allows to mask the register itself.
- */
-#define REGISTER_FUNCTION(testFunctionName)
 
 #define LOOPER(parent, sectionLevelId, description, tags)																				\
 		CONTAINABLESECTION(																												\

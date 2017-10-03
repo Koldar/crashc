@@ -43,7 +43,10 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 		//If we executed the section we check if this execution made the section
 		//fully visited and update its status consequently
 		if (isSectionFullyVisited(section)) {
-			section->status = SECTION_DONE;
+			markSectionAsDone(section);
+		}
+		else {
+			markSectionAsExecuted(section);
 		}
 
 		//We reset the WHEN found tag
