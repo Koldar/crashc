@@ -1,3 +1,5 @@
+#ifdef TEST_0001_000
+
 #include "crashC.h"
 
 TESTSUITE(1) {
@@ -25,3 +27,5 @@ TESTCASE("testcase1", "") {
     }
 }
 }
+
+#endif
