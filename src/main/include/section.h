@@ -17,6 +17,7 @@
  */
 typedef int SectionLevelId;
 struct SectionCell;
+typedef struct Section Section;
 
 /**
  * Represents the type of this section
@@ -290,14 +291,13 @@ typedef struct Section {
 	 */
 	int signalDetected;
 
-
 	///the parent of this section in the tree. May be NULL
 	struct Section* parent;
 	///the first child this section has in the tree. May be NULL
 	struct Section* firstChild;
 	///the next sibling this section has in the tree. May be NULL
 	struct Section* nextSibling;
-} Section;
+};
 
 
 /**

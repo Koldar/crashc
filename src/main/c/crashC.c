@@ -73,7 +73,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 	return getNSection(parent, parent->currentChild);
 }
 
-void resetCurrentSectionTo(const Section* s) {
+void resetFromSignalCurrentSectionTo(int signal, const Section* signaledSection, const Section* s) {
 	currentSection = s;
 }
 
@@ -183,6 +183,14 @@ void callbackDoNothing(Section* section) {
 
 void callbackSetAlreadyFoundWhen(Section * section) {
 	section->parent->alreadyFoundWhen = true;
+}
+
+void signalWhenCallback(int signal, Section* signalledSection, Section* section, Section* targetSection) {
+	section->parent->alreadyFoundWhen = false;
+}
+
+void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
+
 }
 
 int defaultMain(int argc, const char* argv[]) {

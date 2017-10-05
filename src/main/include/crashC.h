@@ -156,7 +156,7 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 /**
  * @param[in] parent the section containing the one we're creating. For example if we're in the test code of <tt>TESTCASE</tt> and we see a  <tt>WHEN</tt> clause
  * 				this attribute is set to the metadata representing <tt>TESTCASE</tt>.
- * @param[in] sectionLevelId the level the children is located
+ * @param[in] type the kind of section to fetch
  * @param[in] decription a brief string explaining what this section is and does
  * @param[in] tags a list of tags. See \ref tags for further information
  * @return
@@ -166,7 +166,7 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags);
 
 /**
- * Reset the ::currentSection global variable to the given one
+ * Reset the ::currentSection global variable to the given one after we have detected a signal
  *
  * Sometimes it happens that we need to abrutely break the flow of ::currentSection.
  * For example when we detect an unhandled signal in one of the sections, we don't need to return to the parent of the section involved,
@@ -177,9 +177,11 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
  * \post
  * 	\li ::currentSection is valid and refers to \c s
  *
- * @param[in] s the section ::currentSection will be moved to
+ * @param[in] signal the signal raised
+ * @param[inout] signalSection the section that caused a signal
+ * @param[inout] s the section ::currentSection will be moved to
  */
-void resetCurrentSectionTo(const Section* s);
+void resetFromSignalCurrentSectionTo(int signal, const Section* signaledSection, const Section* s);
 
 /**
  * Compute the hash of a string
@@ -221,6 +223,17 @@ bool getAccessSequentially(Section* section);
 
 void callbackSetAlreadyFoundWhen(Section * section);
 
+///\defgroup SIGNALCALLBACKS callbacks to reset metadata inside section tree after a signal has been detected
+///@{
+
+void signalWhenCallback(int signal, Section* signalledSection, Section* section, Section* targetSection);
+
+void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection);
+
+
+
+///@}
+
 //Maybe became obsolete?
 int defaultMain(int argc, const char* argv[]);
 
@@ -254,7 +267,6 @@ void callbackDoNothing(Section* section);
 
 /**
  * Main macro of the test suite
- *
  */
 #define CONTAINABLESECTION(parent, sectionType, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
@@ -317,7 +329,7 @@ void callbackDoNothing(Section* section);
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
 					markSectionAsSignalDetected(currentSection);                                                                        \
 					/*we reset the currentSection to the test case*/																	\
-					resetCurrentSectionTo(testCaseInvolved);																							\
+					resetFromSignalCurrentSectionTo(currentSection->signalDetected, currentSection, testCaseInvolved);																							\
 				}                                                                                                                       \
 				for (    																												\
 						;																												\

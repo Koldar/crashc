@@ -12,7 +12,7 @@ TESTSUITE(1) {
 	int i=0;
     TESTCASE("testcase1", "") {
     	i += 1;
-    	drawSectionTree(&rootSection, "issue14_%04d", i);
+    	//drawSectionTree(&rootSection, "issue14_%04d", i);
     	addCharacter('a');
         WHEN("when 1", "") { //we enter here the first time. We then detect a signal and we mark that section are "signaled"
         	addCharacter('b');
