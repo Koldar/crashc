@@ -12,7 +12,6 @@
 #define NO_FLAGS 0
 
 void failsig_handler(int);
-bool haveWeRunEveryChildrenAndSignalHandlingSetup(Section * section);
 
 /**
  * Represents the structure used by crashc to handle signals
