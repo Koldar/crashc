@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 add_definitions(-Wfatal-errors)
-add_definitions(-DTEST_0006)
+add_definitions(-DTEST_0014)
 
 add_subdirectory(src/main/c)
 add_subdirectory(src/test/c)
