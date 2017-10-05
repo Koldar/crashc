@@ -38,15 +38,17 @@ CRASHC_BUILD_DEBUG=`pwd`
 OLDPWD=`pwd`
 
 cd ${CRASHC_BUILD_DEBUG}
+	ls -l ${CRASHC_TEST_C}| grep -E "issue[0-9]+\." | sed 's/  */ /g' | cut -d" " -f9 | sed 's/test_issue\([0-9][0-9]*\)\.c/\1/g'
 	for issueID in `ls -l ${CRASHC_TEST_C}| grep -E "issue[0-9]+\." | sed 's/  */ /g' | cut -d" " -f9 | sed 's/test_issue\([0-9][0-9]*\)\.c/\1/g'`
 	do
-		printf "testing issue #%04d\n" "${issueID}"
+		issueIDInt=`expr ${issueID} + 0`
+		printf "testing issue %04d\n" ${issueIDInt}
 		#alter CMakeFiles.txt in the main directory
-		printf -v define_value 'TEST_%04d' "${issueID}"
+		printf -v define_value 'TEST_%04d' "${issueIDInt}"
 		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 	
-		cmake ../.. && make && clear && ./Test > output.${issueID}.txt
+		cmake ../.. && make && clear && ./Test > "output.${issueID}.txt"
 		#we ensure the just created output has no KO
 		if test `cat output.${issueID}.txt | grep "KO" | wc -l` -gt 0
 		then
