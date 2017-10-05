@@ -210,6 +210,10 @@ void markSectionAsSignalDetected(Section* section) {
 	section->status = SECTION_SIGNAL_DETECTED;
 }
 
+bool isSectionSignalDetected(const Section* section) {
+	return section->status == SECTION_SIGNAL_DETECTED;
+}
+
 /** Marks the given section as already executed by setting
  *  the struct appropriate boolean flag.
  */

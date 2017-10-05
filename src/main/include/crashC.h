@@ -325,15 +325,17 @@ void callbackDoNothing(Section* section);
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
 																																		\
 				testCaseInvolved = currentSection;																						\
+				bool UV(signalDetected) = false;	\
 				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
 					markSectionAsSignalDetected(currentSection);                                                                        \
+					UV(signalDetected) = true; \
 					/*we reset the currentSection to the test case*/																	\
 					resetFromSignalCurrentSectionTo(currentSection->signalDetected, currentSection, testCaseInvolved);																							\
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
-						!haveWeRunWholeTreeSection(currentSection)                                                   \
+						!UV(signalDetected) && !haveWeRunWholeTreeSection(currentSection)                                                   \
 						;																												\
 				)																														\
 		)

@@ -124,11 +124,12 @@ typedef enum section_type {
  */
 typedef struct Section {
 	/**
-	 * An id that uniquely identifies a prticular section.
+	 * An id that uniquely identifies a particular section.
 	 *
 	 * Like the pointer of the section, but more easy to read. Used internally
 	 */
 	int id;
+	//TODO levelId is actually useless because you can fetch it from parent pointers
 	/**
 	 * The id of the level of the section
 	 *
@@ -380,6 +381,12 @@ bool haveWeRunEveryChildrenInSection(const Section* section);
  * @param[inout] section the section to alter
  */
 void markSectionAsSignalDetected(Section* section);
+
+/**
+ * @param[in] section the section to check
+ * @return true if the section was marked as signal detected; false otherwise
+ */
+bool isSectionSignalDetected(const Section* section);
 
 /**
  * Mark the section as \b executed
