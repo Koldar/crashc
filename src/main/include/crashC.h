@@ -199,7 +199,6 @@ bool getAccess_When(Section * section);
  * @param[in] section the section involved
  */
 bool getAlwaysTrue(Section* section);
-<<<<<<< HEAD
 
 /**
  * Grant access only to one section type per ::LOOPER loop
@@ -209,8 +208,6 @@ bool getAlwaysTrue(Section* section);
  * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
  */
 bool getAccessSequentially(Section* section);
-=======
->>>>>>> refs/remotes/origin/issue#14
 
 ///@}
 
