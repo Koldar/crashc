@@ -133,7 +133,7 @@ bool areWeComputingChildren(const Section* section) {
 }
 
 bool haveWeRunEverythingInSection(const Section* section) {
-	return (section->status == SECTION_DONE) || (section->status == SECTION_SIGNAL_DETECTED);
+	return (section->status == SECTION_DONE);
 }
 
 bool haveWeRunWholeTreeSection(const Section* rootSection) {
@@ -144,13 +144,6 @@ bool haveWeRunWholeTreeSection(const Section* rootSection) {
 bool haveWeRunEveryChildrenInSection(const Section* section) {
 	// ****************** CHECKING IF WE HAVE RUN EVERYTHING IN THE GIVEN SECTION *****************************
 
-	char buffer[300];
-	printf("%s\n", (populateBufferStringOfSection(section, 300, buffer), buffer));
-	//this section had raised a signal in the past. So we ignore it as far as running is concerned
-	//note that we ignore a section which raised signals even if we're still computing children on it. It doesn't matter
-	if (section->status == SECTION_SIGNAL_DETECTED) {
-		return true;
-	}
 	if (section->status == SECTION_DONE) {
 		return true;
 	}

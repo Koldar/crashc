@@ -57,17 +57,6 @@
 #endif
 
 /**
- * Represents a default test main you can use to quickly run your tests with default functionalities
- */
-#ifndef CC_AUTOMAIN
-#	define CC_AUTOMAIN int main(int argc, const char* argv[]){											\
-		return defaultMain(argc, argv);																	\
-}
-#endif
-
-
-
-/**
  * Callback representing a general condition that determine if we can access to a particular section
  *
  * the parameter is the section to check whilst the return value is
@@ -210,6 +199,7 @@ bool getAccess_When(Section * section);
  * @param[in] section the section involved
  */
 bool getAlwaysTrue(Section* section);
+
 /**
  * Grant access only to one section type per ::LOOPER loop
  *
@@ -222,20 +212,6 @@ bool getAccessSequentially(Section* section);
 ///@}
 
 void callbackSetAlreadyFoundWhen(Section * section);
-
-///\defgroup SIGNALCALLBACKS callbacks to reset metadata inside section tree after a signal has been detected
-///@{
-
-void signalWhenCallback(int signal, Section* signalledSection, Section* section, Section* targetSection);
-
-void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection);
-
-
-
-///@}
-
-//Maybe became obsolete?
-int defaultMain(int argc, const char* argv[]);
 
 ///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
 ///@{

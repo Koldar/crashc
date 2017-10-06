@@ -47,6 +47,28 @@ typedef enum section_type {
 	ST_THEN
 } section_type;
 
+typedef enum {
+	SECTION_UNEXEC,
+	SECTION_EXEC,
+	SECTION_DONE,
+	/**
+	 * A section has this state when inside its body the program encountered a signal
+	 *
+	 * The status is set only when the code **directed** owned by the section generates a signal. So for example in
+	 * the figure below the signal was raised during the source code of section "B", after executing section "C" but before section "D"
+	 * @dot
+	 * \digraph {
+	 *  A[label="A\\nEXEC"]; B[label="B\\SIGNAL_DETECTED"]; C[label="C\\nDONE"] D[label="UNEXEC"]; E[label="E\\nUNEXEC"]; F[label="F\\nUNEXEC"];
+	 *	A -> B -> C; B -> D; A -> E; A -> F;
+	 * }
+	 * @enddot
+	 *
+	 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNEXEC,
+	 * those section will never be run at all.
+	 */
+	SECTION_SIGNAL_DETECTED
+} section_status_enum;
+
 /**
  * Main structure representing a piece of testable code
  *
@@ -169,7 +191,6 @@ typedef struct Section {
 	 * For example, in the graph inside ::Section, section "when 2" has 2 children
 	 */
 	int childrenNumber;
-
 	/**
 	 * This field is very important, as it holds information about the current state of the section.
 	 * It can assume different values:
@@ -179,27 +200,7 @@ typedef struct Section {
 	 * By definition, we consider a section to be done when is has no child and has been executed at least once or when all of
 	 * its children are done themselves.
 	 */
-	enum {
-		SECTION_UNEXEC,
-		SECTION_EXEC,
-		SECTION_DONE,
-		/**
-		 * A section has this state when inside its body the program encountered a signal
-		 *
-		 * The status is set only when the code **directed** owned by the section generates a signal. So for example in
-		 * the figure below the signal was raised during the source code of section "B", after executing section "C" but before section "D"
-		 * @dot
-		 * \digraph {
-		 *  A[label="A\\nEXEC"]; B[label="B\\SIGNAL_DETECTED"]; C[label="C\\nDONE"] D[label="UNEXEC"]; E[label="E\\nUNEXEC"]; F[label="F\\nUNEXEC"];
-		 *	A -> B -> C; B -> D; A -> E; A -> F;
-		 * }
-		 * @enddot
-		 *
-		 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNEXEC,
-		 * those section will never be run at all.
-		 */
-		SECTION_SIGNAL_DETECTED
-	} status;
+	section_status_enum status;
 
 	/**
 	 * The number of the child we're currently analyzing

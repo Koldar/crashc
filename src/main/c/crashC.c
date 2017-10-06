@@ -44,7 +44,7 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 		//If we executed the section we check if this execution made the section
 		//fully visited and update its status consequently
 		if (isSectionFullyVisited(section)) {
-			section->status = SECTION_DONE;
+			markSectionAsDone(section);
 		}
 
 		//We reset the WHEN found tag
@@ -183,10 +183,6 @@ void callbackDoNothing(Section* section) {
 
 void callbackSetAlreadyFoundWhen(Section * section) {
 	section->parent->alreadyFoundWhen = true;
-}
-
-void signalWhenCallback(int signal, Section* signalledSection, Section* section, Section* targetSection) {
-	section->parent->alreadyFoundWhen = false;
 }
 
 void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
