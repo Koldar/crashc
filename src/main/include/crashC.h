@@ -199,6 +199,7 @@ bool getAccess_When(Section * section);
  * @param[in] section the section involved
  */
 bool getAlwaysTrue(Section* section);
+<<<<<<< HEAD
 
 /**
  * Grant access only to one section type per ::LOOPER loop
@@ -208,6 +209,8 @@ bool getAlwaysTrue(Section* section);
  * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
  */
 bool getAccessSequentially(Section* section);
+=======
+>>>>>>> refs/remotes/origin/issue#14
 
 ///@}
 
@@ -275,7 +278,7 @@ void callbackDoNothing(Section* section);
 				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
 				;																														\
 				currentSection->loop2 = false,																							\
-				markSectionAsExecuted(currentSection)  																					\
+				markSectionAsExecuted(currentSection)																					\
 		)
 
 #define NOCODE
@@ -285,14 +288,6 @@ void callbackDoNothing(Section* section);
  */
 #define TEST_FUNCTION(testFunctionName)																							\
 	void testFunctionName()
-
-/**
- * Register a function defined by ::TEST_FUNCTION
- *
- * In my knowledge, it's impossible to auto register a function in C with macro programming.
- * From this assumption, we need to register in some way a function. This macro allows to mask the register itself.
- */
-#define REGISTER_FUNCTION(testFunctionName)
 
 #define LOOPER(parent, sectionType, description, tags)																				\
 		CONTAINABLESECTION(																												\

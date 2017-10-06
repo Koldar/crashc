@@ -207,11 +207,19 @@ bool isSectionSignalDetected(const Section* section) {
 	return section->status == SECTION_SIGNAL_DETECTED;
 }
 
-/** Marks the given section as already executed by setting
- *  the struct appropriate boolean flag.
+/** Marks the given section as already executed once by setting
+ *  the appropriate section_status_enum value
  */
 void markSectionAsExecuted(Section* section) {
 	section->status = SECTION_EXEC;
+}
+
+/**
+ * Marks the given section as fully visited by setting the
+ * appropriate section_status_enum value
+ */
+void markSectionAsDone(Section * section) {
+	section->status = SECTION_DONE;
 }
 
 /*
