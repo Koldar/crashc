@@ -65,6 +65,17 @@ int compareTags(const tag* tag1, const tag* tag2);
 bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2);
 
 /**
+ * Adds a new tag inside a hashtable
+ *
+ * \post
+ * 	\li after this operation, the hastable has increased its size by 1
+ *
+ * @param[inout] tagHashTable hashtable to populate
+ * @param[in] name name of the tag to add
+ */
+void addTagNameInTagHashTable(tag_ht* tagHashTable, const char* name);
+
+/**
  *
  * @param[in] str the string whose hash we want to compute
  * @return the hashcode of a string

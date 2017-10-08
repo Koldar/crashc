@@ -48,6 +48,12 @@ bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2) {
 	return false;
 }
 
+void addTagNameInTagHashTable(tag_ht* tagHashTable, const char* name) {
+	//TODO to improve performances you don't need to create a tag every time you see a name, There should be a tag pool containing
+	//all the tags in the project. In this way, tag with the same name are created only once
+	addItemInHTWithKey(tagHashTable, getHashOfString(name), initTag(name));
+}
+
 int getHashOfString(const char* str) {
 	unsigned int hash = 5381;
 	int c;
