@@ -5,6 +5,8 @@ Section* currentSection = NULL;
 Section* testCaseInvolved = NULL;
 test_pointer tests_array[MAX_TESTS];
 int suites_array_index = 0;
+tag_ht* runOnlyIfTags = NULL;
+tag_ht* excludeTags = NULL;
 
 /**
  * This function registers a testsuite by storing its function pointer into
@@ -20,10 +22,34 @@ void update_test_array(test_pointer func) {
     suites_array_index++;
 }
 
+void setupContextTags() {
+	if (runOnlyIfTags == NULL) {
+		runOnlyIfTags = initHT();
+	}
+	if (excludeTags == NULL) {
+		excludeTags = initHT();
+	}
+
+}
+
+
+void tearDownContextTags() {
+	if (runOnlyIfTags != NULL) {
+		destroyHTCellWithElement(runOnlyIfTags, destroyTag);
+		runOnlyIfTags = NULL;
+	}
+	if (excludeTags != NULL) {
+		destroyHTCellWithElement(excludeTags, destroyTag);
+		excludeTags = NULL;
+	}
+}
+
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
 	if (!section->loop2) {
 		return false;
 	}
+
+
 	section->accessGranted = cs(section);
 	if (section->accessGranted) {
 		callback(section);

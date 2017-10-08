@@ -106,11 +106,39 @@ extern Section* currentSection;
  */
 extern Section* testCaseInvolved;
 
+/**
+ * Represents the tags the user has specified as the only one that should be consider
+ *
+ * A test is run only if it declares at least one tag inside this container.
+ * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
+ *
+ * \ingroup globalVariables
+ */
+extern tag_ht* runOnlyIfTags;
+/**
+ * Represents the tags the user has specified as the ones that excludes tests
+ *
+ * A test is skipped if it declares at least one tag inside this container.
+ * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
+ *
+ * \ingroup globalVariables
+ */
+extern tag_ht* excludeTags;
 
 /**
  * Function used to update the tests_array[] array when registering a new testsuite
  */
 void update_test_array(test_pointer);
+
+/**
+ * Setup ::runOnlyIfTags and ::excludeTags
+ */
+void setupContextTags();
+
+/**
+ * Destroy ::runOnlyIfTags and ::excludeTags
+ */
+void tearDownContextTags();
 
 /**
  * Function to run in the access cycle
@@ -342,11 +370,13 @@ void callbackDoNothing(Section* section);
 #   define MAX_TESTS 256
 #endif
 
+//TODO all those functions should be included in the only one global models
 /**
  * Macro used to contain all test declarations and to generate the main function for the
  * execution of the various tests
  */
 #define TESTS_START int main(void) { \
+		setupContextTags(); \
 		_crashc_sigaction.sa_handler = &failsig_handler;  \
 		registerSignalHandlerForSignals();
 

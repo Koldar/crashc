@@ -24,7 +24,7 @@ typedef struct Tag {
 /**
  * An alias to improve readability inside the code
  */
-typedef Tag TagHashTable;
+typedef Tag tag_ht;
 
 /**
  * Removed from memory a previously created tag

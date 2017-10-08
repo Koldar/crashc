@@ -173,7 +173,7 @@ typedef struct Section {
 	/**
 	 * List of tags associated to the section
 	 */
-	TagHashTable* tags;
+	tag_ht* tags;
 
 	/**
 	 * determine if ::Section::childrenNumber has a meaning
@@ -237,6 +237,19 @@ typedef struct Section {
 	 * true if the software has given us the access to execute the code inside the Section, false otheriwse
 	 */
 	bool accessGranted;
+	/**
+	 * true if the software has given us the access to execute the code tag-wise
+	 *
+	 * The software can deny the access to the underlying section for 2 reasons:
+	 * \li the section has incompatible tags with the tag context of the test run;
+	 * \li the condition of the section is not satisfied;
+	 *
+	 *
+	 * The first check is computed before the second one. Together with  ::Section::accessGranted, this field
+	 * allow you to understand why a particular section has been denied. In particular this field is true
+	 * if the section tags are compatible with the tag context; false otherwise
+	 */
+	bool accessTagGranted;
 
 	/**
 	 * This field is used to ensure that WHEN sections are executed in the proper order.
@@ -404,6 +417,8 @@ void markSectionAsDone(Section* section);
 
 //Documentation in .c file, TODO: move it here
 bool isSectionFullyVisited(Section * section);
+
+bool isIntersectionSectionWithContextTagsEmpty(Section* section, tag_ht* tags);
 
 /**
  * Given a string \c tags, the function will populate the hash table in \c section with all
