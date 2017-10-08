@@ -10,21 +10,6 @@
 #include "errors.h"
 #include <stdbool.h>
 
-/**
- * A structure representing a cell of the hash table
- *
- * see <a href="http://troydhanson.github.io/uthash/userguide.html">uthash</a> for further information
- */
-typedef struct HTCell {
-	unsigned long id;
-	void* data;
-	UT_hash_handle hh;
-} HTCell;
-
-typedef struct HT {
-	HTCell* head;
-};
-
 static HTCell* initHTCell(const void* e, unsigned long key);
 static void destroyHTCell(HTCell* htCell);
 
@@ -152,7 +137,7 @@ bool isHTEmpty(const HT* ht) {
 }
 
 void* getFirstItemInHT(const HT* ht) {
-	ITERATE_VALUES_ON_HT(ht, data, void) {
+	ITERATE_VALUES_ON_HT(ht, data, void*) {
 		return data;
 	}
 	return NULL;

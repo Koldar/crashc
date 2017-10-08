@@ -33,9 +33,20 @@
 #include "uthash.h"
 #include "macros.h"
 
-typedef struct HT HT;
+/**
+ * A structure representing a cell of the hash table
+ *
+ * see <a href="http://troydhanson.github.io/uthash/userguide.html">uthash</a> for further information
+ */
+typedef struct HTCell {
+	unsigned long id;
+	void* data;
+	UT_hash_handle hh;
+} HTCell;
 
-typedef struct HTCell HTCell;
+typedef struct HT {
+	HTCell* head;
+} HT;
 
 /**
  * Create a new hashtable in memory
@@ -226,13 +237,13 @@ for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));     
  *
  * @param[in] _head double point to an hashtable to go through
  * @param[in] _data the name of the variable that will contain a value in the iteration
- * @param[in] type the type of \c _data. pointer is automatically added. So if you put \c int, data will have type <tt>int*</tt>
+ * @param[in] type the type of \c _data. So if you put \c int, data will have type <tt>int</tt>
  */
 #define ITERATE_VALUES_ON_HT(_head,_data,type) \
 	HTCell* UV(head) = ((HT*)(_head))->head;\
 	HTCell* UV(el) = NULL; \
 	HTCell* UV(tmp) = NULL;\
-	type* _data = NULL; \
+	type _data = NULL; \
 	if (UV(head) != NULL) { \
 		_data = UV(head)->data; \
 	} \
