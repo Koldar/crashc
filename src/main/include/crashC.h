@@ -110,7 +110,9 @@ extern Section* testCaseInvolved;
  * Represents the tags the user has specified as the only one that should be consider
  *
  * A test is run only if it declares at least one tag inside this container.
- * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
+ * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence.
+ *
+ * If this hashtable is empty, then we consider as if the check does't need to happen
  *
  * \ingroup globalVariables
  */
@@ -120,6 +122,8 @@ extern tag_ht* runOnlyIfTags;
  *
  * A test is skipped if it declares at least one tag inside this container.
  * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
+ *
+ * If this hashtable is empty, then we consider as if the check does't need to happen
  *
  * \ingroup globalVariables
  */
@@ -151,8 +155,13 @@ void tearDownContextTags();
  * @param[in] section the section we want to access in
  * @param[in] cs the condition we need to satisfy in order to access the section
  * @param[in] callback the code to execute if the system grant us access to the section. Note that in this way the code is called \b before entering in the section
+ * @param[in] runOnlyIfTags an hash table containing all the tags allowed. If a section does not have a tag inside this set, it won't be run
+ * @param[in] excludeIfTags an hash table containing all the tags prohibited. If a section has at least one tag inside this set, it won't be run
+ * @return
+ * 	\li true if the section has to be explored;
+ * 	\li false otherwise;
  */
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback);
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags);
 /**
  * Function supposed to run in the parentSwitcher cycle
  *
@@ -300,7 +309,7 @@ void callbackDoNothing(Section* section);
 		for (																															\
 				currentSection->loop2 = true																							\
 				;																														\
-				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack)										\
+				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack, runOnlyIfTags, excludeTags)										\
 				;																														\
 				currentSection->loop2 = false,																							\
 				markSectionAsExecuted(currentSection)																					\

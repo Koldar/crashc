@@ -44,11 +44,31 @@ void tearDownContextTags() {
 	}
 }
 
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback) {
+bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
 	if (!section->loop2) {
 		return false;
 	}
 
+	//TODO here we need  to replace the parameter runOnlyWithTags and excludeIfTags with a pointer of the global model
+	//check if the section we're dealing with is compliant with the context tags
+	if (!isHTEmpty(excludeIfTags)) {
+		if (haveTagSetsIntersection(section->tags, excludeIfTags)) {
+			section->accessTagGranted = false;
+			section->accessGranted = false;
+			markSectionAsSkippedByTag(section);
+			return false;
+		}
+	}
+
+	if (!isHTEmpty(runOnlyIfTags)) {
+		if (!haveTagSetsIntersection(section->tags, runOnlyIfTags)) {
+			section->accessTagGranted = false;
+			section->accessGranted = false;
+			markSectionAsSkippedByTag(section);
+			return false;
+		}
+	}
+	section->accessTagGranted = true;
 
 	section->accessGranted = cs(section);
 	if (section->accessGranted) {
@@ -101,15 +121,6 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 
 void resetFromSignalCurrentSectionTo(int signal, const Section* signaledSection, const Section* s) {
 	currentSection = s;
-}
-
-int hash(const char* str) {
-	unsigned int hash = 5381;
-	int c;
-
-	while ((c = *str++))
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-	return hash;
 }
 
 bool getAlwaysTrue(Section* section) {

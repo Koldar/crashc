@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+
 /**
  * The id the next section created with ::initSection will have.
  *
@@ -93,7 +94,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
-	retVal->tags = NULL;
+	retVal->tags = initHT();
 
 	populateTagsHT(retVal, tags, ' ');
 
@@ -112,12 +113,7 @@ void destroySection(Section* section) {
 		return;
 	}
 
-	Tag* current;
-	Tag* tmp;
-	HASH_ITER(hh, section->tags, current, tmp) {
-		HASH_DEL(section->tags, current);
-		destroyTag(current);
-	}
+	destroyHTWithElements(section->tags, destroyTag);
 	destroyList(section->failureReportList);
 	//destroyListWithElement(section->sectionToRunList, destroySection);
 	destroyListWithElement(section->assertionReportList, destroyTestReport);
@@ -220,6 +216,10 @@ void markSectionAsExecuted(Section* section) {
  */
 void markSectionAsDone(Section * section) {
 	section->status = SECTION_DONE;
+}
+
+void markSectionAsSkippedByTag(Section* section) {
+	section->status = SECTION_SKIPPED_BY_TAG;
 }
 
 /*
@@ -357,7 +357,6 @@ void populateTagsHT(Section* section, const char* tags, char separator) {
 	char token[100];
 	char* positionToWriteInBuffer = NULL;
 	int tokenId;
-	Tag* tag;
 
 	//i don't want to use strtok because it may be used inside the functions to test: i don't want to mess with their strtok starte
 	while(*tags != '\0') {
@@ -375,16 +374,12 @@ void populateTagsHT(Section* section, const char* tags, char separator) {
 			tags++;
 		}
 
-		tokenId = hash(token);
-		HASH_FIND_INT(section->tags, &tokenId, tag);
-		if (tag == NULL) {
-			tag = malloc(sizeof(Tag));
-			if (tag == NULL) {
-				MALLOCERRORCALLBACK();
-			}
-			tag->id = tokenId;
-			tag->name = strdup(token);
-			HASH_ADD_INT(section->tags, id, tag);
+		//add the fetched tag inside the section
+		tokenId = getHashOfString(token);
+		tag* tagWithTokenId = getItemInHT(section->tags, tokenId);
+		if (tagWithTokenId == NULL) {
+			tagWithTokenId = initTag(token);
+			addItemInHTWithKey(section->tags, tokenId, tagWithTokenId);
 		}
 	}
 }

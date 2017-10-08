@@ -66,7 +66,14 @@ typedef enum {
 	 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNEXEC,
 	 * those section will never be run at all.
 	 */
-	SECTION_SIGNAL_DETECTED
+	SECTION_SIGNAL_DETECTED,
+	/**
+	 * A section has this state when we encountered it but we didn't explore its body because the tags were uncompliant with the context
+	 *
+	 * Suppose the user chose to exclude sections whose tags contains "SKIP". If we encounter any section containing the tag "SKIP"
+	 * we need to mark it somehow. This status represents this very concept.
+	 */
+	SECTION_SKIPPED_BY_TAG
 } section_status_enum;
 
 /**
@@ -415,10 +422,26 @@ void markSectionAsExecuted(Section* section);
  */
 void markSectionAsDone(Section* section);
 
+/**
+ * Mark section as a one which we didn't explore because of the tags
+ *
+ * @param[in] section the section whose status we need to update
+ */
+void markSectionAsSkippedByTag(Section* section);
+
 //Documentation in .c file, TODO: move it here
 bool isSectionFullyVisited(Section * section);
 
-bool isIntersectionSectionWithContextTagsEmpty(Section* section, tag_ht* tags);
+/**
+ * Check if the 2 hashtables has an intersection not null
+ *
+ * @param[in] tagSet1 the first tagset to check;
+ * @param[in] tagSet2 the second tagset too check
+ * @return
+ * 	\li true if the 2 sets has at least one element in common;
+ * 	\li false otherwise
+ */
+bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2);
 
 /**
  * Given a string \c tags, the function will populate the hash table in \c section with all
