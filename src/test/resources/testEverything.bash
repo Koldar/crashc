@@ -38,7 +38,6 @@ CRASHC_BUILD_DEBUG=`pwd`
 OLDPWD=`pwd`
 
 cd ${CRASHC_BUILD_DEBUG}
-	ls -l ${CRASHC_TEST_C}| grep -E "issue[0-9]+\." | sed 's/  */ /g' | cut -d" " -f9 | sed 's/test_issue\([0-9][0-9]*\)\.c/\1/g'
 	for issueID in `ls -l ${CRASHC_TEST_C}| grep -E "issue[0-9]+\." | sed 's/  */ /g' | cut -d" " -f9 | sed 's/test_issue\([0-9][0-9]*\)\.c/\1/g'`
 	do
 		issueIDInt=`expr ${issueID} + 0`
@@ -48,7 +47,15 @@ cd ${CRASHC_BUILD_DEBUG}
 		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 	
-		cmake ../.. && make && clear && ./Test > "output.${issueID}.txt"
+		cmake ../.. && make
+		 ./Test > "output.${issueID}.txt"
+		#the file needs to contain something
+		if test `cat output.${issueID}.txt | wc -l` -eq 0
+		then
+			echo "Error: the file \"output.${issueID}.txt\" is empty but every test generates non empty output files! This is an error!"
+			cd ${CRASHC_MAIN_FOLDER}
+			exit 1
+		fi
 		#we ensure the just created output has no KO
 		if test `cat output.${issueID}.txt | grep "KO" | wc -l` -gt 0
 		then
