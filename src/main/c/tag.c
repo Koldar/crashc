@@ -63,3 +63,68 @@ int getHashOfString(const char* str) {
 	return hash;
 }
 
+char* computeNextTagInStr(const char* str, char separator, char* charactersToIgnore, char* output) {
+	char* outputIndex = NULL;
+	char ch = '\0';
+	char* input = NULL;
+	bool toSkip = false;
+
+	//I don't use strtok because I don't want to use something with side effects
+	input = str;
+	outputIndex = &output[0];
+	while (true) {
+		ch = *input;
+
+		//check if the character has to be skipped
+		toSkip = false;
+		for (int i=0; (charactersToIgnore[i])!='\0'; i++) {
+			if (ch == charactersToIgnore[i]) {
+				toSkip = true;
+			}
+		}
+
+		if (!toSkip) {
+			//add the character to the buffer
+			if (ch == separator || ch == '\0') {
+				*outputIndex = '\0';
+				goto exit;
+			} else {
+				*outputIndex = ch;
+			}
+		}
+
+		//go to the next character
+		outputIndex += 1;
+		input += 1;
+	}
+
+	exit:;
+	if (*input != '\0') {
+		input++;
+	}
+	return input;
+}
+
+void populateTagsHT(tag_ht* output, const char* tags, char separator) {
+	char token[100];
+	char* positionToWriteInBuffer = NULL;
+	int tokenId;
+
+	char* tokenString = tags;
+
+	while (*tokenString != '\0') {
+		tokenString = computeNextTagInStr(tokenString, separator, "", token);
+
+		if (strlen(token) == 0) {
+			return;
+		}
+
+		//add the fetched tag inside the section
+		tokenId = getHashOfString(token);
+		tag* tagWithTokenId = getItemInHT(output, tokenId);
+		if (tagWithTokenId == NULL) {
+			tagWithTokenId = initTag(token);
+			addItemInHTWithKey(output, tokenId, tagWithTokenId);
+		}
+	}
+}

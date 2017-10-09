@@ -96,7 +96,8 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->parent = NULL;
 	retVal->tags = initHT();
 
-	populateTagsHT(retVal, tags, ' ');
+	//TODO ' ' should be changed into CC_TAGS_SEPARATOR
+	populateTagsHT(retVal->tags, tags, ' ');
 
 	return retVal;
 }
@@ -350,36 +351,4 @@ static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section
 		tmp = tmp->nextSibling;
 	}
 
-}
-
-
-void populateTagsHT(Section* section, const char* tags, char separator) {
-	char token[100];
-	char* positionToWriteInBuffer = NULL;
-	int tokenId;
-
-	//i don't want to use strtok because it may be used inside the functions to test: i don't want to mess with their strtok starte
-	while(*tags != '\0') {
-
-		//fetch a tag inside tags
-		positionToWriteInBuffer = token;
-		while((*tags != separator) && (*tags != '\0')) {
-			*positionToWriteInBuffer = *tags;
-			positionToWriteInBuffer++;
-			tags++;
-		}
-		*positionToWriteInBuffer = '\0';
-		if (*tags != '\0') {
-			//if we've not reached the end we need to go to the next tag
-			tags++;
-		}
-
-		//add the fetched tag inside the section
-		tokenId = getHashOfString(token);
-		tag* tagWithTokenId = getItemInHT(section->tags, tokenId);
-		if (tagWithTokenId == NULL) {
-			tagWithTokenId = initTag(token);
-			addItemInHTWithKey(section->tags, tokenId, tagWithTokenId);
-		}
-	}
 }

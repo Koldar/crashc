@@ -48,6 +48,7 @@
 #include "uthash.h"
 #include "section.h"
 #include "sigHandling.h"
+#include "command_line.h"
 
 /**
  * the character used to divide tags inside a single string
@@ -384,8 +385,9 @@ void callbackDoNothing(Section* section);
  * Macro used to contain all test declarations and to generate the main function for the
  * execution of the various tests
  */
-#define TESTS_START int main(void) { \
+#define TESTS_START int main(const int argc, const char** args) { \
 		setupContextTags(); \
+		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, runOnlyIfTags, excludeTags); \
 		_crashc_sigaction.sa_handler = &failsig_handler;  \
 		registerSignalHandlerForSignals();
 

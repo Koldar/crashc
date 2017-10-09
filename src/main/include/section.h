@@ -444,21 +444,6 @@ bool isSectionFullyVisited(Section * section);
 bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2);
 
 /**
- * Given a string \c tags, the function will populate the hash table in \c section with all
- * the tags inside \c tags
- *
- * For example if \c separator is ' ', a compliant \c tags string is <tt>tag1 tag2 tag3</tt>
- *
- * \note
- * the strings generated are \b cloned inside the hash table
- *
- * @param[in] section the section whose tag hash table will be populated
- * @param[in] tags a string containing "separator"-separated substring, each of them representing a tag
- * @param[in] separator a character dividing 2 tags in string \c tags
- */
-void populateTagsHT(Section* section, const char* tags, char separator);
-
-/**
  * Populated a buffer containing a string representation of the section
  *
  * @param[in] s the section whose string representation we want to retrieve

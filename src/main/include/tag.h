@@ -82,5 +82,27 @@ void addTagNameInTagHashTable(tag_ht* tagHashTable, const char* name);
  */
 int getHashOfString(const char* str);
 
+/**
+ * Fetch the next token in the stream of characters representing a tag
+ *
+ * @param[in] str the string where we need to fetch the next token
+ * @param[in] separator a character representing when a token ends and when it starts
+ * @param[in] charactersToIgnore a string containing a list of characters we can safely ignore in \c str
+ * @param[inout] output a buffer that will contain the token just read
+ * @return the first character of rhe next new token or 0 if we reached the end of the string
+ */
+char* computeNextTagInStr(const char* str, char separator, char* charactersToIgnore, char* output);
+
+/**
+ * adds in \c output all the tags inside the stream of tags
+ *
+ * \post
+ * 	\li \c output size increased
+ *
+ * @param[inout] output the hashtable where to add every tag found in \c tags
+ * @param[in] tags a string containing tags, each of them separated by \c separator
+ * @param[in] separator a character separating 2 tags. No double separators allwoed
+ */
+void populateTagsHT(tag_ht* output, const char* tags, char separator);
 
 #endif /* TAG_H_ */
