@@ -12,6 +12,7 @@
 
 #include "command_line.h"
 #include "tag.h"
+#include "macros.h"
 
 static struct option long_options[] = {
 	{"include_tag",		required_argument,	0,	'i'},
@@ -59,7 +60,7 @@ void printHelp(FILE* fout) {
 			fprintf(fout,
 					"Like \"i\", but allows to specify multiple tags. Tags are separated via \"%c\". "
 					"Can be defined multiple times.",
-					' ' //TODO replace with CC_TAG_SEPARATOR
+					CC_TAGS_SEPARATOR
 			);
 			break;
 		}
@@ -67,7 +68,7 @@ void printHelp(FILE* fout) {
 			fprintf(fout,
 					"Like \"e\", but allows to specify multiple tags. Tags are separated via \"%c\". "
 					"Can be defined multiple times.",
-					' ' //TODO replace with CC_TAG_SEPARATOR
+					CC_TAGS_SEPARATOR
 			);
 			break;
 		}

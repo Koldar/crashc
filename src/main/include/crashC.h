@@ -50,12 +50,6 @@
 #include "sigHandling.h"
 #include "command_line.h"
 
-/**
- * the character used to divide tags inside a single string
- */
-#ifndef CC_TAGS_SEPARATOR
-#	define CC_TAGS_SEPARATOR ' '
-#endif
 
 /**
  * Callback representing a general condition that determine if we can access to a particular section

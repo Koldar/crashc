@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "macros.h"
 
 /**
  * The id the next section created with ::initSection will have.
@@ -96,8 +97,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->parent = NULL;
 	retVal->tags = initHT();
 
-	//TODO ' ' should be changed into CC_TAGS_SEPARATOR
-	populateTagsHT(retVal->tags, tags, ' ');
+	populateTagsHT(retVal->tags, tags, CC_TAGS_SEPARATOR);
 
 	return retVal;
 }

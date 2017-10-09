@@ -8,6 +8,12 @@
 #ifndef MACROS_H_
 #define MACROS_H_
 
+/**
+ * the character used to divide tags inside a single string
+ */
+#ifndef CC_TAGS_SEPARATOR
+#	define CC_TAGS_SEPARATOR ' '
+#endif
 
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
