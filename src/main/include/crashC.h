@@ -488,9 +488,14 @@ void callbackDoNothing(Section* section);
 /**
  * Macro that registers a single test suite given its ID.
  */
- #define REG_TEST(id) \
+ #define REGISTER_SUITE(id) \
      void suite_ ## id(); \
      update_test_array(suite_ ## id)
+
+/**
+ * Alias of ::REGISTER_SUITE
+ */
+#define REG_SUITE(id) REGISTER_SUITE(id)
 
 /**
  * Registers all the TESTSUITES whose ID is specified in the macro arguments.
@@ -504,7 +509,7 @@ void callbackDoNothing(Section* section);
     FE_39,FE_38,FE_37,FE_36,FE_35,FE_34,FE_33,FE_32,FE_31,FE_30, \
     FE_29,FE_28,FE_27,FE_26,FE_25,FE_24,FE_23,FE_22,FE_21,FE_20, \
     FE_19,FE_18,FE_17,FE_16,FE_15,FE_14,FE_13,FE_12,FE_11,FE_10, \
-    FE_9,FE_8,FE_7,FE_6,FE_5,FE_4,FE_3,FE_2,FE_1, FE_0)(REG_TEST, __VA_ARGS__)
+    FE_9,FE_8,FE_7,FE_6,FE_5,FE_4,FE_3,FE_2,FE_1, FE_0)(REGISTER_SUITE, __VA_ARGS__)
 
 
 #endif

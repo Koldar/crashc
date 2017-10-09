@@ -4,8 +4,8 @@
 #include "test_checker.h"
 
 TESTS_START
-REG_TEST(1);
-REG_TEST(2);
+REG_SUITE(1);
+REG_SUITE(2);
 TESTS_END
 
 TESTSUITE(1) {

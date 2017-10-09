@@ -3,7 +3,7 @@
 #include "crashC.h"
 
 TESTS_START
-REG_TEST(1);
+REG_SUITE(1);
 TESTS_END
 
 #endif
