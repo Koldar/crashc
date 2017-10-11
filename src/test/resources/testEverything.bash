@@ -47,7 +47,13 @@ cd ${CRASHC_BUILD_DEBUG}
 		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 	
-		cmake ../.. && make
+		cmake ../..
+		make
+		if test $? -ne 0
+		then
+			echo "Error: could not compile file of issue ${issueID}. Please fix compile errors!"
+			exit 1
+		fi		
 		 ./Test > "output.${issueID}.txt"
 		#the file needs to contain something
 		if test `cat output.${issueID}.txt | wc -l` -eq 0
