@@ -11,8 +11,6 @@
 //Used by crashc_sigaction_struct to indicate an empty bitmask
 #define NO_FLAGS 0
 
-void failsig_handler(int);
-
 /**
  * Registers all the signal CRASHC test framework wants to handle
  *

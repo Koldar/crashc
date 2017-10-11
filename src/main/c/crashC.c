@@ -86,10 +86,8 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
-		printf("adding!\n");
 		return addSectionToParent(initSection(type, parent->levelId + 1, decription, tags), parent);
 	}
-	printf("setting\n");
 	return getNSection(parent, parent->currentChild);
 }
 

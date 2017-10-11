@@ -227,7 +227,6 @@ void callbackDoNothing(Section* section);
 		 * we return to the parent section
 		 */																																\
 		(model)->currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);									\
-		printf("after %p\n",(model)->currentSection);\
 		(model)->currentSection->loopId += 1;																							\
 		setupCode																														\
 		for (																															\
@@ -326,7 +325,6 @@ void callbackDoNothing(Section* section);
 #define TESTS_START int main(const int argc, const char** args) { \
 		cc_model = setupDefaultMainModel();\
 		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); \
-		(&cc_model)->_crashc_sigaction.sa_handler = &failsig_handler;  \
 		registerSignalHandlerForSignals();
 
 /**

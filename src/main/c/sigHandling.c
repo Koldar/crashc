@@ -18,7 +18,10 @@
 #include "sigHandling.h"
 #include "main_model.h"
 
+static void failsig_handler(int signum);
+
 void registerSignalHandlerForSignals() {
+	(&cc_model)->_crashc_sigaction.sa_handler = &failsig_handler;
 	//register signals
 	//TODO add even this signals
 //	if (sigaction(SIGHUP, &sa, NULL) == -1) {
@@ -50,7 +53,7 @@ void registerSignalHandlerForSignals() {
  * @param signum an ID representing the signal detected
  *
  */
-void failsig_handler(int signum) {
+static void failsig_handler(int signum) {
 
 	printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
     //Mark test as failed code
