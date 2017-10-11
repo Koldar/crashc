@@ -16,6 +16,7 @@
  *
  */
 #include "sigHandling.h"
+#include "main_model.h"
 
  /**
   * This variable is used to store the execution state to be restored thanks to
@@ -59,10 +60,10 @@ void registerSignalHandlerForSignals() {
  */
 void failsig_handler(int signum) {
 
-	printf("marking section \"%s\" as signal detected!\n", currentSection->description);
+	printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
     //Mark test as failed code
-	markSectionAsSignalDetected(currentSection);
-	currentSection->signalDetected = signum;
+	markSectionAsSignalDetected((&cc_model)->currentSection);
+	(&cc_model)->currentSection->signalDetected = signum;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
     siglongjmp(signal_jump_point, 1);

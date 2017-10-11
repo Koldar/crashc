@@ -1,47 +1,19 @@
 #include "crashC.h"
+#include "main_model.h"
 
-Section rootSection = {0, 0, ST_ROOT, "root", false, 0, 0, false, NULL, NULL, NULL};
-Section* currentSection = NULL;
-Section* testCaseInvolved = NULL;
-test_pointer tests_array[MAX_TESTS];
-int suites_array_index = 0;
-tag_ht* runOnlyIfTags = NULL;
-tag_ht* excludeTags = NULL;
-
-/**
- * This function registers a testsuite by storing its function pointer into
- * the global array. The function automatically updates the variable used to
- * keep track of the array dimension.
- * TODO: Add control on duplicates testsuites
- *
- *
- * @param[in] func the function to register
- */
-void update_test_array(test_pointer func) {
-    tests_array[suites_array_index] = func;
-    suites_array_index++;
-}
-
-void setupContextTags() {
-	if (runOnlyIfTags == NULL) {
-		runOnlyIfTags = initHT();
-	}
-	if (excludeTags == NULL) {
-		excludeTags = initHT();
-	}
-
-}
+//TODO remove
+//Section rootSection = {0, 0, ST_ROOT, "root", false, 0, 0, false, NULL, NULL, NULL};
+//Section* currentSection = NULL;
+//Section* testCaseInvolved = NULL;
+//test_pointer tests_array[MAX_TESTS];
+//int suites_array_index = 0;
+//tag_ht* runOnlyIfTags = NULL;
+//tag_ht* excludeTags = NULL;
 
 
-void tearDownContextTags() {
-	if (runOnlyIfTags != NULL) {
-		destroyHTCellWithElement(runOnlyIfTags, destroyTag);
-		runOnlyIfTags = NULL;
-	}
-	if (excludeTags != NULL) {
-		destroyHTCellWithElement(excludeTags, destroyTag);
-		excludeTags = NULL;
-	}
+void update_test_array(test_pointer func, crashc_model* model) {
+	model->tests_array[model->suites_array_index] = func;
+	model->suites_array_index++;
 }
 
 bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
@@ -114,13 +86,15 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
+		printf("adding!\n");
 		return addSectionToParent(initSection(type, parent->levelId + 1, decription, tags), parent);
 	}
+	printf("setting\n");
 	return getNSection(parent, parent->currentChild);
 }
 
-void resetFromSignalCurrentSectionTo(int signal, const Section* signaledSection, const Section* s) {
-	currentSection = s;
+void resetFromSignalCurrentSectionTo(crashc_model* model, int signal, const Section* signaledSection, const Section* s) {
+	model->currentSection = s;
 }
 
 bool getAlwaysTrue(Section* section) {

@@ -49,6 +49,8 @@
 #include "section.h"
 #include "sigHandling.h"
 #include "command_line.h"
+#include "model.h"
+#include "main_model.h"
 
 
 /**
@@ -61,83 +63,21 @@ typedef bool (*condition_section)(Section*);
 typedef void (*AfterExecutedSectionCallBack)(Section** parentPosition, Section* child);
 typedef void (*BeforeStartingSectionCallBack)(Section* sectionGranted);
 
-/**
- * Function pointer used to point at the functions which contain the testsuites.
- *
- */
-typedef void (*test_pointer)();
 
+//TODO change name into updateTestArray
 /**
- * Array containing the pointers to the testsuites functions
- */
-extern test_pointer tests_array[];
-
-/**
- * This variable is used to keep track of the tests_array[] array dimension
- */
-extern int suites_array_index;
-
-/**
- * global variable representing the root of the section tree
- */
-extern Section rootSection;
-/**
- * global variable representing what is the section we're analyzing right now.
+ * This function registers a testsuite by storing its function pointer into
+ * the global array. The function automatically updates the variable used to
+ * keep track of the array dimension.
+ * TODO: Add control on duplicates testsuites
  *
- * Suppose we have the tree shown in ::Section. Suppose you're analyzing when2: you need something
- * that allows you to synchronize what the code is reading and the section tree metadata; aka you need something
- * that points which section you're actually in. This variable is that pointer.
+ * \post
+ * 	\li \c func added in the index
  *
- * When you're in when2 this variable is set to the node in the tree representing when2. When you enter inside the code of "then1",
- * this variable is reset to point then 1 ::Section. Then, when you return to when2 to execute the code between then1 and then2, this variable
- * is set again in a way to point "when2".
+ * @param[in] func the function to register
+ * @param[inout] model the model where we operate on
  */
-extern Section* currentSection;
-/**
- * global variable representing the test case crashC is handling right now.
- * Crash C can handle at most 1 test case per time
- *
- * \ingroup globalVariables
- */
-extern Section* testCaseInvolved;
-
-/**
- * Represents the tags the user has specified as the only one that should be consider
- *
- * A test is run only if it declares at least one tag inside this container.
- * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence.
- *
- * If this hashtable is empty, then we consider as if the check does't need to happen
- *
- * \ingroup globalVariables
- */
-extern tag_ht* runOnlyIfTags;
-/**
- * Represents the tags the user has specified as the ones that excludes tests
- *
- * A test is skipped if it declares at least one tag inside this container.
- * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
- *
- * If this hashtable is empty, then we consider as if the check does't need to happen
- *
- * \ingroup globalVariables
- */
-extern tag_ht* excludeTags;
-
-/**
- * Function used to update the tests_array[] array when registering a new testsuite
- */
-void update_test_array(test_pointer);
-
-/**
- * Setup ::runOnlyIfTags and ::excludeTags
- */
-void setupContextTags();
-
-/**
- * Destroy ::runOnlyIfTags and ::excludeTags
- */
-void tearDownContextTags();
+void update_test_array(test_pointer func, crashc_model* model);
 
 /**
  * Function to run in the access cycle
@@ -198,11 +138,12 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
  * \post
  * 	\li ::currentSection is valid and refers to \c s
  *
+ * @param[inout] model the model to update
  * @param[in] signal the signal raised
- * @param[inout] signalSection the section that caused a signal
- * @param[inout] s the section ::currentSection will be moved to
+ * @param[in] signalSection the section that caused a signal
+ * @param[in] s the section ::currentSection will be moved to
  */
-void resetFromSignalCurrentSectionTo(int signal, const Section* signaledSection, const Section* s);
+void resetFromSignalCurrentSectionTo(crashc_model* model, int signal, const Section* signaledSection, const Section* s);
 
 /**
  * Compute the hash of a string
@@ -275,21 +216,24 @@ void callbackDoNothing(Section* section);
 
 /**
  * Main macro of the test suite
+ *
+ * @param[inout] model variable of type pointer of ::crashc_model containing all the data to manage
  */
-#define CONTAINABLESECTION(parent, sectionType, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
+#define CONTAINABLESECTION(model, parent, sectionType, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
 		 */																																\
-		currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);												\
-		currentSection->loopId += 1;																									\
+		(model)->currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);									\
+		printf("after %p\n",(model)->currentSection);\
+		(model)->currentSection->loopId += 1;																							\
 		setupCode																														\
 		for (																															\
-				currentSection->loop1 = true																							\
+				(model)->currentSection->loop1 = true																							\
 				;																														\
-				runOnceAndDoWorkAtEnd(currentSection, &currentSection, 																	\
+				runOnceAndDoWorkAtEnd((model)->currentSection, &((model)->currentSection), 												\
 						getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback			\
 				)																														\
 				;																														\
@@ -299,15 +243,15 @@ void callbackDoNothing(Section* section);
 				 *  CONTAINABLESECTION is satisfied for its children
 				 *  CONTAINABLESECTION.
 				 */																														\
-				 currentSection->loop1 = false																							\
+				 (model)->currentSection->loop1 = false																							\
 		)																																\
 		for (																															\
-				currentSection->loop2 = true																							\
+				(model)->currentSection->loop2 = true																							\
 				;																														\
-				runOnceAndCheckAccessToSection(currentSection, condition, accessGrantedCallBack, runOnlyIfTags, excludeTags)										\
+				runOnceAndCheckAccessToSection((model)->currentSection, condition, accessGrantedCallBack, (model)->runOnlyIfTags, (model)->excludeTags)	\
 				;																														\
-				currentSection->loop2 = false,																							\
-				markSectionAsExecuted(currentSection)																					\
+				(model)->currentSection->loop2 = false,																							\
+				markSectionAsExecuted((model)->currentSection)																					\
 		)
 
 #define NOCODE
@@ -318,61 +262,61 @@ void callbackDoNothing(Section* section);
 #define TEST_FUNCTION(testFunctionName)																							\
 	void testFunctionName()
 
-#define LOOPER(parent, sectionType, description, tags)																				\
+/**
+ * @param[inout] model a variable of type ::crashc_model containing all the data needed by crashc
+ * @param[in] parent a variable of type ::Section representing the parent section of this section
+ */
+#define LOOPER(model, parent, sectionType, description, tags)																				\
 		CONTAINABLESECTION(																												\
+				(model),\
 				parent, sectionType, description, tags,																				\
 				getAlwaysTrue, callbackDoNothing, 																						\
 				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
 																																		\
-				testCaseInvolved = currentSection;																						\
+				(model)->testCaseInvolved = (model)->currentSection;																						\
 				bool UV(signalDetected) = false;	\
 				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
-					markSectionAsSignalDetected(currentSection);                                                                        \
+					markSectionAsSignalDetected((model)->currentSection);                                                                        \
 					UV(signalDetected) = true; \
 					/*we reset the currentSection to the test case*/																	\
-					resetFromSignalCurrentSectionTo(currentSection->signalDetected, currentSection, testCaseInvolved);																							\
+					resetFromSignalCurrentSectionTo((model), (model)->currentSection->signalDetected, (model)->currentSection, (model)->testCaseInvolved);																							\
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
-						!UV(signalDetected) && !haveWeRunWholeTreeSection(currentSection)                                                   \
+						!UV(signalDetected) && !haveWeRunWholeTreeSection((model)->currentSection)                                                   \
 						;																												\
 				)																														\
 		)
 
 
-#define TESTCASE(description, tags) LOOPER(&rootSection, 1, description, tags)
+//TODO the parent of the test case is not the root section, but the "suite section". We need to include them in the section tree as well!
+#define TESTCASE(description, tags) LOOPER(&cc_model, ((&cc_model)->rootSection), 1, description, tags)
 #define EZ_TESTCASE(description) TESTCASE(description, "")
 
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
 //#define EZ_TESTCASE(description) TESTCASE(description, "")
 
-#define ALWAYS_ENTER(sectionType, description, tags) CONTAINABLESECTION(																\
-		currentSection, sectionType, description, tags,																				\
+#define ALWAYS_ENTER(model, sectionType, description, tags) CONTAINABLESECTION(																\
+		(model), \
+		(model)->currentSection, sectionType, description, tags,																				\
 		getAlwaysTrue, callbackDoNothing,																								\
 		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,					\
 		NOCODE																															\
 )
 
-#define ENTER_ONE_PER_LOOP(sectionType, description, tags) CONTAINABLESECTION(														\
-		currentSection, sectionType, description, tags,																				\
+#define ENTER_ONE_PER_LOOP(model, sectionType, description, tags) CONTAINABLESECTION(														\
+		(model), \
+		(model)->currentSection, sectionType, description, tags,																				\
 		getAccess_When, callbackSetAlreadyFoundWhen, 																						\
 		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
 		NOCODE 																															\
 )
 
-#define WHEN(description, tags) ENTER_ONE_PER_LOOP(5, description, tags)
+#define WHEN(description, tags) ENTER_ONE_PER_LOOP((&cc_model), 5, description, tags)
 #define EZ_WHEN(description) WHEN(description, "")
-#define THEN(description, tags) ALWAYS_ENTER(10, description, tags)
+#define THEN(description, tags) ALWAYS_ENTER((&cc_model), 10, description, tags)
 #define EZ_THEN(description) THEN(description, "")
-
-//Multiple source files support
-/* The maximum number of registrable suites. This macro is used to set the
- * initial size of the internal array used to contain the tests functions pointers
- */
-#ifndef MAX_TESTS
-#   define MAX_TESTS 256
-#endif
 
 //TODO all those functions should be included in the only one global models
 /**
@@ -380,8 +324,8 @@ void callbackDoNothing(Section* section);
  * execution of the various tests
  */
 #define TESTS_START int main(const int argc, const char** args) { \
-		setupContextTags(); \
-		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, runOnlyIfTags, excludeTags); \
+		cc_model = setupDefaultMainModel();\
+		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); \
 		_crashc_sigaction.sa_handler = &failsig_handler;  \
 		registerSignalHandlerForSignals();
 
@@ -390,8 +334,8 @@ void callbackDoNothing(Section* section);
  * of the registered testsuites
  */
 #define TESTS_END \
-    for (int i = 0; i < suites_array_index; i++) { \
-        tests_array[i](); \
+    for (int i = 0; i < (&cc_model)->suites_array_index; i++) { \
+    	(&cc_model)->tests_array[i](); \
     } \
 } //main function closing bracket
 
@@ -490,7 +434,7 @@ void callbackDoNothing(Section* section);
  */
  #define REGISTER_SUITE(id) \
      void suite_ ## id(); \
-     update_test_array(suite_ ## id)
+     update_test_array(suite_ ## id, (&cc_model))
 
 /**
  * Alias of ::REGISTER_SUITE

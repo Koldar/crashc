@@ -15,8 +15,8 @@
 TESTS_START
 
 //add the tags we want to use
-addTagNameInTagHashTable(runOnlyIfTags, "RUN");
-addTagNameInTagHashTable(excludeTags, "NORUN");
+addTagNameInTagHashTable(cc_model.runOnlyIfTags, "RUN");
+addTagNameInTagHashTable(cc_model.excludeTags, "NORUN");
 
 REG_SUITE(1);
 REG_SUITE(2);
