@@ -18,14 +18,6 @@
 #include "sigHandling.h"
 #include "main_model.h"
 
- /**
-  * This variable is used to store the execution state to be restored thanks to
-  * setjmp and longjmp when needed during faulty test execution.
-  * By faulty test we mean tests which generate SIGSEGV or SIGFPE.
-  */
-jmp_buf signal_jump_point;
-struct sigaction _crashc_sigaction;
-
 void registerSignalHandlerForSignals() {
 	//register signals
 	//TODO add even this signals
@@ -41,7 +33,7 @@ void registerSignalHandlerForSignals() {
 //		perror("Error: cannot handle SIGUSR1"); //should not happen
 //	}
 	//TODO do not register signal if it  is already registers by the program under test itself
-	if (sigaction(SIGFPE, &_crashc_sigaction, NULL) == -1) {
+	if (sigaction(SIGFPE, &((&cc_model)->_crashc_sigaction), NULL) == -1) {
 		perror("Error: cannot handle SIGUSR1"); //should not happen
 	}
 }
@@ -66,5 +58,5 @@ void failsig_handler(int signum) {
 	(&cc_model)->currentSection->signalDetected = signum;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
-    siglongjmp(signal_jump_point, 1);
+    siglongjmp((&cc_model)->signal_jump_point, 1);
 }

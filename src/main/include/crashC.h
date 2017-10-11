@@ -275,7 +275,7 @@ void callbackDoNothing(Section* section);
 																																		\
 				(model)->testCaseInvolved = (model)->currentSection;																						\
 				bool UV(signalDetected) = false;	\
-				if (sigsetjmp(signal_jump_point, 1)) {                                                                                  \
+				if (sigsetjmp((model)->signal_jump_point, 1)) {                                                                                  \
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
 					markSectionAsSignalDetected((model)->currentSection);                                                                        \
 					UV(signalDetected) = true; \
@@ -326,7 +326,7 @@ void callbackDoNothing(Section* section);
 #define TESTS_START int main(const int argc, const char** args) { \
 		cc_model = setupDefaultMainModel();\
 		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); \
-		_crashc_sigaction.sa_handler = &failsig_handler;  \
+		(&cc_model)->_crashc_sigaction.sa_handler = &failsig_handler;  \
 		registerSignalHandlerForSignals();
 
 /**

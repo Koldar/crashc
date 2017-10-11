@@ -14,12 +14,6 @@
 void failsig_handler(int);
 
 /**
- * Represents the structure used by crashc to handle signals
- */
-extern struct sigaction _crashc_sigaction;
-extern jmp_buf signal_jump_point;
-
-/**
  * Registers all the signal CRASHC test framework wants to handle
  *
  * \post

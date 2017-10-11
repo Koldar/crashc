@@ -12,6 +12,8 @@
 
 #include "typedefs.h"
 #include "section.h"
+#include <signal.h>
+#include <setjmp.h>
 
 /**
  * The maximum number of registrable suites
@@ -70,6 +72,16 @@ typedef struct crashc_model {
 	 * If this hashtable is empty, then we consider as if the check does't need to happen
 	 */
 	tag_ht* excludeTags;
+	/**
+	 * This variable is used to store the execution state to be restored thanks to
+	 * setjmp and longjmp when needed during faulty test execution.
+	 * By faulty test we mean tests which generate SIGSEGV or SIGFPE.
+	 */
+	jmp_buf signal_jump_point;
+	/**
+	 * A structure representing the flag intercepted by crashc
+	 */
+	struct sigaction _crashc_sigaction;
 } crashc_model;
 
 /**
