@@ -1,55 +1,27 @@
-/*
- * testReport.c
+/**
+ * This file contains the function used by CrashC to generate and handle the test reports
+ * TODO: Fix strdup unsafe call, add dimension limit to avoid overflows
  *
- *  Created on: Feb 15, 2017
- *      Author: koldar
+ * Author: Lorenzo Nodari
+ *
  */
 
 #include "testReport.h"
-#include "errors.h"
 
-typedef struct TestReport {
-	const char* file;
-	int lineNo;
-	const char* expr;
-	/**
-	 * True if the particular test has passed; false otherwise
-	 */
-	bool outcome;
-};
+TestReport * initTestReport(Section * testcase) {
+	TestReport * retVal = malloc(sizeof(TestReport));
 
-TestReport* initTestReport(const char* file, const int lineNo, const char* expr, const bool outcome) {
-	TestReport* retVal = malloc(sizeof(TestReport));
-	if (retVal == NULL) {
-		MALLOCERRORCALLBACK();
-	}
-
-	retVal->file = strdup(file);
-	retVal->lineNo = lineNo;
-	retVal->expr = strdup(expr);
-	retVal->outcome = outcome;
+	retVal->testcase_name = strdup(testcase->description);
+	retVal->execution_time = 0;
+	retVal->test_sections = initList();
 
 	return retVal;
 }
 
-void destroyTestReport(TestReport* tr) {
-	free(tr->file);
-	free(tr->expr);
-	free(tr);
+void destroyTestReport(TestReport * report) {
+	free(report->testcase_name);
+	destroyListWithElement(report->test_sections, destroySection);
+	free(report);
 }
 
-bool getOutcomeFromTestReport(const TestReport* tr) {
-	return tr->outcome;
-}
 
-const char* getFileTestedOfTestReport(const TestReport* tr) {
-	return tr->file;
-}
-
-int getLineNoOfTestReport(const TestReport* tr) {
-	return tr->lineNo;
-}
-
-const char* getExprTestedOfTestReport(const TestReport* tr) {
-	return tr->expr;
-}

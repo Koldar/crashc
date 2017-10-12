@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 #include "tag.h"
-#include "testReport.h"
 
 /**
  * Represents the type ::Section::levelId has
@@ -267,44 +266,6 @@ typedef struct Section {
 	 */
 	bool alreadyFoundWhen;
 
-	/**
-	 * queue used to check which child section has to be executed next.
-	 *
-	 * \attention
-	 * This field is used only for a particular ::CONTAINABLESECTION implementation, not for every section. In particular
-	 * this field is used to implement \c WHEN behaviour.
-	 *
-	 * Suppose you have a test case with lots of whens
-	 *
-	 * @code
-	 * 	TESTCASE("tc1","") {
-	 * 		code1;
-	 * 		WHEN("w1","") {
-	 * 		}
-	 * 		code2;
-	 * 		WHEN("w2","") {
-	 * 		}
-	 * 		code3;
-	 * 		WHEN("w3","") {
-	 * 		}
-	 * 		code4;
-	 * 	}
-	 * @endcode
-	 *
-	 * Since you need to compute only a when per time, we need something to tell us which is the next when we need to compute.
-	 * The head of this list tell us exactly this.
-	 *
-	 * \todo however, the structure will fail if inside the test case there are 2 different section level (ie. 2 whens and 1 then)
-	 *
-	struct SectionCell* sectionToRunList;*/ //I dont think this is really needed
-	/**
-	 * A list containing all the assertions inside this section
-	 */
-	TestReportList* assertionReportList;
-	/**
-	 * A list containing all the failures inside ::Section::assertionReportList
-	 */
-	TestReportList* failureReportList;
 	/**
 	 * The signal datected when running this section
 	 *

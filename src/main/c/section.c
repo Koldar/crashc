@@ -79,18 +79,15 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	nextSectionId += 1;
 	retVal->accessGranted = false;
 	retVal->alreadyFoundWhen = false;
-	retVal->assertionReportList = initList();
 	retVal->childrenNumber = 0;
 	retVal->childrenNumberComputed = false;
 	retVal->status = SECTION_UNEXEC;
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
-	retVal->failureReportList = initList();
 	retVal->type = type;
 	retVal->levelId = levelId;
 	retVal->loopId = 0;
-	//retVal->sectionToRunList = initList();
 	retVal->loop1 = false;
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
@@ -115,9 +112,7 @@ void destroySection(Section* section) {
 	}
 
 	destroyHTWithElements(section->tags, destroyTag);
-	destroyList(section->failureReportList);
 	//destroyListWithElement(section->sectionToRunList, destroySection);
-	destroyListWithElement(section->assertionReportList, destroyTestReport);
 	free(section->description);
 	free(section);
 }
