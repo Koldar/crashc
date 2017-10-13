@@ -10,8 +10,11 @@
 
 TestReport * initTestReport(Section * testcase) {
 	TestReport * retVal = malloc(sizeof(TestReport));
+	if (retVal == NULL) {
+		MALLOCERRORCALLBACK();
+	}
 
-	retVal->testcase_name = strdup(testcase->description);
+	retVal->testcase_desc = strdup(testcase->description);
 	retVal->execution_time = 0;
 	retVal->test_sections = initList();
 
@@ -19,7 +22,7 @@ TestReport * initTestReport(Section * testcase) {
 }
 
 void destroyTestReport(TestReport * report) {
-	free(report->testcase_name);
+	free(report->testcase_desc);
 	destroyListWithElement(report->test_sections, destroySection);
 	free(report);
 }

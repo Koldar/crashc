@@ -26,6 +26,7 @@
 #include "stdbool.h"
 #include <stdlib.h>
 #include "macros.h"
+#include "errors.h"
 
 
 typedef struct list list;

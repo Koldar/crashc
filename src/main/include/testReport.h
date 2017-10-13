@@ -11,6 +11,8 @@
 #include <time.h>
 #include "list.h"
 #include "section.h"
+#include "errors.h"
+#include "tag.h"
 
 
 /**
@@ -50,16 +52,20 @@ typedef struct {
 	char * filename;
 
 	/**
-	 * The name of the testcase that contained this test
+	 * The description of the testcase that contained this test
 	 */
-	char * testcase_name;
+	char * testcase_desc;
+
 	/**
-	 * The list of the SectionSnapshots passed by this test
+	 * The list of the SectionSnapshots which composed this test
 	 */
 	list * test_sections;
 
 	/**
 	 * The time that it took to complete the test
+	 * Note that execution times might be higher than expected due to the necessary
+	 * overhead introduced by the internal code created by CrashC to properly
+	 * guide the tests' execution flow
 	 */
 	clock_t execution_time;
 
@@ -69,11 +75,12 @@ typedef struct {
  * This structure contains the informations contained in a Section at a precise moment of the program execution,
  * which are then used by the test reports to yield the user a more detailed set of informations about a given test.
  * Note that this structure contains only the fields of a Section which are subject to changes during the execution
- * of the tests. Immutable informations, such as the section name or tags, etc... , are not stored in the SectionSnapshot
- * as they can be easily retrieved through a Section pointer.
+ * of the tests.
  */
 typedef struct {
-	//TODO Implement
+	char * description;
+	tag_ht *  tags;
+	section_type type;
 } SectionSnapshot;
 
 TestReport * initTestReport(Section * testcase);

@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include "tag.h"
+#include "errors.h"
 
 /**
  * Represents the type ::Section::levelId has
