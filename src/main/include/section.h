@@ -9,6 +9,7 @@
 #define SECTION_H_
 
 #include <stdbool.h>
+#include "testReport.h"
 #include "tag.h"
 #include "errors.h"
 
@@ -273,6 +274,11 @@ typedef struct Section {
 	 * The value is meaningful only when ::Section::status is set to ::SECTION_SIGNAL_DETECTED
 	 */
 	int signalDetected;
+
+	/**
+	 * The latest snapshot taken of this Section, used to create test reports
+	 */
+	SectionSnapshot * latestSnapshot;
 
 	///the parent of this section in the tree. May be NULL
 	struct Section* parent;

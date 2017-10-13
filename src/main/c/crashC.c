@@ -1,16 +1,6 @@
 #include "crashC.h"
 #include "main_model.h"
 
-//TODO remove
-//Section rootSection = {0, 0, ST_ROOT, "root", false, 0, 0, false, NULL, NULL, NULL};
-//Section* currentSection = NULL;
-//Section* testCaseInvolved = NULL;
-//test_pointer tests_array[MAX_TESTS];
-//int suites_array_index = 0;
-//tag_ht* runOnlyIfTags = NULL;
-//tag_ht* excludeTags = NULL;
-
-
 void update_test_array(test_pointer func, crashc_model* model) {
 	model->tests_array[model->suites_array_index] = func;
 	model->suites_array_index++;
@@ -51,6 +41,9 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 
 bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
 	if (section->loop1) {
+		//TODO: Move this code to a callback when this function will be substituted by the bi-callback version
+		cc_model->currentSection->latestSnapshot = initSectionSnapshot(cc_model->currentSection);
+
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).

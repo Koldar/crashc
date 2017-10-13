@@ -91,6 +91,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->loop1 = false;
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
+	retVal->latestSnapshot = NULL;
 	retVal->parent = NULL;
 	retVal->tags = initHT();
 

@@ -8,23 +8,34 @@
 
 #include "testReport.h"
 
-TestReport * initTestReport(Section * testcase) {
+TestReport * initTestReport(char * filename, Section * testcase) {
 	TestReport * retVal = malloc(sizeof(TestReport));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->testcase_desc = strdup(testcase->description);
+	retVal->filename = strdup(filename);
 	retVal->execution_time = 0;
-	retVal->test_sections = initList();
+	retVal->testcase_snapshot = takeSectionSnapshot(testcase);
 
 	return retVal;
 }
 
-void destroyTestReport(TestReport * report) {
-	free(report->testcase_desc);
-	destroyListWithElement(report->test_sections, destroySection);
-	free(report);
+SectionSnapshot * initSectionSnapshot(Section * section) {
+	SectionSnapshot * retVal = malloc(sizeof(SectionSnapshot));
+	if (retVal == NULL) {
+		MALLOCERRORCALLBACK();
+	}
+
+	retVal->description  = strdup(section->description);
+	retVal->tags         = section->tags;
+	retVal->type         = section->type;
+	retVal->status       = SNAPSHOT_EXEC;
+	retVal->elapsed_time = 0;
+	retVal->parent       = NULL;
+	retVal->firstChild   = NULL;
+	retVal->nextSibling  = NULL;
+
 }
 
 
