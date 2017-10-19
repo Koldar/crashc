@@ -16,7 +16,7 @@ TestReport * initTestReport(char * filename, Section * testcase) {
 
 	retVal->filename = strdup(filename);
 	retVal->execution_time = 0;
-	retVal->testcase_snapshot = takeSectionSnapshot(testcase);
+	retVal->testcase_snapshot = initSectionSnapshot(testcase);
 
 	return retVal;
 }
@@ -36,6 +36,7 @@ SectionSnapshot * initSectionSnapshot(Section * section) {
 	retVal->firstChild   = NULL;
 	retVal->nextSibling  = NULL;
 
+	return retVal;
 }
 
 

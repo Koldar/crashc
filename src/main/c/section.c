@@ -241,7 +241,7 @@ bool isSectionFullyVisited(Section * section) {
 		Section * next_child = section->firstChild;
 
 		while (next_child != NULL) {
-			if (!isSectionFullyVisited(next_child)) {
+			if (next_child->status != SECTION_DONE) {
 				return false;
 			}
 			next_child = next_child->nextSibling;

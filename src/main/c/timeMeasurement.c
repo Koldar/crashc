@@ -8,11 +8,11 @@ typedef enum {
 } TimeFormat;
 
 static TimeFormat parseTimeFormatFromString(const char * str) {
-	switch (*s) {
-	case 's': return TM_SECONDS;
-	case 'm': return TM_MILLI;
-	case 'u': return TM_MICRO;
-	case 'n': return TM_NANO;
+	switch (*str) {
+	case 's': return TF_SECONDS;
+	case 'm': return TF_MILLI;
+	case 'u': return TF_MICRO;
+	case 'n': return TF_NANO;
 	}
 }
 
@@ -22,9 +22,9 @@ struct timespec getCurrentTime() {
 	return retVal;
 }
 
-long computetimeGap(struct timespec start, struct timespec end, const char * str)  {
+long computetimeGap(struct timespec start, struct timespec end, const char * format_str)  {
 	long sec, nanoSec, retVal;
-	TimeFormat format = parseTimeFormatFromString(str);
+	TimeFormat format = parseTimeFormatFromString(format_str);
 
 	sec = end.tv_sec - start.tv_sec;
 	nanoSec = end.tv_nsec - start.tv_nsec;

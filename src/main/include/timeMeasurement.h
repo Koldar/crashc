@@ -4,7 +4,7 @@
 #include <time.h>
 
 struct timespec getCurrentTime();
-long computetimeGap(struct timespec start, struct timespec end, TimeFormat format);
+long computetimeGap(struct timespec start, struct timespec end, const char * format_str);
 
 
 #endif

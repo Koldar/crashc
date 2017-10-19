@@ -50,6 +50,7 @@
 #include "sigHandling.h"
 #include "command_line.h"
 #include "model.h"
+#include "testReport.h"
 #include "main_model.h"
 
 
@@ -256,12 +257,6 @@ void callbackDoNothing(Section* section);
 #define NOCODE
 
 /**
- * Represents a macro that defines a function
- */
-#define TEST_FUNCTION(testFunctionName)																							\
-	void testFunctionName()
-
-/**
  * @param[inout] model a variable of type ::crashc_model containing all the data needed by crashc
  * @param[in] parent a variable of type ::Section representing the parent section of this section
  */
@@ -308,7 +303,7 @@ void callbackDoNothing(Section* section);
 		(model), \
 		(model)->currentSection, sectionType, description, tags,																				\
 		getAccess_When, callbackSetAlreadyFoundWhen, 																						\
-		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
+		doWorkAtEndCallbackGoToParentAndThenToNextSibling, doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,																							\
 		NOCODE 																															\
 )
 

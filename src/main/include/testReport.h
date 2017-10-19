@@ -12,16 +12,6 @@
 #include "errors.h"
 #include "tag.h"
 
-/**
- * This structure defines the possible statuses in which a snapshot can be.
- * This indicates the "exit status" of the section in the particular test
- */
-typedef enum {
-	SNAPSHOT_EXEC,
-	SNAPSHOT_SKIPPED,
-	SNAPSHOT_SIGNALED,
-	SNAPSHOT_FAILED
-} snapshot_status;
 
 /**
  * This struct represents the actual test report.
@@ -75,60 +65,8 @@ typedef struct {
 
 } TestReport;
 
-/**
- * This structure contains the informations contained in a Section at a precise moment of the program execution,
- * which are then used by the test reports to yield the user a more detailed set of informations about a given test.
- * Note that this structure contains only the fields of a Section which are subject to changes during the execution
- * of the tests. Note that this structure contains an implicit tree, used by CrashC to track the relationships between the
- * sections involved in a precise test
- */
-typedef struct {
-	/**
-	 * The description of this section
-	 */
-	char * description;
 
-	/**
-	 * The tags associated to this section
-	 */
-	tag_ht *  tags;
-
-	/**
-	 * The type of this section
-	 */
-	section_type type;
-
-	/**
-	 * The status of the snapshot.
-	 * This actually pretty much just mimic the status the section to which this snapshot
-	 * refers to, but it is a bit different as some section statuses makes no sense in the
-	 * context of the snapshot, e.g SECTION_UNEXEC, SECTION_EXEC, etc..
-	 */
-	snapshot_status status;
-
-	/**
-	 * The amount of time the section ran during one specific test.
-	 * This field has no meaning until the section is complitely executed.
-	 */
-	struct timespec elapsed_time;
-
-	/**
-	 * The pointer to the parent of this snapshot in the snapshot tree
-	 */
-	SectionSnapshot * parent;
-
-	/**
-	 * The pointer to the first child of this snapshot in the snapshot tree
-	 */
-	SectionSnapshot * firstChild;
-
-	/**
-	 * The pointer to the next sibling of this snapshot in the snapshot tree
-	 */
-	SectionSnapshot * nextSibling;
-
-} SectionSnapshot;
-
-TestReport * initTestReport(char * filename, Section * testcase);
+TestReport * initTestReport(char * filename, struct Section * testcase);
+SectionSnapshot * initSectionSnapshot(Section * section);
 
 #endif /* TESTREPORT_H_ */
