@@ -125,48 +125,6 @@ bool areWeComputingChildren(const Section* section) {
 	return !section->childrenNumberComputed;
 }
 
-bool haveWeRunEverythingInSection(const Section* section) {
-	return (section->status == SECTION_DONE);
-}
-
-bool haveWeRunWholeTreeSection(const Section* rootSection) {
-	printf("checking whether we have run the whole tree...\n");
-	return haveWeRunEveryChildrenInSection(rootSection);
-}
-
-bool haveWeRunEveryChildrenInSection(const Section* section) {
-	// ****************** CHECKING IF WE HAVE RUN EVERYTHING IN THE GIVEN SECTION *****************************
-
-	if (section->status == SECTION_DONE) {
-		return true;
-	}
-
-	//We still don't know how many children this section has, so we can't tell if we have completely run this section or not
-	if (areWeComputingChildren(section)) {
-		return false;
-	}
-
-	// ***************** CHECKING DIRECT CHILDREN OF THE GIVEN SECTION RECURSIVELY ******************************
-
-	//the section has no children. So of course we have run everything in this section!
-	if (section->firstChild == NULL) {
-		return true;
-	}
-
-	//otherwise, we repeat the question to each children of the section:
-	if (!haveWeRunEveryChildrenInSection(section->firstChild)) {
-		return false;
-	}
-	Section* tmp = section->firstChild->nextSibling;
-	while (tmp != NULL) {
-		if (!haveWeRunEveryChildrenInSection(tmp)) {
-			return false;
-		}
-		tmp = tmp->nextSibling;
-	}
-	return true;
-}
-
 int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer) {
 	int i = 0;
 	i += snprintf(&buffer[i], spaceLeft - i, "[%d: %s; status:", s->levelId, s->description);
@@ -219,21 +177,16 @@ void markSectionAsSkippedByTag(Section* section) {
 	section->status = SECTION_SKIPPED_BY_TAG;
 }
 
-/*
- * We use this function to determine wheter we can set a section as
- * fully visited, thus we don't need to execute it anymore.
- * A section is considered fully executed in two cases:
- * 1- When it has no child
- * 2- When every child of the section is fully visited itself
- *
- * Note that we first check if the section has been executed at least once, as
- * if a given section has never been executed it surely can not be fully visited.
- */
-bool isSectionFullyVisited(Section * section) {
-	if (section->status == SECTION_UNEXEC) {
+bool sectionStillNeedsExecution(Section * section) {
+	if (section->status == SECTION_UNEXEC || section->status == SECTION_EXEC) {
+		return true;
+	}
+	else {
 		return false;
 	}
+}
 
+bool isSectionFullyVisited(Section * section) {
 	if (section->childrenNumber == 0) {
 		return true;
 	}
@@ -241,7 +194,7 @@ bool isSectionFullyVisited(Section * section) {
 		Section * next_child = section->firstChild;
 
 		while (next_child != NULL) {
-			if (next_child->status != SECTION_DONE) {
+			if (sectionStillNeedsExecution(next_child)) {
 				return false;
 			}
 			next_child = next_child->nextSibling;

@@ -231,7 +231,7 @@ void callbackDoNothing(Section* section);
 		(model)->currentSection->loopId += 1;																							\
 		setupCode																														\
 		for (																															\
-				(model)->currentSection->loop1 = true																							\
+				(model)->currentSection->loop1 = true																					\
 				;																														\
 				runOnceAndDoWorkAtEnd((model)->currentSection, &((model)->currentSection), 												\
 						getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback			\
@@ -278,7 +278,7 @@ void callbackDoNothing(Section* section);
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
-						!UV(signalDetected) && !haveWeRunWholeTreeSection((model)->currentSection)                                                   \
+						!UV(signalDetected) && sectionStillNeedsExecution((model)->currentSection)                                                   \
 						;																												\
 				)																														\
 		)

@@ -420,11 +420,6 @@ bool areWeComputingChildren(const Section* section);
 bool haveWeRunWholeTreeSection(const Section* rootSection);
 
 /**
- * @param[in] section involved
- * @return True if the source code section has been executed at least once
- */
-bool haveWeRunEverythingInSection(const Section* section);
-/**
  * @param[in] section the section involved
  * @return true if we have executed at least once every <b>direct</b> children of this section
  */
@@ -464,7 +459,24 @@ void markSectionAsDone(Section* section);
  */
 void markSectionAsSkippedByTag(Section* section);
 
-//Documentation in .c file, TODO: move it here
+/**
+ * This function tells if a given section will be executed again depending
+ * on its status. More precisely, a section still needs to be executed when its status
+ * is UNEXEC or EXEC. If it is SKIPPED_BY_TAG, DONE or SIGNALED then it means it will
+ * no longer be executed.
+ */
+bool sectionStillNeedsExecution(Section * section);
+
+/*
+ * We use this function to determine wheter we can set a section as
+ * fully visited, thus we don't need to execute it anymore.
+ * A section is considered fully executed in two cases:
+ * 1- When it has no child
+ * 2- When every child of the section is fully visited itself
+ *
+ * Note that we first check if the section has been executed at least once, as
+ * if a given section has never been executed it surely can not be fully visited.
+ */
 bool isSectionFullyVisited(Section * section);
 
 /**
