@@ -8,7 +8,6 @@
 #include "section.h"
 #include <stdio.h>
 #include <stdarg.h>
-
 #include "macros.h"
 
 /**
@@ -31,7 +30,6 @@ static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section
  *  Returns a pointer to the added section.
  */
 Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
-	//NEVER USED - Section* r = NULL;
 	Section* list = NULL;
 
 	toAdd->parent = parent;
@@ -91,7 +89,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->loop1 = false;
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
-	retVal->latestSnapshot = NULL;
+	//retVal->latestSnapshot = NULL;
 	retVal->parent = NULL;
 	retVal->tags = initHT();
 

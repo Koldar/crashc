@@ -84,8 +84,7 @@ typedef enum {
  * This indicates the "exit status" of the section in the particular test
  */
 typedef enum {
-	SNAPSHOT_EXEC,
-	SNAPSHOT_SKIPPED,
+	SNAPSHOT_OK,
 	SNAPSHOT_SIGNALED,
 	SNAPSHOT_FAILED
 } snapshot_status;
@@ -128,19 +127,26 @@ typedef struct SectionSnapshot {
 	long elapsed_time;
 
 	/**
-	 * The pointer to the parent of this snapshot in the snapshot tree
+	 * The id of the level of the section represented by the snapshot.
+	 * This is useful to derive the hierarchy of the sections involved in
+	 * a particular test without needing to store a tree.
+	 */
+	SectionLevelId levelId;
+
+	/**
+	 * The pointer to the parent snapshot in the snapshot tree
 	 */
 	struct SectionSnapshot * parent;
 
 	/**
-	 * The pointer to the first child of this snapshot in the snapshot tree
-	 */
-	struct SectionSnapshot * firstChild;
-
-	/**
 	 * The pointer to the next sibling of this snapshot in the snapshot tree
 	 */
-	struct SectionSnapshot * nextSibling;
+	struct SectionSnapshot * next_sibling;
+
+	/**
+	 * The pointer to the first child of this snapshot in the snapshot tree
+	 */
+	struct SectionSnapshot * first_child;
 
 } SectionSnapshot;
 
@@ -344,8 +350,9 @@ typedef struct Section {
 
 	/**
 	 * The latest snapshot taken of this Section, used to create test reports
-	 */
+	 *
 	struct SectionSnapshot * latestSnapshot;
+	*/
 
 	///the parent of this section in the tree. May be NULL
 	struct Section* parent;
