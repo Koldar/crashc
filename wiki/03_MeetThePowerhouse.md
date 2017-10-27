@@ -112,88 +112,88 @@ Testcase section
 First of all ´TESTCASE´: while ´TESTSUITE´ defines a **test suites**, ´TESTCASE´ defines
 a series of test somewhat similar among them.
 
-	#include <crashC.h>
+    #include <crashC.h>
 
-	TESTS_START
-	REGISTER_SUITE(1);
-	TESTS_END
+    TESTS_START
+    REGISTER_SUITE(1);
+    TESTS_END
 
-	TESTSUITE(1) {
+    TESTSUITE(1) {
 
-		TESTCASE("list", "") {
-			//testing init and destroy
-			list* l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			destroyList(l);
+        TESTCASE("list", "") {
+            //testing init and destroy
+            list* l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            destroyList(l);
 
-			//testing addTail function
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addTail(l, 5);
-			assert(!isEmpty(l));
-			assert(getSize(l)==1);
-			destroyList(l);
+            //testing addTail function
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addTail(l, 5);
+            assert(!isEmpty(l));
+            assert(getSize(l)==1);
+            destroyList(l);
 
-			//testing addHead function
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addHead(l, 3);
-			assert(!isEmpty(l));
-			assert(getSize(l)==1);
-			destroyList(l);
+            //testing addHead function
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addHead(l, 3);
+            assert(!isEmpty(l));
+            assert(getSize(l)==1);
+            destroyList(l);
 
-			//testing  multiple addTail and addHead
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addTail(l, 5);
-			addHead(l, 3);
-			addTail(l, 7);
-			assert(!isEmpty(l));
-			assert(getSize(l)==3);
-			destroyList(l);
+            //testing  multiple addTail and addHead
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addTail(l, 5);
+            addHead(l, 3);
+            addTail(l, 7);
+            assert(!isEmpty(l));
+            assert(getSize(l)==3);
+            destroyList(l);
 
-			//testing isPresent function
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addTail(l, 5);
-			addHead(l, 3);
-			addTail(l, 7);
-			assert(isPresent(l, 7));
-			assert(!isPresent(l, 4));
-			destroyList(l);
+            //testing isPresent function
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addTail(l, 5);
+            addHead(l, 3);
+            addTail(l, 7);
+            assert(isPresent(l, 7));
+            assert(!isPresent(l, 4));
+            destroyList(l);
 
-			//testing removal successful
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addTail(l, 5);
-			addHead(l, 3);
-			addTail(l, 7);
-			removeItem(l, 7);
-			assert(!isPresent(l, 7));
-			assert(!isEmpty(l));
-			assert(getSize(l)==2);
-			destroyList(l);
+            //testing removal successful
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addTail(l, 5);
+            addHead(l, 3);
+            addTail(l, 7);
+            removeItem(l, 7);
+            assert(!isPresent(l, 7));
+            assert(!isEmpty(l));
+            assert(getSize(l)==2);
+            destroyList(l);
 
-			//testing removal unsuccessful
-			l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			addTail(l, 5);
-			addHead(l, 3);
-			addTail(l, 7);
-			removeItem(l, 4);
-			assert(!isPresent(l, 4));
-			assert(!isEmpty(l));
-			assert(getSize(l)==3);
-			destroyList(l);
-		}
-	}
+            //testing removal unsuccessful
+            l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            addTail(l, 5);
+            addHead(l, 3);
+            addTail(l, 7);
+            removeItem(l, 4);
+            assert(!isPresent(l, 4));
+            assert(!isEmpty(l));
+            assert(getSize(l)==3);
+            destroyList(l);
+        }
+    }
 
 Ok, really cool but nothing actually changed! Hell, we even increase the total line number in the source code!
 However, using ´TESTCASE´ allows you to create indipendent pieces of tests within the same test suite:
@@ -208,53 +208,53 @@ When section
 
 You can start compressing code by using ´WHEN´. The previous example is encoded in crashC as:
 
-	#include <crashC.h>
+    #include <crashC.h>
 
-	TESTS_START
-	REGISTER_SUITE(1);
-	TESTS_END
+    TESTS_START
+    REGISTER_SUITE(1);
+    TESTS_END
 
-	TESTSUITE(1) {
-		TESTCASE("list", "") {
-			list* l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			WHEN("adding on tail", "") {
-				addTail(l, 5);
-				assert(!isEmpty(l));
-				assert(getSize(l)==1);
-			}
-			WHEN("adding on head", "") {
-				addHead(l, 3);
-				assert(!isEmpty(l));
-				assert(getSize(l)==1);
-			}
-			WHEN("lists of 3 items", "") {
-				addTail(l, 5);
-				addHead(l, 3);
-				addTail(l, 7);
-				assert(!isEmpty(l));
-				assert(getSize(l)==3);    
-				WHEN("checking presence", "") {
-					assert(isPresent(l, 7));
-					assert(!isPresent(l, 4));
-				}  
-				WHEN("removing present item", "") {
-					removeItem(l, 7);
-					assert(!isPresent(l, 7));
-					assert(!isEmpty(l));
-					assert(getSize(l)==2);
-				}
-				WHEN("removing absent item", "") {
-					removeItem(l, 4);
-					assert(!isPresent(l, 4));
-					assert(!isEmpty(l));
-					assert(getSize(l)==3);
-				}
-			}
-			destroyList(l);
-		}
-	}
+    TESTSUITE(1) {
+        TESTCASE("list", "") {
+            list* l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            WHEN("adding on tail", "") {
+                addTail(l, 5);
+                assert(!isEmpty(l));
+                assert(getSize(l)==1);
+            }
+            WHEN("adding on head", "") {
+                addHead(l, 3);
+                assert(!isEmpty(l));
+                assert(getSize(l)==1);
+            }
+            WHEN("lists of 3 items", "") {
+                addTail(l, 5);
+                addHead(l, 3);
+                addTail(l, 7);
+                assert(!isEmpty(l));
+                assert(getSize(l)==3);    
+                WHEN("checking presence", "") {
+                    assert(isPresent(l, 7));
+                    assert(!isPresent(l, 4));
+                }  
+                WHEN("removing present item", "") {
+                    removeItem(l, 7);
+                    assert(!isPresent(l, 7));
+                    assert(!isEmpty(l));
+                    assert(getSize(l)==2);
+                }
+                WHEN("removing absent item", "") {
+                    removeItem(l, 4);
+                    assert(!isPresent(l, 4));
+                    assert(!isEmpty(l));
+                    assert(getSize(l)==3);
+                }
+            }
+            destroyList(l);
+        }
+    }
 
 The code below is perfectly equivalent to the one in the first example. **Such compactness! Much Wow!**
 But how does it achieve it?
@@ -280,63 +280,63 @@ Then
 
 We can improve readbiliy by adding the ´THEN´ section, thus *somewhat* achieving a pseudo BDD-style:
 
-	#include <crashC.h>
+    #include <crashC.h>
 
-	TESTS_START
-	REGISTER_SUITE(1);
-	TESTS_END
+    TESTS_START
+    REGISTER_SUITE(1);
+    TESTS_END
 
-	TESTSUITE(1) {
-		TESTCASE("list", "") {
-			list* l = initList();
-			assert(isEmpty(l));
-			assert(getSize(l)==0);
-			WHEN("adding on tail", "") {
-				addTail(l, 5);
-				THEN("size increments","") {
-					assert(!isEmpty(l));
-					assert(getSize(l)==1);
-				}
-			}
-			WHEN("adding on head", "") {
-				addHead(l, 3);
-				THEN("size increments", "") {
-					assert(!isEmpty(l));
-					assert(getSize(l)==1);
-				}
-			}
-			WHEN("lists of 3 items", "") {
-				addTail(l, 5);
-				addHead(l, 3);
-				addTail(l, 7);
-				THEN("size is 3", "") {
-					assert(!isEmpty(l));
-					assert(getSize(l)==3);    
-				}
-				WHEN("checking presence", "") {
-					assert(isPresent(l, 7));
-					assert(!isPresent(l, 4));
-				}  
-				WHEN("removing present item", "") {
-					removeItem(l, 7);
-					THEN("size decrements", "") {
-						assert(!isPresent(l, 7));
-						assert(!isEmpty(l));
-						assert(getSize(l)==2);
-					}
-				}
-				WHEN("removing absent item", "") {
-					removeItem(l, 4);
-					THEN("size is unchanged", "") {
-						assert(!isPresent(l, 4));
-						assert(!isEmpty(l));
-						assert(getSize(l)==3);
-					}
-				}
-			}
-			destroyList(l);
-		}
-	}
+    TESTSUITE(1) {
+        TESTCASE("list", "") {
+            list* l = initList();
+            assert(isEmpty(l));
+            assert(getSize(l)==0);
+            WHEN("adding on tail", "") {
+                addTail(l, 5);
+                THEN("size increments","") {
+                    assert(!isEmpty(l));
+                    assert(getSize(l)==1);
+                }
+            }
+            WHEN("adding on head", "") {
+                addHead(l, 3);
+                THEN("size increments", "") {
+                    assert(!isEmpty(l));
+                    assert(getSize(l)==1);
+                }
+            }
+            WHEN("lists of 3 items", "") {
+                addTail(l, 5);
+                addHead(l, 3);
+                addTail(l, 7);
+                THEN("size is 3", "") {
+                    assert(!isEmpty(l));
+                    assert(getSize(l)==3);    
+                }
+                WHEN("checking presence", "") {
+                    assert(isPresent(l, 7));
+                    assert(!isPresent(l, 4));
+                }  
+                WHEN("removing present item", "") {
+                    removeItem(l, 7);
+                    THEN("size decrements", "") {
+                        assert(!isPresent(l, 7));
+                        assert(!isEmpty(l));
+                        assert(getSize(l)==2);
+                    }
+                }
+                WHEN("removing absent item", "") {
+                    removeItem(l, 4);
+                    THEN("size is unchanged", "") {
+                        assert(!isPresent(l, 4));
+                        assert(!isEmpty(l));
+                        assert(getSize(l)==3);
+                    }
+                }
+            }
+            destroyList(l);
+        }
+    }
 
 ´THEN´ sections are useful to improve test readability.
 
