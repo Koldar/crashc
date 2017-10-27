@@ -24,7 +24,7 @@ where "XXX" can be one of the possible choices:
 - STATIC_LIBRARY
 - ALL_IN_ONE_HEADER (the **default** one)
 
-Next phase
-==========
+What's next?
+============
 
 All done? go to the next phase (quick tutorial)[]!
