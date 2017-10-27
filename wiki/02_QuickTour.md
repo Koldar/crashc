@@ -23,10 +23,10 @@ The boilerplate code is reduced to the minimum as well.
     
 Follows a brief description of what we're  doing:
 
-- ´#include<crashC.h>´: mandatory if you want to use crashC!
-- ´TESTS_START´ defines what **test suites** you want to run. Put all the suites you want inside it;
-- ´REGISTER_SUITE(1)´: mark the given suite as "wants to be run";
-- ´TESTSUITE(1) {´: declare what is the code to run in the ´suite(1)´;
+- `#include<crashC.h>`: mandatory if you want to use crashC!
+- `TESTS_START` defines what **test suites** you want to run. Put all the suites you want inside it;
+- `REGISTER_SUITE(1)`: mark the given suite as "wants to be run";
+- `TESTSUITE(1) {`: declare what is the code to run in the ´suite(1)´;
 
 The rest of the example is pretty much self-explanatory. Briefly, we create a test suite, and we tell crashC to run it.
 The output of crashC is **an executable**. So, in order to successfully compiles it, you need to build it like the following:
