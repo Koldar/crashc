@@ -109,7 +109,7 @@ We can use this (toy) example to showcase sections.
 Testcase section
 ----------------
 
-First of all ´TESTCASE´: while ´TESTSUITE´ defines a **test suites**, ´TESTCASE´ defines
+First of all `TESTCASE`: while `TESTSUITE` defines a **test suites**, `TESTCASE` defines
 a series of test somewhat similar among them.
 
     #include <crashC.h>
@@ -196,17 +196,17 @@ a series of test somewhat similar among them.
     }
 
 Ok, really cool but nothing actually changed! Hell, we even increase the total line number in the source code!
-However, using ´TESTCASE´ allows you to create indipendent pieces of tests within the same test suite:
+However, using `TESTCASE` allows you to create indipendent pieces of tests within the same test suite:
 at the end, *test suites* are meant as containers of *test cases*. You can view the code as:
 
 > A test suite contains several test cases. Each test case tests something.
 
-You are encouraged to create as many ´TESTCASE´ as you want: you want to create ´TESTCASE´ because **only inside them** you can exploit all other sections Crashc provides.
+You are encouraged to create as many `TESTCASE` as you want: you want to create `TESTCASE` because **only inside them** you can exploit all other sections Crashc provides.
 
 When section
 ------------
 
-You can start compressing code by using ´WHEN´. The previous example is encoded in crashC as:
+You can start compressing code by using `WHEN`. The previous example is encoded in crashC as:
 
     #include <crashC.h>
 
@@ -258,16 +258,16 @@ You can start compressing code by using ´WHEN´. The previous example is encode
 
 The code below is perfectly equivalent to the one in the first example. **Such compactness! Much Wow!**
 But how does it achieve it?
-Code inside a ´WHEN´ defines **an hypotetic use case while its body represents what happens when such use case to test happens**.
-CrashC (behind the hood) tries to test all the hypotetic use case you provide with ´WHEN´, one per time. Code inside ´TESTCASE´ is always
-executed so you can put code in the ´TESCASE´ to setup and teardown resources (see ´l´ variable).
+Code inside a `WHEN` defines **an hypotetic use case while its body represents what happens when such use case to test happens**.
+CrashC (behind the hood) tries to test all the hypotetic use case you provide with `WHEN`, one per time. Code inside `TESTCASE` is always
+executed so you can put code in the `TESCASE` to setup and teardown resources (see `l` variable).
 
-So, the first 2 ´WHEN´ of ´TESTCASE´ represents 2 different and **separate** use cases:
+So, the first 2 `WHEN` of `TESTCASE` represents 2 different and **separate** use cases:
 
 - WHEN we're adding on tail;
 - WHEN we're adding on head;
 
-If there are nested ´WHEN´, they represent combinations of scenarios. For example the last ´WHEN´ contains 3 different use cases:
+If there are nested `WHEN`, they represent combinations of scenarios. For example the last `WHEN` contains 3 different use cases:
 
 - WHEN there is a lists of 3 items AND we're checking presence do;
 - WHEN there is a lists of 3 items AND removing present item do;
@@ -278,7 +278,7 @@ Note that the code inside "lists of 3 items" is executed for every of those 3 sc
 Then
 ----
 
-We can improve readbiliy by adding the ´THEN´ section, thus *somewhat* achieving a pseudo BDD-style:
+We can improve readbiliy by adding the `THEN` section, thus *somewhat* achieving a pseudo BDD-style:
 
     #include <crashC.h>
 
@@ -338,7 +338,7 @@ We can improve readbiliy by adding the ´THEN´ section, thus *somewhat* achievi
         }
     }
 
-´THEN´ sections are useful to improve test readability.
+`THEN` sections are useful to improve test readability.
 
 What's next?
 ============
