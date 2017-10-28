@@ -5,9 +5,12 @@
  *      Author: koldar
  */
 
+#ifndef ALL_IN_ONE
+	#include <string.h>
+#endif
+
 #include "testReport.h"
 #include "errors.h"
-#include <string.h>
 
 typedef struct TestReport {
 	const char* file;
