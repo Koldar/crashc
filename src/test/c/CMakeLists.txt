@@ -1,4 +1,4 @@
-set(PROJECT_NAME "Test")
+set(TEST_NAME "${THEPROJECT_NAME}Test")
 
 #include in the build all the content inside the directory
 include_directories("../include")
@@ -6,15 +6,28 @@ include_directories("../../main/include")
 
 #you might want to add the sources via the following command: set(SOURCES src/mainapp.cpp src/Student.cpp)
 #but with GLOB is all much easier; include in the build all the content filtered by the pattern
-
 file(GLOB SOURCES "*.c")
 
-#create the library called "EZGraph" from all the files labelled with "SOURCES"
-add_executable(${PROJECT_NAME} ${SOURCES})
-link_directories(${CMAKE_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} "CrashC")
+#compile a particular test.
+message(STATUS "adding TEST macro to generate automatic tests used to test crashc itself")
+add_definitions(-DTEST_0014)
 
-set_target_properties(${PROJECT_NAME}
+add_executable(${TEST_NAME} ${SOURCES})
+link_directories(${CMAKE_BINARY_DIR})
+
+if(${THEPROJECT_OUTPUT} STREQUAL "SO")
+    message(STATUS "Building Tests against shared library")
+    
+    target_link_libraries(${TEST_NAME} ${PROJECT_NAME} ${THEPROJECT_TEST_ADDITIONAL_SHARED_LIBRARIES})
+endif(${THEPROJECT_OUTPUT} STREQUAL "SO")
+
+if(${THEPROJECT_OUTPUT} STREQUAL "AO")
+    message(STATUS "Building Tests against static library")   
+     
+    target_link_libraries(${TEST_NAME} ${PROJECT_NAME} ${THEPROJECT_TEST_ADDITIONAL_SHARED_LIBRARIES})
+endif(${THEPROJECT_OUTPUT} STREQUAL "AO")
+
+set_target_properties(${TEST_NAME}
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
