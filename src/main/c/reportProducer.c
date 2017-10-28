@@ -49,7 +49,7 @@ static void reportProducerRecursive(ReportProducerImplementation rpi, Section* s
 		int i;
 
 		rpi.handleSectionStarted(sectionToDraw, depth);
-		ITERATE_ON_LIST(sectionToDraw->assertionReportList, cell, el, TestReport) {
+		ITERATE_ON_LIST(sectionToDraw->assertionReportList, cell, el, TestReport*) {
 			rpi.handleAssertionStarted(el, depth);
 			rpi.handleAssertion(el, depth);
 			rpi.handleAssertionFinished(el, depth);
@@ -138,7 +138,7 @@ static void reportProducerConsoleRecursive(Section* sectionToDraw, int depth, Se
 						"%s:\n",
 						sectionToDraw->description
 		);
-		ITERATE_ON_LIST(sectionToDraw->failureReportList, cell, el, TestReport) {
+		ITERATE_ON_LIST(sectionToDraw->failureReportList, cell, el, TestReport*) {
 			//TODO customize colors
 			fcprintf(stdout,
 					ANSI_COLOR_RED
