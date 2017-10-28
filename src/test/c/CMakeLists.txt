@@ -3,6 +3,7 @@ set(TEST_NAME "${THEPROJECT_NAME}Test")
 #include in the build all the content inside the directory
 include_directories("../include")
 include_directories("../../main/include")
+include_directories("${CMAKE_BINARY_DIR}/allInOne")
 
 #you might want to add the sources via the following command: set(SOURCES src/mainapp.cpp src/Student.cpp)
 #but with GLOB is all much easier; include in the build all the content filtered by the pattern

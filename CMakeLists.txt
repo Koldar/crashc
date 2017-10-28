@@ -8,7 +8,7 @@ set(THEPROJECT_NAME "CrashC")
 set(THEPROJECT_VERSION 1.0)
 #what will be prodiced: either EXE (executable); SO (shared library) AO (static library)
 #Can be overriden by using "cmake -DU_LIBRARY_TYPE:STRING=<newvalue>" command
-set(THEPROJECT_OUTPUT "SO")
+set(THEPROJECT_OUTPUT "AO")
 #a spaced separated list of shared libraries that will be used when linking the main project. Each library needs to be installed
 #on the system. Each library should be declared as a quoted string
 set(THEPROJECT_REQUIRED_SHARED_LIBRARIES "m")
@@ -32,6 +32,7 @@ set(CMAKE_FILE_ALTERED_COMMAND
     " - added custom command line option 'U_AUTOMATED_TEST_ISSUE_ID' containing the issue id to test in the automated tests" "\n"
     " - added project variable 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID'" "\n"
     " - 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID' default to TEST_0001" "\n"
+    " - create 'CREATE ALL IN ONE HEADER' section in src/test/c file" "\n"
 )
 #Represents the version of the building process version. You can use this value to understand what this cmake building process can and can't do
 #For example in building processes before the "1.0" "sudo make install" of exectuables wasn't supported.

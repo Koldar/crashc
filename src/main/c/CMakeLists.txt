@@ -42,9 +42,25 @@ set_target_properties(${THEPROJECT_NAME}
 
 #copy the contents of src/main/resources inside build/XXX
 add_custom_command(
-    TARGET ${THEPROJECT_NAME} 
+    OUTPUT "copy_resources"
+    COMMENT "copy all the files in src/main/resources/"
+    DEPENDS ${THEPROJECT_NAME} 
     POST_BUILD COMMAND 
     ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/../../src/main/resources $<TARGET_FILE_DIR:${THEPROJECT_NAME}>
+)
+
+# ******************** CREATE ALL IN ONE HEADER *****************
+add_custom_command(
+    OUTPUT "allInOneHeader"
+    COMMENT "build the header containing all the crashC code into ${CMAKE_BINARY_DIR}"
+    DEPENDS "copy_resources"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/"
+    COMMAND ./buildAllInOneInclude.bash "allInOne" "crashC"
+)
+
+add_custom_target(
+  BuildAllInOnHeader ALL
+  DEPENDS "allInOneHeader"
 )
 
 #************** SUDO MAKE INSTALL ****************
