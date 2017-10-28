@@ -179,7 +179,7 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
 		list* UV(l) = (_l);\
 		list_cell* cell = getHeadInList(UV(l)); \
 		list_cell* UV(next) = NULL;\
-		type* _payload = NULL;\
+		type _payload = NULL;\
 		if (cell != NULL) {\
 			_payload = getPayloadInListCell(cell);\
 			if (getNextInListCell(cell) != NULL) {\
@@ -219,7 +219,7 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
 #define VARIABLE_ITERATE_ON_LIST(_l, previousCell, cell, _payload, type) \
 		list* UV(l) = (_l);\
 		list_cell* UV(next) = NULL;\
-		type* _payload = NULL;\
+		type _payload = NULL;\
 		if (getHeadInList(UV(l)) != NULL) {\
 			_payload = getPayloadInListCell(getHeadInList(UV(l)));\
 			if (getNextInListCell(getHeadInList(UV(l))) != NULL) {\

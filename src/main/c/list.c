@@ -56,14 +56,14 @@ list* initList() {
 }
 
 void destroyList(list* lst) {
-	ITERATE_ON_LIST(lst, cell, value, void) {
+	ITERATE_ON_LIST(lst, cell, value, void*) {
 		free(cell);
 	}
 	free(lst);
 }
 
 void destroyListWithElement(list* lst, void(*destructor)(void*)) {
-	ITERATE_ON_LIST(lst, cell, value, void) {
+	ITERATE_ON_LIST(lst, cell, value, void*) {
 		destructor(cell->payload);
 		free(cell);
 	}
@@ -71,7 +71,7 @@ void destroyListWithElement(list* lst, void(*destructor)(void*)) {
 }
 
 void clearList(list* l) {
-	ITERATE_ON_LIST(l, cell, value, void) {
+	ITERATE_ON_LIST(l, cell, value, void*) {
 		free(cell);
 	}
 	l->head = NULL;
@@ -178,7 +178,7 @@ void* getTailOfList(const list* l) {
 }
 
 void* getNthElementOfList(const list* l, int index) {
-	ITERATE_ON_LIST(l, cell, payload, void) {
+	ITERATE_ON_LIST(l, cell, payload, void*) {
 		if (index == 0) {
 			return payload;
 		}
