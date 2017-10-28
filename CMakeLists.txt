@@ -27,7 +27,12 @@ set(THEPROJECT_POSITION_INDEPENDENT_CODE "true")
 set(STANDARD_CMAKE_FILE_ALTERED "true")
 #If you have altered the standard CMAKE file standard process, consider explaining in this variable what have you changed to help future maintainers!
 #The variable is ignored if "STANDARD_CMAKE_FILE_ALTERED" is false
-set(CMAKE_FILE_ALTERED_COMMAND "added add_definitions(-DTEST_XXXX) inside src/test/c used in the testAll bash")
+set(CMAKE_FILE_ALTERED_COMMAND 
+    " - added add_definitions(-DTEST_XXXX) inside src/test/c used in the testAll bash" "\n"
+    " - added custom command line option 'U_AUTOMATED_TEST_ISSUE_ID' containing the issue id to test in the automated tests" "\n"
+    " - added project variable 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID'" "\n"
+    " - 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID' default to TEST_0001" "\n"
+)
 #Represents the version of the building process version. You can use this value to understand what this cmake building process can and can't do
 #For example in building processes before the "1.0" "sudo make install" of exectuables wasn't supported.
 # - 1.0: first version
@@ -66,6 +71,12 @@ SET(U_FPIC "" CACHE STRING "true to enable PIC. False to enable Relocation")
 SET(U_LIBRARY_TYPE "" CACHE STRING "SO for shared library, AO for static library")
 SET(U_INSTALL_DIRECTORY "" CACHE STRING "The place where everything 'sudo make install' is positioned")
 
+SET(THEPROJECT_AUTOMATED_TEST_ISSUE_ID "TEST_0001")
+
+if (NOT ${U_AUTOMATED_TEST_ISSUE_ID} STREQUAL "")
+    set(THEPROJECT_AUTOMATED_TEST_ISSUE_ID ${U_AUTOMATED_TEST_ISSUE_ID})
+    message(STATUS "${BoldYellow}changing AUTOMTES TEST ISSUE ID to ${U_AUTOMATED_TEST_ISSUE_ID}${ColorReset}") 
+endif()
 if (NOT ${U_FPIC} STREQUAL "")
     set(THEPROJECT_POSITION_INDEPENDENT_CODE ${U_FPIC})
     message(STATUS "${BoldYellow}changing FPIC to ${THEPROJECT_POSITION_INDEPENDENT_CODE}${ColorReset}")

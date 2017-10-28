@@ -9,8 +9,8 @@ include_directories("../../main/include")
 file(GLOB SOURCES "*.c")
 
 #compile a particular test.
-message(STATUS "adding TEST macro to generate automatic tests used to test crashc itself")
-add_definitions(-DTEST_0014)
+message(STATUS "testing automated test ${THEPROJECT_AUTOMATED_TEST_ISSUE_ID}...")
+add_definitions(-D${THEPROJECT_AUTOMATED_TEST_ISSUE_ID})
 
 add_executable(${TEST_NAME} ${SOURCES})
 link_directories(${CMAKE_BINARY_DIR})
