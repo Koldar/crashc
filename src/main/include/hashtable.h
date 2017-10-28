@@ -29,7 +29,9 @@
 #ifndef HASHTABLE_H_
 #define HASHTABLE_H_
 
-#include <stdbool.h>
+#ifndef ALL_IN_ONE
+	#include <stdbool.h>
+#endif
 #include "uthash.h"
 #include "macros.h"
 

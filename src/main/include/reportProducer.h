@@ -8,9 +8,13 @@
 #ifndef REPORTPRODUCER_H_
 #define REPORTPRODUCER_H_
 
+#ifndef ALL_IN_ONE
+	#include <stdio.h>
+	#include <stdlib.h>
+#endif
+
 #include "section.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 
 /**
  * Represents which implementation we need to use in ::produceReport

@@ -5,11 +5,13 @@
  *      Author: koldar
  */
 
-#include "section.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <unistd.h>
+#ifndef ALL_IN_ONE
+	#include <stdio.h>
+	#include <stdarg.h>
+	#include <unistd.h>
+#endif
 
+#include "section.h"
 #include "macros.h"
 
 /**

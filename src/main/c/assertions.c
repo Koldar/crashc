@@ -7,8 +7,10 @@
 
 
 #include "assertions.h"
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef ALL_IN_ONE
+	#include <stdio.h>
+	#include <stdlib.h>
+#endif
 
 void __assert(Section* section, const char* expr, const char* file, const int line, const bool outcome) {
 	//TODO add stop at first error

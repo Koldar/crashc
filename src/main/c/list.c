@@ -6,13 +6,18 @@
  */
 
 #define _GNU_SOURCE
+
+#ifndef ALL_IN_ONE
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
+
 #include "list.h"
 #include "macros.h"
 #include "errors.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
 
 typedef struct list_cell {
 	///represents the paylaod inside this cell of the list

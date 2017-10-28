@@ -8,7 +8,9 @@
 #ifndef SECTION_H_
 #define SECTION_H_
 
-#include <stdbool.h>
+#ifndef ALL_IN_ONE
+	#include <stdbool.h>
+#endif
 #include "tag.h"
 #include "testReport.h"
 

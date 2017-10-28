@@ -23,8 +23,11 @@
 #ifndef LIST_H_
 #define LIST_H_
 
+#ifndef ALL_IN_ONE
+	#include <stdlib.h>
+#endif
+
 #include "stdbool.h"
-#include <stdlib.h>
 #include "macros.h"
 
 
