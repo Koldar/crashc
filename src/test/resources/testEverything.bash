@@ -48,6 +48,7 @@ cd ${CRASHC_BUILD_DEBUG}
 		#now we compile everything
 	
 		cmake ../..
+		make allInOneHeader
 		make
 		if test $? -ne 0
 		then
