@@ -15,7 +15,6 @@ cd build/Release
 	fi
 	make allInOneHeader
 	cp -fv libCrashC.so.1.0 ../Production/
-	cp -fv allInOne/crashC.h ../Production/
 	cp -fv allInOne/crashC.all.in.one.h ../Production/
 	cmake -DU_LIBRARY_TYPE:STRING=AO ../..
 	make all
