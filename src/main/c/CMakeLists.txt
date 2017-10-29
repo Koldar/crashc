@@ -44,8 +44,8 @@ set_target_properties(${THEPROJECT_NAME}
 add_custom_command(
     OUTPUT "copy_resources"
     COMMENT "copy all the files in src/main/resources/"
-    DEPENDS ${THEPROJECT_NAME} 
-    POST_BUILD COMMAND 
+    DEPENDS ${THEPROJECT_NAME}
+    POST_BUILD COMMAND
     ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/../../src/main/resources $<TARGET_FILE_DIR:${THEPROJECT_NAME}>
 )
 
@@ -55,7 +55,7 @@ add_custom_command(
     COMMENT "build the header containing all the crashC code into ${CMAKE_BINARY_DIR}"
     DEPENDS "copy_resources"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/"
-    COMMAND ./buildAllInOneInclude.bash "allInOne" "crashC"
+    COMMAND ./buildAllInOneInclude.bash "allInOne" "crashC.all.in.one.h"
 )
 
 add_custom_target(
