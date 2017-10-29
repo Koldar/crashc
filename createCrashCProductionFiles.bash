@@ -4,6 +4,8 @@
 mkdir -pv build/Production
 mkdir -pv build/Release
 
+PRODUCTION="../Production/"
+
 OLDPWD=`pwd`
 cd build/Release
 	cmake -DU_LIBRARY_TYPE:STRING=SO ../..
@@ -13,9 +15,12 @@ cd build/Release
 		cd ${OLDPWD}
 		exit 1
 	fi
-	make allInOneHeader
-	cp -fv libCrashC.so.1.0 ../Production/
-	cp -fv allInOne/crashC.all.in.one.h ../Production/
+	#move header files to production
+	mkdir -pv "${PRODUCTION}/include"
+	cp -fv ../../src/main/include/*.h "${PRODUCTION}/include"
+	make allInOneHeader	
+	cp -fv libCrashC.so.1.0 "${PRODUCTION}"
+	cp -fv allInOne/crashC.all.in.one.h "${PRODUCTION}"
 	cmake -DU_LIBRARY_TYPE:STRING=AO ../..
 	make all
 	if test $? -ne 0
@@ -23,7 +28,7 @@ cd build/Release
 		cd ${OLDPWD}
 		exit 1
 	fi
-	cp -fv libCrashC.a ../Production/
+	cp -fv libCrashC.a "${PRODUCTION}"
 cd ${OLDPWD}
 
 

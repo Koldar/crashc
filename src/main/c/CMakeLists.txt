@@ -55,7 +55,7 @@ add_custom_command(
     COMMENT "build the header containing all the crashC code into ${CMAKE_BINARY_DIR}"
     DEPENDS "copy_resources"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/"
-    COMMAND ./buildAllInOneInclude.bash "allInOne" "crashC.all.in.one.h"
+    COMMAND ./buildAllInOneInclude.bash "allInOne" "crashC.all.in.one.h" "../../src/main/c" "../../src/main/include"
 )
 
 add_custom_target(

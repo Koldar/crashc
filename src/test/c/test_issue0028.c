@@ -16,10 +16,10 @@ TESTS_END
 
 TESTSUITE(1) {
 	clearTestChecker();
-	TESTCASE("test") {
+	TESTCASE("test", "") {
 		addCharacter('a');
 	}
-	assertTestCheckerAndReset('a');
+	assertTestCheckerAndReset("a");
 }
 
 #endif
