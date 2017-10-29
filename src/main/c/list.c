@@ -6,13 +6,16 @@
  */
 
 #define _GNU_SOURCE
-#include "list.h"
-#include "macros.h"
-#include "errors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "list.h"
+#include "macros.h"
+#include "errors.h"
+
+
 
 typedef struct list_cell {
 	///represents the paylaod inside this cell of the list

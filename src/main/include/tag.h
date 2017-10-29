@@ -9,6 +9,7 @@
 #define TAG_H_
 
 #include <stdbool.h>
+
 #include "hashtable.h"
 
 /**

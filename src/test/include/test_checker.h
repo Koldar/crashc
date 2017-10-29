@@ -9,7 +9,6 @@
 #define TEST_CHECKER_H_
 
 #include <stdbool.h>
-#include <string.h>
 
 /**
  * Prepare the test check to be used in a new crash c test

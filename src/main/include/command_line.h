@@ -8,6 +8,7 @@
 #ifndef COMMAND_LINE_H_
 #define COMMAND_LINE_H_
 
+#include <stdio.h>
 #include "tag.h"
 
 /**

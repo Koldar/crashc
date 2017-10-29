@@ -30,6 +30,7 @@
 #define HASHTABLE_H_
 
 #include <stdbool.h>
+
 #include "uthash.h"
 #include "macros.h"
 

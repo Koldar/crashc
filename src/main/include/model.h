@@ -10,10 +10,12 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include "typedefs.h"
-#include "section.h"
 #include <signal.h>
 #include <setjmp.h>
+
+#include "typedefs.h"
+#include "section.h"
+
 
 /**
  * The maximum number of registrable suites

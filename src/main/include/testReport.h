@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+
 #include "list.h"
 #include "errors.h"
 

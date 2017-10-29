@@ -3,8 +3,9 @@
 
 #include <signal.h>
 #include <setjmp.h>
-#include "section.h"
+
 #include "crashC.h"
+#include "section.h"
 
 //Used by longjmp, no special meaning at the moment
 #define JMP_CODE 1

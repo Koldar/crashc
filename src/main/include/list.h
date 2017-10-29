@@ -23,8 +23,9 @@
 #ifndef LIST_H_
 #define LIST_H_
 
-#include "stdbool.h"
 #include <stdlib.h>
+
+#include "stdbool.h"
 #include "macros.h"
 
 

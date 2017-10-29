@@ -5,8 +5,10 @@
  *      Author: koldar
  */
 
-#include "tag.h"
+
 #include <stdbool.h>
+
+#include "tag.h"
 #include "hashtable.h"
 #include "errors.h"
 

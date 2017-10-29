@@ -9,6 +9,7 @@
 #define SECTION_H_
 
 #include <stdbool.h>
+
 #include "tag.h"
 #include "testReport.h"
 

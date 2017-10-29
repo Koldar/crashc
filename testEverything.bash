@@ -44,18 +44,17 @@ cd ${CRASHC_BUILD_DEBUG}
 		printf "testing issue %04d\n" ${issueIDInt}
 		#alter CMakeFiles.txt in the main directory
 		printf -v define_value 'TEST_%04d' "${issueIDInt}"
-		sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
+		#sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 	
-		cmake ../..
-		make allInOneHeader
+		cmake -DU_AUTOMATED_TEST_ISSUE_ID:STRING=${define_value} ../..
 		make
 		if test $? -ne 0
 		then
 			echo "Error: could not compile file of issue ${issueID}. Please fix compile errors!"
 			exit 1
 		fi		
-		 ./Test > "output.${issueID}.txt"
+		./CrashCTest > "output.${issueID}.txt"
 		#the file needs to contain something
 		if test `cat output.${issueID}.txt | wc -l` -eq 0
 		then

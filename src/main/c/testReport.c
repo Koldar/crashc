@@ -5,9 +5,10 @@
  *      Author: koldar
  */
 
+#include <string.h>
+
 #include "testReport.h"
 #include "errors.h"
-#include <string.h>
 
 typedef struct TestReport {
 	const char* file;

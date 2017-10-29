@@ -8,9 +8,11 @@
 #ifndef REPORTPRODUCER_H_
 #define REPORTPRODUCER_H_
 
-#include "section.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "section.h"
+
 
 /**
  * Represents which implementation we need to use in ::produceReport

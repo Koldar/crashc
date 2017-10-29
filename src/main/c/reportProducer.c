@@ -5,9 +5,10 @@
  *      Author: koldar
  */
 
+#include <stdarg.h>
+
 #include "reportProducer.h"
 #include "console_color.h"
-#include <stdarg.h>
 
 
 void fcprintf(FILE* f, ConsoleColor c, const char* template, ...);

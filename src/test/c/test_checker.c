@@ -10,6 +10,7 @@
 #include "test_checker.h"
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 static char __TEST_CHECKER_BUFFER[1000];
 static int nextPosition;

@@ -5,10 +5,12 @@
  *      Author: koldar
  */
 
+#include <stdbool.h>
+
 #include "hashtable.h"
 #include "macros.h"
 #include "errors.h"
-#include <stdbool.h>
+
 
 static HTCell* initHTCell(const void* e, unsigned long key);
 static void destroyHTCell(HTCell* htCell);
