@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#include <crashC.h>
+#include "crashC.h"
 #include "section.h"
 
 //Used by longjmp, no special meaning at the moment

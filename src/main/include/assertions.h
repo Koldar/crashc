@@ -8,7 +8,7 @@
 #ifndef ASSERTIONS_H_
 #define ASSERTIONS_H_
 
-#include <crashC.h>
+#include "crashC.h"
 
 ///**
 // * Trace the assertion inside the test framework report infrastructure

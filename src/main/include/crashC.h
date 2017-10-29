@@ -45,7 +45,7 @@
 #include <stdio.h>
 
 #include "errors.h"
-#include "uthash.h"
+#include "hashtable.h"
 #include "section.h"
 #include "sigHandling.h"
 #include "command_line.h"
