@@ -5,9 +5,7 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <stdarg.h>
-#endif
+#include <stdarg.h>
 
 #include "reportProducer.h"
 #include "console_color.h"

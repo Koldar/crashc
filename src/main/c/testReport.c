@@ -5,9 +5,7 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <string.h>
-#endif
+#include <string.h>
 
 #include "testReport.h"
 #include "errors.h"

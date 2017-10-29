@@ -5,9 +5,8 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <stdbool.h>
-#endif
+
+#include <stdbool.h>
 
 #include "tag.h"
 #include "hashtable.h"

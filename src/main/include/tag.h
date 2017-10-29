@@ -8,9 +8,8 @@
 #ifndef TAG_H_
 #define TAG_H_
 
-#ifndef ALL_IN_ONE
-	#include <stdbool.h>
-#endif
+#include <stdbool.h>
+
 #include "hashtable.h"
 
 /**

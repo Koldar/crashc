@@ -23,9 +23,7 @@
 #ifndef LIST_H_
 #define LIST_H_
 
-#ifndef ALL_IN_ONE
-	#include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 #include "stdbool.h"
 #include "macros.h"

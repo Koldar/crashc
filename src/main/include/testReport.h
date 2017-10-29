@@ -8,10 +8,9 @@
 #ifndef TESTREPORT_H_
 #define TESTREPORT_H_
 
-#ifndef ALL_IN_ONE
-	#include <stdbool.h>
-	#include <stdlib.h>
-#endif
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "list.h"
 #include "errors.h"
 

@@ -36,15 +36,13 @@
  * @endcode
  */
 
-#ifndef OLDCRASHC_H_
-#define OLDCRASHC_H_
+#ifndef CRASHC_H_
+#define CRASHC_H_
 
-#ifndef ALL_IN_ONE
-	#include <stdbool.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <stdio.h>
-#endif
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "errors.h"
 #include "uthash.h"

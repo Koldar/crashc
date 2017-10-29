@@ -7,17 +7,15 @@
 
 
 #include "assertions.h"
-#ifndef ALL_IN_ONE
-	#include <stdio.h>
-	#include <stdlib.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
 
-void __assert(Section* section, const char* expr, const char* file, const int line, const bool outcome) {
-	//TODO add stop at first error
-	TestReport* tr = initTestReport(file, line, expr, outcome);
-	addTailInList(section->assertionReportList, tr);
-	if (!outcome) {
-		addTailInList(section->failureReportList, tr);
-		fprintf(stderr, "%s:%d the expression \"%s\" failed.\n", file, line, expr);
-	}
-}
+//void __assert(Section* section, const char* expr, const char* file, const int line, const bool outcome) {
+//	//TODO add stop at first error
+//	TestReport* tr = initTestReport(file, line, expr, outcome);
+//	addTailInList(section->assertionReportList, tr);
+//	if (!outcome) {
+//		addTailInList(section->failureReportList, tr);
+//		fprintf(stderr, "%s:%d the expression \"%s\" failed.\n", file, line, expr);
+//	}
+//}

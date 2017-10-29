@@ -7,11 +7,9 @@
 
 #define _GNU_SOURCE
 
-#ifndef ALL_IN_ONE
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "list.h"
 #include "macros.h"

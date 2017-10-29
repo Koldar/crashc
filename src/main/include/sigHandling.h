@@ -1,11 +1,10 @@
 #ifndef SIGHANDLING_H_
 #define SIGHANDLING_H_
 
-#ifndef ALL_IN_ONE
-	#include <signal.h>
-	#include <setjmp.h>
-#endif
-#include "oldcrashC.h"
+#include <signal.h>
+#include <setjmp.h>
+
+#include <crashC.h>
 #include "section.h"
 
 //Used by longjmp, no special meaning at the moment

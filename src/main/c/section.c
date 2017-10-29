@@ -5,11 +5,9 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <stdio.h>
-	#include <stdarg.h>
-	#include <unistd.h>
-#endif
+#include <stdio.h>
+#include <stdarg.h>
+#include <unistd.h>
 
 #include "section.h"
 #include "macros.h"

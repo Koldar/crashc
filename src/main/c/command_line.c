@@ -5,12 +5,10 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <getopt.h>
-	#include <stdbool.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <stdbool.h>
 
 #include "command_line.h"
 #include "tag.h"

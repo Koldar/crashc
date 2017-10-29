@@ -8,10 +8,8 @@
 #ifndef REPORTPRODUCER_H_
 #define REPORTPRODUCER_H_
 
-#ifndef ALL_IN_ONE
-	#include <stdio.h>
-	#include <stdlib.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "section.h"
 

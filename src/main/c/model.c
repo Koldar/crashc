@@ -5,9 +5,7 @@
  *      Author: koldar
  */
 
-#ifndef ALL_IN_ONE
-	#include <stdlib.h>
-#endif
+#include <stdlib.h>
 #include "model.h"
 
 crashc_model setupDefaultMainModel() {
