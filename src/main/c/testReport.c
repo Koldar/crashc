@@ -88,6 +88,7 @@ void updateSnapshotStatus(Section * section, SectionSnapshot * snapshot) {
 
 void updateTestOutcome(TestReport * report, SectionSnapshot * last_snapshot) {
 	if (last_snapshot->status != SNAPSHOT_OK) {
+		report->testcase_snapshot->status = last_snapshot->status;
 		report->outcome = TEST_FAILURE;
 	}
 }

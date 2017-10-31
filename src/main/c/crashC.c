@@ -1,3 +1,4 @@
+#include <ct_utils.h>
 #include "crashC.h"
 #include "main_model.h"
 #include "list.h"
@@ -105,6 +106,8 @@ void doWorkAtEndCallbackChildrenNumberComputed(crashc_model * model, Section** p
 	section->currentChild = 0;
 
 	updateSnapshotStatus(model->currentSection, model->currentSnapshot);
+
+	model->currentSnapshot = model->currentSnapshot->parent;
 }
 
 void doWorkAtEndCallbackResetContainer(crashc_model * model, Section** pointerToSetAsParent, Section* child) {

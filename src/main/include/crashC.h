@@ -52,7 +52,7 @@
 #include "model.h"
 #include "testReport.h"
 #include "main_model.h"
-
+#include "report_producer.h"
 
 /**
  * Callback representing a general condition that determine if we can access to a particular section
@@ -316,7 +316,7 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 
 
 //TODO the parent of the test case is not the root section, but the "suite section". We need to include them in the section tree as well!
-#define TESTCASE(description, tags) LOOPER(&cc_model, ((&cc_model)->rootSection), 1, description, tags)
+#define TESTCASE(description, tags) LOOPER(&cc_model, ((&cc_model)->rootSection), ST_TESTCASE, description, tags)
 #define EZ_TESTCASE(description) TESTCASE(description, "")
 
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
@@ -338,9 +338,9 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 		NOCODE 																															\
 )
 
-#define WHEN(description, tags) ENTER_ONE_PER_LOOP((&cc_model), 5, description, tags)
+#define WHEN(description, tags) ENTER_ONE_PER_LOOP((&cc_model), ST_WHEN, description, tags)
 #define EZ_WHEN(description) WHEN(description, "")
-#define THEN(description, tags) ALWAYS_ENTER((&cc_model), 10, description, tags)
+#define THEN(description, tags) ALWAYS_ENTER((&cc_model), ST_THEN, description, tags)
 #define EZ_THEN(description) THEN(description, "")
 
 //TODO all those functions should be included in the only one global models
@@ -360,7 +360,15 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 #define TESTS_END \
     for (int i = 0; i < (&cc_model)->suites_array_index; i++) { \
     	(&cc_model)->tests_array[i](); \
-    } \
+    } 														\
+	list_cell * cell = getHeadInList(cc_model.test_reports_list); \
+	TestReport * report = getPayloadInListCell(cell); 			\
+	while (true) {												\
+		ct_stdout_report(report);								\
+		cell = getNextInListCell(cell);							\
+		if (cell == NULL) break;								\
+		report = getPayloadInListCell(cell); 					\
+	}															\
 } //main function closing bracket
 
 /**
