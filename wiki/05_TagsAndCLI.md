@@ -13,7 +13,7 @@ feature since a long time.
 How to use tags?
 ================
 
-Consider the example from [Meet the Powerhouse]():
+Consider the example from [Meet the Powerhouse](https://github.com/Koldar/crashc/blob/master/wiki/03_MeetThePowerhouse.md):
 
 ```
 #include <crashC.h>
