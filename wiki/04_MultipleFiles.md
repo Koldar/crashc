@@ -48,4 +48,4 @@ And that's it!
 What's next?
 ============
 
-Like in [Catch Cpp](https://github.com/philsquared/Catch), CrashC has tags allowing you to quickly customize which tests to run and which tests you want to skip. Want to know more? Go to the next [page]().
+Like in [Catch Cpp](https://github.com/philsquared/Catch), CrashC has tags allowing you to quickly customize which tests to run and which tests you want to skip. Want to know more? Go to the next [page](https://github.com/Koldar/crashc/blob/master/wiki/05_TagsAndCLI.md).
