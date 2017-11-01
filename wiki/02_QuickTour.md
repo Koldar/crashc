@@ -40,4 +40,4 @@ What's next?
 ============
 
 From this example it seems crashC is not different from any other C testing framework you came across. As you will realize, suites **aren't** 
-the most important concepts in crashC, **section are**. Understand what I mean by that in the (following page)[].
+the most important concepts in crashC, **section are**. Understand what I mean by that in the (https://github.com/Koldar/crashc/blob/master/wiki/03_MeetThePowerhouse.md)[following page].
