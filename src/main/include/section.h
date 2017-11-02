@@ -11,14 +11,16 @@
 #include <stdbool.h>
 
 #include "tag.h"
-#include "testReport.h"
+#include "errors.h"
 
 /**
  * Represents the type ::Section::levelId has
  */
 typedef int SectionLevelId;
 struct SectionCell;
+struct SectionSnapshot;
 typedef struct Section Section;
+
 
 /**
  * Represents the type of this section
@@ -76,6 +78,78 @@ typedef enum {
 	 */
 	SECTION_SKIPPED_BY_TAG
 } section_status_enum;
+
+
+/**
+ * This structure defines the possible statuses in which a snapshot can be.
+ * This indicates the "exit status" of the section in the particular test
+ */
+typedef enum {
+	SNAPSHOT_OK,
+	SNAPSHOT_SIGNALED,
+	SNAPSHOT_FAILED
+} snapshot_status;
+
+/**
+ * This structure contains the informations contained in a Section at a precise moment of the program execution,
+ * which are then used by the test reports to yield the user a more detailed set of informations about a given test.
+ * Note that this structure contains only the fields of a Section which are subject to changes during the execution
+ * of the tests. Note that this structure contains an implicit tree, used by CrashC to track the relationships between the
+ * sections involved in a precise test
+ */
+typedef struct SectionSnapshot {
+	/**
+	 * The description of this section
+	 */
+	char * description;
+
+	/**
+	 * The tags associated to this section
+	 */
+	tag_ht *  tags;
+
+	/**
+	 * The type of this section
+	 */
+	section_type type;
+
+	/**
+	 * The status of the snapshot.
+	 * This actually pretty much just mimic the status the section to which this snapshot
+	 * refers to, but it is a bit different as some section statuses makes no sense in the
+	 * context of the snapshot, e.g SECTION_UNEXEC, SECTION_EXEC, etc..
+	 */
+	snapshot_status status;
+
+	/**
+	 * The amount of time the section ran during one specific test.
+	 * This field has no meaning until the section is complitely executed.
+	 */
+	long elapsed_time;
+
+	/**
+	 * The id of the level of the section represented by the snapshot.
+	 * This is useful to derive the hierarchy of the sections involved in
+	 * a particular test without needing to store a tree.
+	 */
+	SectionLevelId levelId;
+
+	/**
+	 * The pointer to the parent snapshot in the snapshot tree
+	 */
+	struct SectionSnapshot * parent;
+
+	/**
+	 * The pointer to the next sibling of this snapshot in the snapshot tree
+	 */
+	struct SectionSnapshot * next_sibling;
+
+	/**
+	 * The pointer to the first child of this snapshot in the snapshot tree
+	 */
+	struct SectionSnapshot * first_child;
+
+} SectionSnapshot;
 
 /**
  * Main structure representing a piece of testable code
@@ -269,49 +343,17 @@ typedef struct Section {
 	bool alreadyFoundWhen;
 
 	/**
-	 * queue used to check which child section has to be executed next.
-	 *
-	 * \attention
-	 * This field is used only for a particular ::CONTAINABLESECTION implementation, not for every section. In particular
-	 * this field is used to implement \c WHEN behaviour.
-	 *
-	 * Suppose you have a test case with lots of whens
-	 *
-	 * @code
-	 * 	TESTCASE("tc1","") {
-	 * 		code1;
-	 * 		WHEN("w1","") {
-	 * 		}
-	 * 		code2;
-	 * 		WHEN("w2","") {
-	 * 		}
-	 * 		code3;
-	 * 		WHEN("w3","") {
-	 * 		}
-	 * 		code4;
-	 * 	}
-	 * @endcode
-	 *
-	 * Since you need to compute only a when per time, we need something to tell us which is the next when we need to compute.
-	 * The head of this list tell us exactly this.
-	 *
-	 * \todo however, the structure will fail if inside the test case there are 2 different section level (ie. 2 whens and 1 then)
-	 *
-	struct SectionCell* sectionToRunList;*/ //I dont think this is really needed
-	/**
-	 * A list containing all the assertions inside this section
-	 */
-	TestReportList* assertionReportList;
-	/**
-	 * A list containing all the failures inside ::Section::assertionReportList
-	 */
-	TestReportList* failureReportList;
-	/**
 	 * The signal datected when running this section
 	 *
 	 * The value is meaningful only when ::Section::status is set to ::SECTION_SIGNAL_DETECTED
 	 */
 	int signalDetected;
+
+	/**
+	 * The latest snapshot taken of this Section, used to create test reports
+	 *
+	struct SectionSnapshot * latestSnapshot;
+	*/
 
 	///the parent of this section in the tree. May be NULL
 	struct Section* parent;
@@ -386,11 +428,6 @@ bool areWeComputingChildren(const Section* section);
 bool haveWeRunWholeTreeSection(const Section* rootSection);
 
 /**
- * @param[in] section involved
- * @return True if the source code section has been executed at least once
- */
-bool haveWeRunEverythingInSection(const Section* section);
-/**
  * @param[in] section the section involved
  * @return true if we have executed at least once every <b>direct</b> children of this section
  */
@@ -430,7 +467,24 @@ void markSectionAsDone(Section* section);
  */
 void markSectionAsSkippedByTag(Section* section);
 
-//Documentation in .c file, TODO: move it here
+/**
+ * This function tells if a given section will be executed again depending
+ * on its status. More precisely, a section still needs to be executed when its status
+ * is UNEXEC or EXEC. If it is SKIPPED_BY_TAG, DONE or SIGNALED then it means it will
+ * no longer be executed.
+ */
+bool sectionStillNeedsExecution(Section * section);
+
+/*
+ * We use this function to determine wheter we can set a section as
+ * fully visited, thus we don't need to execute it anymore.
+ * A section is considered fully executed in two cases:
+ * 1- When it has no child
+ * 2- When every child of the section is fully visited itself
+ *
+ * Note that we first check if the section has been executed at least once, as
+ * if a given section has never been executed it surely can not be fully visited.
+ */
 bool isSectionFullyVisited(Section * section);
 
 /**

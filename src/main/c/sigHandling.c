@@ -61,6 +61,10 @@ static void failsig_handler(int signum) {
 	markSectionAsSignalDetected((&cc_model)->currentSection);
 	(&cc_model)->currentSection->signalDetected = signum;
 
+	(&cc_model)->currentSnapshot->status = SNAPSHOT_SIGNALED;
+	TestReport * report = getLastElementOfList((&cc_model)->test_reports_list);
+	updateTestOutcome(report, (&cc_model)->currentSnapshot);
+
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
     siglongjmp((&cc_model)->signal_jump_point, 1);
 }

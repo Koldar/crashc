@@ -42,7 +42,7 @@ TESTS_END
 TESTSUITE(1) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("1", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -95,7 +95,7 @@ TESTSUITE(1) {
 TESTSUITE(2) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("2", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -146,7 +146,7 @@ TESTSUITE(2) {
 TESTSUITE(3) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("3", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -197,7 +197,7 @@ TESTSUITE(3) {
 TESTSUITE(4) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("4", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -248,7 +248,7 @@ TESTSUITE(4) {
 TESTSUITE(5) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("5", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -299,7 +299,7 @@ TESTSUITE(5) {
 TESTSUITE(6) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("6", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -350,7 +350,7 @@ TESTSUITE(6) {
 TESTSUITE(7) {
 
 	clearTestChecker();
-	TESTCASE("", "NORUN") { //NORUN!
+	TESTCASE("7", "NORUN") { //NORUN!
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -403,7 +403,7 @@ TESTSUITE(7) {
 TESTSUITE(102) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("102", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -454,7 +454,7 @@ TESTSUITE(102) {
 TESTSUITE(103) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("103", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -505,7 +505,7 @@ TESTSUITE(103) {
 TESTSUITE(104) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("104", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -556,7 +556,7 @@ TESTSUITE(104) {
 TESTSUITE(105) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("105", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -607,7 +607,7 @@ TESTSUITE(105) {
 TESTSUITE(106) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("106", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -658,7 +658,7 @@ TESTSUITE(106) {
 TESTSUITE(107) {
 
 	clearTestChecker();
-	TESTCASE("", "") { //NORUN!
+	TESTCASE("107", "") { //NORUN!
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');
@@ -711,7 +711,7 @@ TESTSUITE(107) {
 TESTSUITE(201) {
 
 	clearTestChecker();
-	TESTCASE("", "RUN") {
+	TESTCASE("201", "RUN") {
 		addCharacter('a');
 		WHEN("", "RUN") {
 			addCharacter('b');

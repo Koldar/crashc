@@ -50,8 +50,9 @@
 #include "sigHandling.h"
 #include "command_line.h"
 #include "model.h"
+#include "testReport.h"
 #include "main_model.h"
-
+#include "report_producer.h"
 
 /**
  * Callback representing a general condition that determine if we can access to a particular section
@@ -59,9 +60,9 @@
  * the parameter is the section to check whilst the return value is
  * true if the software grant us access to the section, false otherwise
  */
-typedef bool (*condition_section)(Section*);
-typedef void (*AfterExecutedSectionCallBack)(Section** parentPosition, Section* child);
-typedef void (*BeforeStartingSectionCallBack)(Section* sectionGranted);
+typedef bool (*condition_section)(crashc_model * model, Section*);
+typedef void (*AfterExecutedSectionCallBack)(crashc_model * model, Section** parentPosition, Section* child);
+typedef void (*BeforeStartingSectionCallBack)(crashc_model * model, Section* sectionGranted);
 
 
 //TODO change name into updateTestArray
@@ -77,7 +78,7 @@ typedef void (*BeforeStartingSectionCallBack)(Section* sectionGranted);
  * @param[in] func the function to register
  * @param[inout] model the model where we operate on
  */
-void update_test_array(test_pointer func, crashc_model* model);
+void update_test_array(crashc_model * model, test_pointer func);
 
 /**
  * Function to run in the access cycle
@@ -96,7 +97,7 @@ void update_test_array(test_pointer func, crashc_model* model);
  * 	\li true if the section has to be explored;
  * 	\li false otherwise;
  */
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags);
+bool runOnceAndCheckAccessToSection(crashc_model * model, Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags);
 /**
  * Function supposed to run in the parentSwitcher cycle
  *
@@ -112,7 +113,7 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
  * @param[in] accessGrantedCallback function called \b afrer \c callback if the software has entered in the section source code
  * @param[in] accessDeniedCallback function called \b afrer \c callback if the software hasn't entered in the section source code
  */
-bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback);
+bool runOnceAndDoWorkAtEnd(crashc_model * model, Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback);
 
 /**
  * @param[in] parent the section containing the one we're creating. For example if we're in the test code of <tt>TESTCASE</tt> and we see a  <tt>WHEN</tt> clause
@@ -164,14 +165,14 @@ int hash(const char* str);
  * We use this function to check whether or not we need to enter in the
  * given WHEN section
  */
-bool getAccess_When(Section * section);
+bool getAccess_When(crashc_model * model, Section * section);
 
 /**
  * Grants always access
  *
  * @param[in] section the section involved
  */
-bool getAlwaysTrue(Section* section);
+bool getAlwaysTrue(crashc_model * model, Section* section);
 
 /**
  * Grant access only to one section type per ::LOOPER loop
@@ -184,21 +185,38 @@ bool getAccessSequentially(Section* section);
 
 ///@}
 
-void callbackSetAlreadyFoundWhen(Section * section);
+/**
+ * This callback is executed when we get access granted to a WHEN section, before executing its code.
+ * It sets the currentSection's alreadyFoundWhen field and takes a snapshot of the WHEN section for the test report
+ * and adds it to the test report snapshots tree.
+ */
+void callbackEnteringWhen(crashc_model * model, Section * section);
+
+/**
+ * This callback is executed when we get access granted to a THEN section, before executing its code.
+ * It takes a snapshot of the section and adds it to the currentSection's test report snapshots tree.
+ */
+void callbackEnteringThen(crashc_model * model, Section * section);
+
+/**
+ * Updates the currentSnapshot, creating a new one if we started a new test
+ * or adding a snapshot to the current test snapshots tree
+ */
+void updateCurrentSnapshot(crashc_model * model, Section * section);
 
 ///\defgroup AfterExecutedSectionCallbacks callbacks that can be used inside ::runOnceAndDoWorkAtEnd callbacks parameters
 ///@{
 
-void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section);
-void doWorkAtEndCallbackChildrenNumberComputed(Section** pointerToSetAsParent, Section* section);
-void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Section* section);
-void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(Section** pointerToSetAsParent, Section* section);
-void doWorkAtEndCallbackResetContainer(Section** pointerToSetAsParent, Section* child);
-void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackGoToParentAndThenToNextSibling(crashc_model * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackChildrenNumberComputed(crashc_model * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackUpdateSectionToRun(crashc_model * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(crashc_model * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackResetContainer(crashc_model * model, Section** pointerToSetAsParent, Section* child);
+void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(crashc_model * model, Section** pointerToSetAsParent, Section* section);
 /**
  * Do absolutely nothing
  */
-void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackDoNothing(crashc_model * model, Section** pointerToSetAsParent, Section* section);
 
 ///@}
 
@@ -208,7 +226,21 @@ void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* secti
 /**
  * Does nothing
  */
-void callbackDoNothing(Section* section);
+void callbackDoNothing(crashc_model * model, Section* section);
+
+/**
+ * This callback it is used as accessGrantedCallback by TESTCASE sections.
+ * It initializes the test report associated to the particular looper iteration
+ * adds it to the test reports list and takes the snapshot of the testcase
+ */
+void callbackEnteringTestcase(crashc_model * model, Section * section);
+
+/**
+ * This callback is used when exiting from a testcase when access is granted: it simply updates the test report
+ * outcome depending on the status of the last snapshot of the test tree and resets the currentSnapshot pointer
+ * back to NULL to indicate that the current test is over
+ */
+void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerToSetAsParent, Section * section);
 
 ///@}
 
@@ -230,9 +262,9 @@ void callbackDoNothing(Section* section);
 		(model)->currentSection->loopId += 1;																							\
 		setupCode																														\
 		for (																															\
-				(model)->currentSection->loop1 = true																							\
+				(model)->currentSection->loop1 = true																					\
 				;																														\
-				runOnceAndDoWorkAtEnd((model)->currentSection, &((model)->currentSection), 												\
+				runOnceAndDoWorkAtEnd((model), (model)->currentSection, &((model)->currentSection), 												\
 						getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback			\
 				)																														\
 				;																														\
@@ -247,19 +279,13 @@ void callbackDoNothing(Section* section);
 		for (																															\
 				(model)->currentSection->loop2 = true																							\
 				;																														\
-				runOnceAndCheckAccessToSection((model)->currentSection, condition, accessGrantedCallBack, (model)->runOnlyIfTags, (model)->excludeTags)	\
+				runOnceAndCheckAccessToSection((model), (model)->currentSection, condition, accessGrantedCallBack, (model)->runOnlyIfTags, (model)->excludeTags)	\
 				;																														\
 				(model)->currentSection->loop2 = false,																							\
 				markSectionAsExecuted((model)->currentSection)																					\
 		)
 
 #define NOCODE
-
-/**
- * Represents a macro that defines a function
- */
-#define TEST_FUNCTION(testFunctionName)																							\
-	void testFunctionName()
 
 /**
  * @param[inout] model a variable of type ::crashc_model containing all the data needed by crashc
@@ -269,8 +295,8 @@ void callbackDoNothing(Section* section);
 		CONTAINABLESECTION(																												\
 				(model),\
 				parent, sectionType, description, tags,																				\
-				getAlwaysTrue, callbackDoNothing, 																						\
-				doWorkAtEndCallbackResetContainer, doWorkAtEndCallbackDoNothing,  doWorkAtEndCallbackDoNothing, 						\
+				getAlwaysTrue, callbackEnteringTestcase, 																						\
+				doWorkAtEndCallbackResetContainer, callbackExitAccessGrantedTestcase,  doWorkAtEndCallbackDoNothing, 						\
 																																		\
 				(model)->testCaseInvolved = (model)->currentSection;																						\
 				bool UV(signalDetected) = false;	\
@@ -283,14 +309,14 @@ void callbackDoNothing(Section* section);
 				}                                                                                                                       \
 				for (    																												\
 						;																												\
-						!UV(signalDetected) && !haveWeRunWholeTreeSection((model)->currentSection)                                                   \
+						!UV(signalDetected) && sectionStillNeedsExecution((model)->currentSection)                                                   \
 						;																												\
 				)																														\
 		)
 
 
 //TODO the parent of the test case is not the root section, but the "suite section". We need to include them in the section tree as well!
-#define TESTCASE(description, tags) LOOPER(&cc_model, ((&cc_model)->rootSection), 1, description, tags)
+#define TESTCASE(description, tags) LOOPER(&cc_model, ((&cc_model)->rootSection), ST_TESTCASE, description, tags)
 #define EZ_TESTCASE(description) TESTCASE(description, "")
 
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
@@ -299,7 +325,7 @@ void callbackDoNothing(Section* section);
 #define ALWAYS_ENTER(model, sectionType, description, tags) CONTAINABLESECTION(																\
 		(model), \
 		(model)->currentSection, sectionType, description, tags,																				\
-		getAlwaysTrue, callbackDoNothing,																								\
+		getAlwaysTrue, callbackEnteringThen,																								\
 		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,					\
 		NOCODE																															\
 )
@@ -307,14 +333,14 @@ void callbackDoNothing(Section* section);
 #define ENTER_ONE_PER_LOOP(model, sectionType, description, tags) CONTAINABLESECTION(														\
 		(model), \
 		(model)->currentSection, sectionType, description, tags,																				\
-		getAccess_When, callbackSetAlreadyFoundWhen, 																						\
-		doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling, doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun, doWorkAtEndCallbackUpdateSectionToRun,																							\
+		getAccess_When, callbackEnteringWhen, 																						\
+		doWorkAtEndCallbackGoToParentAndThenToNextSibling, doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,																							\
 		NOCODE 																															\
 )
 
-#define WHEN(description, tags) ENTER_ONE_PER_LOOP((&cc_model), 5, description, tags)
+#define WHEN(description, tags) ENTER_ONE_PER_LOOP((&cc_model), ST_WHEN, description, tags)
 #define EZ_WHEN(description) WHEN(description, "")
-#define THEN(description, tags) ALWAYS_ENTER((&cc_model), 10, description, tags)
+#define THEN(description, tags) ALWAYS_ENTER((&cc_model), ST_THEN, description, tags)
 #define EZ_THEN(description) THEN(description, "")
 
 //TODO all those functions should be included in the only one global models
@@ -334,7 +360,15 @@ void callbackDoNothing(Section* section);
 #define TESTS_END \
     for (int i = 0; i < (&cc_model)->suites_array_index; i++) { \
     	(&cc_model)->tests_array[i](); \
-    } \
+    } 														\
+	list_cell * cell = getHeadInList(cc_model.test_reports_list); \
+	TestReport * report = getPayloadInListCell(cell); 			\
+	while (true) {												\
+		ct_stdout_report(report);								\
+		cell = getNextInListCell(cell);							\
+		if (cell == NULL) break;								\
+		report = getPayloadInListCell(cell); 					\
+	}															\
 } //main function closing bracket
 
 /**
@@ -432,7 +466,7 @@ void callbackDoNothing(Section* section);
  */
  #define REGISTER_SUITE(id) \
      void suite_ ## id(); \
-     update_test_array(suite_ ## id, (&cc_model))
+     update_test_array((&cc_model), suite_ ## id)
 
 /**
  * Alias of ::REGISTER_SUITE

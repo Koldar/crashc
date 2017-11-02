@@ -1,22 +1,14 @@
+#include <ct_utils.h>
 #include "crashC.h"
 #include "main_model.h"
+#include "list.h"
 
-//TODO remove
-//Section rootSection = {0, 0, ST_ROOT, "root", false, 0, 0, false, NULL, NULL, NULL};
-//Section* currentSection = NULL;
-//Section* testCaseInvolved = NULL;
-//test_pointer tests_array[MAX_TESTS];
-//int suites_array_index = 0;
-//tag_ht* runOnlyIfTags = NULL;
-//tag_ht* excludeTags = NULL;
-
-
-void update_test_array(test_pointer func, crashc_model* model) {
+void update_test_array(crashc_model * model, test_pointer func) {
 	model->tests_array[model->suites_array_index] = func;
 	model->suites_array_index++;
 }
 
-bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
+bool runOnceAndCheckAccessToSection(crashc_model * model, Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
 	if (!section->loop2) {
 		return false;
 	}
@@ -42,23 +34,23 @@ bool runOnceAndCheckAccessToSection(Section* section, condition_section cs, Befo
 	}
 	section->accessTagGranted = true;
 
-	section->accessGranted = cs(section);
+	section->accessGranted = cs(model, section);
 	if (section->accessGranted) {
-		callback(section);
+		callback(model, section);
 	}
 	return section->accessGranted;
 }
 
-bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
+bool runOnceAndDoWorkAtEnd(crashc_model * model, Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
 	if (section->loop1) {
 		return true;
 	}
 	//callback is always executed and it can (and often will) change pointerToSetAsParent and child pointers (since they point to the same structure).
 	//in order to use the previously pointed structure we copy the child pointer. As for pointerToSetAsParent, we can do nothing since it will be changed nonetheless
 	Section* _child = section;
-	callback(pointerToSetAsParent, section);
+	callback(model, pointerToSetAsParent, section);
 	if (section->accessGranted) {
-
+		//markSectionAsExecuted(section);
 		//If we executed the section we check if this execution made the section
 		//fully visited and update its status consequently
 		if (isSectionFullyVisited(section)) {
@@ -68,9 +60,9 @@ bool runOnceAndDoWorkAtEnd(Section* section, Section** pointerToSetAsParent, Aft
 		//We reset the WHEN found tag
 		section->alreadyFoundWhen = false;
 
-		accessGrantedCallback(pointerToSetAsParent, _child);
+		accessGrantedCallback(model, pointerToSetAsParent, _child);
 	} else {
-		accessDeniedCallback(pointerToSetAsParent, _child);
+		accessDeniedCallback(model, pointerToSetAsParent, _child);
 	}
 	return false;
 }
@@ -95,65 +87,40 @@ void resetFromSignalCurrentSectionTo(crashc_model* model, int signal, const Sect
 	model->currentSection = s;
 }
 
-bool getAlwaysTrue(Section* section) {
+bool getAlwaysTrue(crashc_model * model, Section* section) {
 	return true;
 }
 
-void doWorkAtEndCallbackGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackGoToParentAndThenToNextSibling(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
 	//we finish a section. we return to the parent
 	*pointerToSetAsParent = section->parent;
 	//we go to the next sibling of child
 	(*pointerToSetAsParent)->currentChild += 1;
 }
 
-void doWorkAtEndCallbackChildrenNumberComputed(Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackChildrenNumberComputed(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
 	//we executed the section. Hence we can safely say we know the child number of such section
 	if (!section->childrenNumberComputed) {
 		section->childrenNumberComputed = true;
 	}
 	section->currentChild = 0;
+
+	updateSnapshotStatus(model->currentSection, model->currentSnapshot);
+
+	model->currentSnapshot = model->currentSnapshot->parent;
 }
 
-void doWorkAtEndCallbackUpdateSectionToRun(Section** pointerToSetAsParent, Section* section) {
-	//we executed the section. Hence we can safely say we know the child number of such section
-	if (section->parent->childrenNumberComputed) {
-		//since childrenNumberComputed is not false, that means that we are executing the cycle at least the second time. Hence
-		//we need to pop the head of sectionToRunList. However we don't need to pop the head when we end a WHEN, but when we end a loop cycle.
-		//in order to do it, we pop the end after we executed the last children
-		if (section->nextSibling == NULL) {
-			//popFromList(section->parent->sectionToRunList);
-		}
-	}
-}
-
-void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(Section** pointerToSetAsParent, Section* section) {
-	doWorkAtEndCallbackUpdateSectionToRun(pointerToSetAsParent, section);
-	doWorkAtEndCallbackChildrenNumberComputed(pointerToSetAsParent, section);
-}
-
-void doWorkAtEndCallbackResetContainer(Section** pointerToSetAsParent, Section* child) {
+void doWorkAtEndCallbackResetContainer(crashc_model * model, Section** pointerToSetAsParent, Section* child) {
 	//we finished a section. Hence now we know the number of children that section have
 	child->childrenNumberComputed = true;
 	child->currentChild = 0;
 }
 
-void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling(Section** pointerToSetAsParent, Section* section) {
-	//in the first cycle, when we're trying to compute the number of children of the parent, we also initialize the sectionToRunList
-	if (!section->parent->childrenNumberComputed) {
-		//we can add every children of parent except the first one: such child has already run while we were computing the number of children
-		if (section->parent->currentChild > 0) {
-			//addTailInList(section->parent->sectionToRunList, section);
-		}
-	}
-
-	doWorkAtEndCallbackGoToParentAndThenToNextSibling(pointerToSetAsParent, section);
-}
-
-void doWorkAtEndCallbackDoNothing(Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackDoNothing(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
 
 }
 
-bool getAccess_When(Section * section) {
+bool getAccess_When(crashc_model * model, Section * section) {
 	//section is the WHEN we're considering right now
 
 	//we don't enter in this WHEN if we have already entered in another WHEN of the parent
@@ -168,61 +135,60 @@ bool getAccess_When(Section * section) {
 
 	return true;
 }
-/*
-bool getAccessSequentially(Section* section) {
-	if (section->parent == NULL) {
-		return true;
-	}
 
-	if (section->parent->childrenNumberComputed == false) {
-		return (section->parent->currentChild == 0);
-	}
-
-
-	if (getHeadOfList(section->parent->sectionToRunList) == section) {
-		return true;
-	}
-
-	return false;
-}*/
-
-void callbackDoNothing(Section* section) {
+void callbackDoNothing(crashc_model * model, Section* section) {
 
 }
 
-void callbackSetAlreadyFoundWhen(Section * section) {
+void callbackEnteringThen(crashc_model * model, Section * section) {
+	updateCurrentSnapshot(model, section);
+}
+
+void callbackEnteringWhen(crashc_model * model, Section * section) {
 	section->parent->alreadyFoundWhen = true;
+
+	updateCurrentSnapshot(model, section);
+}
+
+void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerToSetAsParent, Section * section) {
+	TestReport * report = getLastElementOfList(model->test_reports_list);
+	SectionSnapshot * last_snapshot = model->currentSnapshot;
+
+	updateSnapshotStatus(section, model->currentSnapshot);
+	updateTestOutcome(report, last_snapshot);
+
+	//Resets the currentSnapshot pointer to NULL to indicate the end of the test
+	model->currentSnapshot = NULL;
+}
+
+/**
+ * This functions updates the currentSnapshot. More precisely:
+ *  - if currentSnapshot is NULL it means we just started a new test, so it simply takes a section snapshot and sets it
+ *  	as the currentSnapshot
+ *  - if currentSnapshot is not NULL it means we are not in a new test, so we take a snapshot and adds it to the test report tree
+ */
+
+void updateCurrentSnapshot(crashc_model * model, Section * section) {
+	SectionSnapshot * snapshot = initSectionSnapshot(section);
+
+	if (model->currentSnapshot == NULL) {
+		model->currentSnapshot = snapshot;
+	}
+	else {
+		model->currentSnapshot = addSnapshotToTree(snapshot, model->currentSnapshot);
+	}
+
+}
+
+void callbackEnteringTestcase(crashc_model * model, Section * section) {
+	TestReport * report = initTestReport(__FILE__, model->currentSnapshot);
+	addTailInList(model->test_reports_list, report);
+
+	updateCurrentSnapshot(model, model->currentSection);
+
+	report->testcase_snapshot = model->currentSnapshot;
 }
 
 void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
 
-}
-
-int defaultMain(int argc, const char* argv[]) {
-
-}
-
-/**
- * Prints  a debug information about the section
- *
- * @param[in] section the section to analyze
- * @param[in] recursive true if you want to print information about the children (both direct and indirect) of this section, false otherwise;
- */
-static void printSectionData(const Section* section, bool recursive) {
-	fprintf(stdout, "****************\ndescription=%s\nparent=%s\nchildrenNumber=%d\nchildrenNumberComputed=%s\nexecuted=%s\ncurrentChild=%d\nloop1=%s\n",
-			section->description,
-			(section->parent != NULL ? section->parent->description : "<none>"),
-			section->childrenNumber,
-			(section->childrenNumberComputed ? "yes" : "no"),
-			(section->status == SECTION_DONE ? "yes" : "no"),
-			section->currentChild,
-			(section->loop1 ? "yes" : "no")
-	);
-
-	if (recursive && section->firstChild != NULL)
-		printSectionData(section->firstChild, recursive);
-
-	if (recursive && section->nextSibling != NULL) {
-		printSectionData(section->nextSibling, recursive);
-	}
 }
