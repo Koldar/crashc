@@ -10,21 +10,22 @@ You can download the all the version (here)[]. Choose the latest one for the mos
 Otherwise you can build the framework by yourself. In order to do so:
 
     cd <MY_COOL_FOLDER>
-    git checkout <git url>
+    git checkout https://github.com/Koldar/crashc.git
     cd crashc
     mkdir -p build/Release
     cd build/Release
     cmake -DCRASH_OUTPUT="XXX" ../..
     make
+    make allInOneHeader //run if you want to create an header including everything in crashC
     sudo make install
     
 where "XXX" can be one of the possible choices:
 
-- SHARED_LIBRARY
+- SHARED_LIBRARY (the **default** one)
 - STATIC_LIBRARY
-- ALL_IN_ONE_HEADER (the **default** one)
+- ALL_IN_ONE_HEADER
 
 What's next?
 ============
 
-All done? go to the next phase (quick tutorial)[]!
+All done? go to the next phase [quick tutorial](https://github.com/Koldar/crashc/blob/master/wiki/02_QuickTour.md)!

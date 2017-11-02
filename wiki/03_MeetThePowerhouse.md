@@ -11,7 +11,7 @@ to test pretty similar scenarios but a little bit different, one from another.
 If this behaviour remain uncheked, testing source code may become big and unmantainable. The testing framework should provide you
 a way to avoid such copy-pasting.
 
-CrashC answer to this problem are **sections**. Note that this is by no means a *novel idea*: (Catch Cpp)[https://github.com/philsquared/Catch]
+CrashC answer to this problem are **sections**. Note that this is by no means a *novel idea*: (https://github.com/philsquared/Catch)[Catch]
 has this mechanism from a long time. However, nothing similar existed for C (at least, not in a pure way). If you know Catch Cpp, you'll find
 coding in crashC to be somewhat similar.
 
@@ -345,4 +345,4 @@ What's next?
 
 The core or crashC is explained. For a small project this is enough.
 However, if you want to extensively use crashC, you need to learn other stuff: don't worry, it's super easy stuff, no rocket science involved!
-Want to know more? See the (next page)[].
+Want to know more? See the (next page)[https://github.com/Koldar/crashc/blob/master/wiki/04_MultipleFiles.md].

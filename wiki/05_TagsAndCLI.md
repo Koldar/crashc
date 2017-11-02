@@ -13,7 +13,7 @@ feature since a long time.
 How to use tags?
 ================
 
-Consider the example from [Meet the Powerhouse]():
+Consider the example from [Meet the Powerhouse](https://github.com/Koldar/crashc/blob/master/wiki/03_MeetThePowerhouse.md):
 
 ```
 #include <crashC.h>
@@ -101,9 +101,19 @@ Testing only something
         }
     }
  
- Super easy, isn't it? Now l
+ Super easy, isn't it? Now, to tell CrashC you want to run the sections with tag "hello" you need to call the executable with the following parameters, like this:
+ 
+ ```
+ ./Test --include_tag="hello"
+ ```
+ 
+ Exclude something from testing
+ ------------------------------
+ 
+ If you want to exclude some section from testing, you can add those sections with a tag and then add the following parameters when calling the test:
  
  
-
-What if, for example you're trying to develop something else and you want to avoid the third WHEN in the TESTCASE? Thi
-
+ ```
+ ./Test --exclude_tag="hello"
+ ```
+ 
