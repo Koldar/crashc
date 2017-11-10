@@ -8,11 +8,13 @@
 #ifndef TESTREPORT_H_
 #define TESTREPORT_H_
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "section.h"
 #include "errors.h"
 #include "tag.h"
-#include <string.h>
-#include <stdlib.h>
+#include "typedefs.h"
 
 /**
  * This enumerations represents the possible outcomes of a single test:
@@ -53,7 +55,7 @@ typedef enum {
  * This is the reason why the TestReport struct needs an auxiliary struct, SectionSnapshot, to hold the information on the statuses of
  * the sections involved in the test at the moment they were executed.
  */
-typedef struct {
+struct TestReport {
 
 	/**
 	 * The name of the file that contained this test
@@ -79,10 +81,10 @@ typedef struct {
 	 */
 	long execution_time;
 
-} TestReport;
+};
 
 
-TestReport * initTestReport(char * filename, struct Section * testcase);
+TestReport * initTestReport(struct Section * testcase);
 void destroyTestReport(TestReport * report);
 SectionSnapshot * initSectionSnapshot(Section * section);
 void destroySnapshotTree(SectionSnapshot * snapshot);

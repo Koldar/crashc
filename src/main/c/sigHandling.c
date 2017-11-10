@@ -34,11 +34,11 @@ void registerSignalHandlerForSignals() {
 //	}
 //
 //	if (sigaction(SIGINT, &sa, NULL) == -1) {
-//		perror("Error: cannot handle SIGUSR1"); //should not happen
+//		perror("Error: cannot handle SIGINT"); //should not happen
 //	}
 	//TODO do not register signal if it  is already registers by the program under test itself
 	if (sigaction(SIGFPE, &((&cc_model)->_crashc_sigaction), NULL) == -1) {
-		perror("Error: cannot handle SIGUSR1"); //should not happen
+		perror("Error: cannot handle SIGFPE"); //should not happen
 	}
 }
 
@@ -56,7 +56,7 @@ void registerSignalHandlerForSignals() {
  */
 static void failsig_handler(int signum) {
 
-	printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
+	//printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
     //Mark test as failed code
 	markSectionAsSignalDetected((&cc_model)->currentSection);
 	(&cc_model)->currentSection->signalDetected = signum;
@@ -64,6 +64,7 @@ static void failsig_handler(int signum) {
 	(&cc_model)->currentSnapshot->status = SNAPSHOT_SIGNALED;
 	TestReport * report = getLastElementOfList((&cc_model)->test_reports_list);
 	updateTestOutcome(report, (&cc_model)->currentSnapshot);
+	(&cc_model)->currentSnapshot = NULL;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
     siglongjmp((&cc_model)->signal_jump_point, 1);

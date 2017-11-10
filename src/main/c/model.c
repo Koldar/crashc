@@ -6,7 +6,9 @@
  */
 
 #include <stdlib.h>
+
 #include "testReport.h"
+#include "report_producer.h"
 #include "model.h"
 
 crashc_model setupDefaultMainModel() {
@@ -20,13 +22,19 @@ crashc_model setupDefaultMainModel() {
 	retVal.runOnlyIfTags = initHT();
 	retVal.excludeTags = initHT();
 	retVal.rootSection = initSection(ST_ROOT, 0, "root", "");
+	retVal.statistics = initStatistics();
+	retVal.report_producer_implementation = initDefaultReportProducer();
+	retVal.output_file = stdout;
 
 	return retVal;
 }
 
-void tearDownModel(crashc_model ccm) {
+void tearDownDefaultModel(crashc_model ccm) {
 	destroySection(ccm.rootSection);
 	destroyHTWithElements(ccm.excludeTags, destroyTag);
 	destroyHTWithElements(ccm.runOnlyIfTags, destroyTag);
-	destroyListWithElement(ccm.test_reports_list, destroyTestReport);
+	destroyListWithElement(ccm.test_reports_list, destroyTestReport);\
+	destroyStatistics(ccm.statistics);
+	destroyDefaultReportProducer(ccm.report_producer_implementation);
+	fclose(ccm.output_file);
 }

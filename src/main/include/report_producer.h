@@ -8,9 +8,53 @@
 #ifndef REPORT_PRODUCER_H_
 #define REPORT_PRODUCER_H_
 
-#include "section.h"
-#include "testReport.h"
 #include <stdio.h>
+
+#include "section.h"
+#include "list.h"
+#include "testReport.h"
+#include "typedefs.h"
+#include "model.h"
+
+/**
+ * This struct is used to contain the statistics used by CrashC to give the user
+ * additional info on the run tests
+ */
+struct ct_test_statistics_t {
+
+	/**
+	 * The number of total tests
+	 */
+	unsigned int total_tests;
+
+	/**
+	 * The number of passed tests
+	 */
+	unsigned int successful_tests;
+
+	/**
+	 * The number of  failed tests
+	 */
+	unsigned int failed_tests;
+
+};
+
+/**
+ * This structure contains the function pointers to the implementations
+ * of the function used to produce the report of the particular parts of the tests.
+ * This allows for easy customization and high code maintainability
+ */
+struct ct_report_producer_t {
+
+	ct_test_reporter_t test_reporter;
+
+	ct_snapshot_tree_reporter_t snapshot_tree_reporter;
+
+	ct_summary_reporter_t summary_producer;
+
+	ct_reporter_t report_producer;
+
+};
 
 /**
  * Prints the string representation of a snapshot status
@@ -23,18 +67,42 @@ char * ct_snapshot_status_to_string(snapshot_status status);
 char * ct_section_type_to_string(section_type type);
 
 /**
- * Prints the given test report on stdout with a default format
+ * Prints the report of the executed tests in a default format
  */
-void ct_stdout_report(TestReport * report);
+void ct_default_report(struct crashc_model * model);
+/**
+ * Prints the tests summary in a default format
+ */
+void ct_default_report_summary(crashc_model * model);
 
 /**
- * Prints the test report on a given file, with a default format
+ * Prints a the report of a single test with a default format
  */
-void ct_fprint_report(FILE * file, TestReport * report);
+void ct_default_test_report(crashc_model * model, TestReport * report);
 
 /**
- * Prints a string containing default infos about a snapshot tree on the given file
+ * Prints a representation of a snapshot tree in a default format
  */
-void ct_print_snapshot_tree(FILE * file, SectionSnapshot * snapshot, int level);
+void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level);
+
+/**
+ * Initializes and return a structure containing the statistics data related to the tests
+ */
+ct_test_statistics_t * initStatistics();
+
+/**
+ * Initializes the default report producer structure
+ */
+ct_report_producer_t * initDefaultReportProducer();
+
+/**
+ * Frees the memory occupied by a ct_test_statistics_t struct
+ */
+void destroyStatistics(ct_test_statistics_t * stats);
+
+/**
+ * Frees the memory allocated for the default report producer
+ */
+void destroyDefaultReportProducer(ct_report_producer_t * producer);
 
 #endif /* REPORT_PRODUCER_H_ */

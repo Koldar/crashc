@@ -10,11 +10,13 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include "typedefs.h"
-#include "section.h"
-#include "list.h"
 #include <signal.h>
 #include <setjmp.h>
+
+#include "typedefs.h"
+#include "section.h"
+#include "report_producer.h"
+#include "list.h"
 
 /**
  * The maximum number of registrable suites
@@ -104,6 +106,23 @@ typedef struct crashc_model {
 	 */
 	struct sigaction _crashc_sigaction;
 
+	/**
+	 * A structure containing various statistical informations about the tests.
+	 * e.g. the number of total tests, the number of failed tests, etc...
+	 */
+	ct_test_statistics_t * statistics;
+
+	/**
+	 * The implementation of the report producer used by the model.
+	 * This contains the functions used to create a test report
+	 */
+	ct_report_producer_t * report_producer_implementation;
+
+	/**
+	 * The file on which to write the report.
+	 */
+	FILE * output_file;
+
 } crashc_model;
 
 /**
@@ -118,6 +137,6 @@ crashc_model setupDefaultMainModel();
  *
  * @param[in] ccm the model to destroy
  */
-void tearDownModel(crashc_model ccm);
+void tearDownDefaultModel(crashc_model ccm);
 
 #endif /* MODEL_H_ */

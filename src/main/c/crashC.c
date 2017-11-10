@@ -181,7 +181,7 @@ void updateCurrentSnapshot(crashc_model * model, Section * section) {
 }
 
 void callbackEnteringTestcase(crashc_model * model, Section * section) {
-	TestReport * report = initTestReport(__FILE__, model->currentSnapshot);
+	TestReport * report = initTestReport(model->currentSnapshot);
 	addTailInList(model->test_reports_list, report);
 
 	updateCurrentSnapshot(model, model->currentSection);

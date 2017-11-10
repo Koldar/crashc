@@ -10,13 +10,13 @@
 
 #include "testReport.h"
 
-TestReport * initTestReport(char * filename, Section * testcase) {
+TestReport * initTestReport(Section * testcase) {
 	TestReport * retVal = malloc(sizeof(TestReport));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->filename = strdup(filename);
+	retVal->filename = NULL;
 	retVal->execution_time = 0;
 	retVal->outcome = TEST_SUCCESS;
 	retVal->testcase_snapshot = NULL;

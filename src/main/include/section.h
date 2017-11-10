@@ -12,15 +12,7 @@
 
 #include "tag.h"
 #include "errors.h"
-
-/**
- * Represents the type ::Section::levelId has
- */
-typedef int SectionLevelId;
-struct SectionCell;
-struct SectionSnapshot;
-typedef struct Section Section;
-
+#include "typedefs.h"
 
 /**
  * Represents the type of this section
@@ -97,7 +89,7 @@ typedef enum {
  * of the tests. Note that this structure contains an implicit tree, used by CrashC to track the relationships between the
  * sections involved in a precise test
  */
-typedef struct SectionSnapshot {
+struct SectionSnapshot {
 	/**
 	 * The description of this section
 	 */
@@ -149,7 +141,7 @@ typedef struct SectionSnapshot {
 	 */
 	struct SectionSnapshot * first_child;
 
-} SectionSnapshot;
+};
 
 /**
  * Main structure representing a piece of testable code
@@ -226,7 +218,7 @@ typedef struct SectionSnapshot {
  *
  * Note that the code inside when2 (for example, is all the code between the thens plus the THENs themselves
  */
-typedef struct Section {
+struct Section {
 	/**
 	 * An id that uniquely identifies a particular section.
 	 *

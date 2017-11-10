@@ -64,8 +64,6 @@ typedef bool (*condition_section)(crashc_model * model, Section*);
 typedef void (*AfterExecutedSectionCallBack)(crashc_model * model, Section** parentPosition, Section* child);
 typedef void (*BeforeStartingSectionCallBack)(crashc_model * model, Section* sectionGranted);
 
-
-//TODO change name into updateTestArray
 /**
  * This function registers a testsuite by storing its function pointer into
  * the global array. The function automatically updates the variable used to
@@ -257,32 +255,32 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 		 * create a new metadata data representing such section (if not created yet)
 		 * and then we enter in such section. At the end of the execution,
 		 * we return to the parent section
-		 */																																\
-		(model)->currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);									\
-		(model)->currentSection->loopId += 1;																							\
-		setupCode																														\
-		for (																															\
-				(model)->currentSection->loop1 = true																					\
-				;																														\
-				runOnceAndDoWorkAtEnd((model), (model)->currentSection, &((model)->currentSection), 												\
-						getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback			\
-				)																														\
-				;																														\
+		 */																																							\
+		(model)->currentSection = getSectionOrCreateIfNotExist(parent, sectionType, description, tags);																\
+		(model)->currentSection->loopId += 1;																														\
+		setupCode																																					\
+		for (																																						\
+				(model)->currentSection->loop1 = true																												\
+				;																																					\
+				runOnceAndDoWorkAtEnd((model), (model)->currentSection, &((model)->currentSection), 																\
+						getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback										\
+				)																																					\
+				;																																					\
 				/**
 				 *  This code is execute when we have already executed the code
 				 *  inside the container. We assume every post condition of
 				 *  CONTAINABLESECTION is satisfied for its children
 				 *  CONTAINABLESECTION.
-				 */																														\
-				 (model)->currentSection->loop1 = false																							\
-		)																																\
-		for (																															\
-				(model)->currentSection->loop2 = true																							\
-				;																														\
+				 */																																					\
+				 (model)->currentSection->loop1 = false																												\
+		)																																							\
+		for (																																						\
+				(model)->currentSection->loop2 = true																												\
+				;																																					\
 				runOnceAndCheckAccessToSection((model), (model)->currentSection, condition, accessGrantedCallBack, (model)->runOnlyIfTags, (model)->excludeTags)	\
-				;																														\
-				(model)->currentSection->loop2 = false,																							\
-				markSectionAsExecuted((model)->currentSection)																					\
+				;																																					\
+				(model)->currentSection->loop2 = false,																												\
+				markSectionAsExecuted((model)->currentSection)																										\
 		)
 
 #define NOCODE
@@ -291,27 +289,27 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
  * @param[inout] model a variable of type ::crashc_model containing all the data needed by crashc
  * @param[in] parent a variable of type ::Section representing the parent section of this section
  */
-#define LOOPER(model, parent, sectionType, description, tags)																				\
-		CONTAINABLESECTION(																												\
-				(model),\
-				parent, sectionType, description, tags,																				\
-				getAlwaysTrue, callbackEnteringTestcase, 																						\
-				doWorkAtEndCallbackResetContainer, callbackExitAccessGrantedTestcase,  doWorkAtEndCallbackDoNothing, 						\
-																																		\
-				(model)->testCaseInvolved = (model)->currentSection;																						\
-				bool UV(signalDetected) = false;	\
-				if (sigsetjmp((model)->signal_jump_point, 1)) {                                                                                  \
+#define LOOPER(model, parent, sectionType, description, tags)																										\
+		CONTAINABLESECTION(																																			\
+				(model),																																			\
+				parent, sectionType, description, tags,																												\
+				getAlwaysTrue, callbackEnteringTestcase, 																											\
+				doWorkAtEndCallbackResetContainer, callbackExitAccessGrantedTestcase,  doWorkAtEndCallbackDoNothing, 												\
+																																									\
+				(model)->testCaseInvolved = (model)->currentSection;																								\
+				bool UV(signalDetected) = false;																													\
+				if (sigsetjmp((model)->signal_jump_point, 1)) {                                                                                  					\
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
-					markSectionAsSignalDetected((model)->currentSection);                                                                        \
-					UV(signalDetected) = true; \
-					/*we reset the currentSection to the test case*/																	\
-					resetFromSignalCurrentSectionTo((model), (model)->currentSection->signalDetected, (model)->currentSection, (model)->testCaseInvolved);																							\
-				}                                                                                                                       \
-				for (    																												\
-						;																												\
-						!UV(signalDetected) && sectionStillNeedsExecution((model)->currentSection)                                                   \
-						;																												\
-				)																														\
+					markSectionAsSignalDetected((model)->currentSection);                                                                        					\
+					UV(signalDetected) = true; 																														\
+					/*we reset the currentSection to the test case*/																								\
+					resetFromSignalCurrentSectionTo((model), (model)->currentSection->signalDetected, (model)->currentSection, (model)->testCaseInvolved);			\
+				}                                                                                                                       							\
+				for (    																																			\
+						;																																			\
+						!UV(signalDetected) && sectionStillNeedsExecution((model)->currentSection)                                                   				\
+						;																																			\
+				)																																					\
 		)
 
 
@@ -322,19 +320,19 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
 //#define EZ_TESTCASE(description) TESTCASE(description, "")
 
-#define ALWAYS_ENTER(model, sectionType, description, tags) CONTAINABLESECTION(																\
-		(model), \
-		(model)->currentSection, sectionType, description, tags,																				\
-		getAlwaysTrue, callbackEnteringThen,																								\
-		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,					\
+#define ALWAYS_ENTER(model, sectionType, description, tags) CONTAINABLESECTION(															\
+		(model), 																														\
+		(model)->currentSection, sectionType, description, tags,																		\
+		getAlwaysTrue, callbackEnteringThen,																							\
+		doWorkAtEndCallbackGoToParentAndThenToNextSibling,	doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,	\
 		NOCODE																															\
 )
 
-#define ENTER_ONE_PER_LOOP(model, sectionType, description, tags) CONTAINABLESECTION(														\
-		(model), \
-		(model)->currentSection, sectionType, description, tags,																				\
-		getAccess_When, callbackEnteringWhen, 																						\
-		doWorkAtEndCallbackGoToParentAndThenToNextSibling, doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,																							\
+#define ENTER_ONE_PER_LOOP(model, sectionType, description, tags) CONTAINABLESECTION(													\
+		(model), 																														\
+		(model)->currentSection, sectionType, description, tags,																		\
+		getAccess_When, callbackEnteringWhen, 																							\
+		doWorkAtEndCallbackGoToParentAndThenToNextSibling, doWorkAtEndCallbackChildrenNumberComputed, doWorkAtEndCallbackDoNothing,		\
 		NOCODE 																															\
 )
 
@@ -348,27 +346,21 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
  * Macro used to contain all test declarations and to generate the main function for the
  * execution of the various tests
  */
-#define TESTS_START int main(const int argc, const char** args) { \
-		cc_model = setupDefaultMainModel();\
-		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); \
+#define TESTS_START int main(const int argc, const char** args) { 																\
+		cc_model = setupDefaultMainModel();																						\
+		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); 		\
 		registerSignalHandlerForSignals();
 
 /**
  * This macro is used to complete the mainfile main function and to start the execution
  * of the registered testsuites
  */
-#define TESTS_END \
-    for (int i = 0; i < (&cc_model)->suites_array_index; i++) { \
-    	(&cc_model)->tests_array[i](); \
-    } 														\
-	list_cell * cell = getHeadInList(cc_model.test_reports_list); \
-	TestReport * report = getPayloadInListCell(cell); 			\
-	while (true) {												\
-		ct_stdout_report(report);								\
-		cell = getNextInListCell(cell);							\
-		if (cell == NULL) break;								\
-		report = getPayloadInListCell(cell); 					\
-	}															\
+#define TESTS_END 																	\
+    for (int i = 0; i < (&cc_model)->suites_array_index; i++) { 					\
+    	(&cc_model)->tests_array[i](); 												\
+    } 																				\
+	(&cc_model)->report_producer_implementation->report_producer(&cc_model);		\
+	tearDownDefaultModel(cc_model);													\
 } //main function closing bracket
 
 /**
@@ -451,21 +443,21 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
  * Used by REGTESTS() to get the name of the FE_n macro that is
  * to be used to start the iteration on the macro arguments
  */
-#define GET_FE_NAME( \
-          _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
-         _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
-         _21,_22,_23,_24,_25,_26,_27,_28,_29,_30, \
-         _31,_32,_33,_34,_35,_36,_37,_38,_39,_40, \
-         _41,_42,_43,_44,_45,_46,_47,_48,_49,_50, \
-         _51, _52, _53, _54, _55, _56, _57, _58, _59, \
+#define GET_FE_NAME( 										\
+          _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, 		\
+         _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, 			\
+         _21,_22,_23,_24,_25,_26,_27,_28,_29,_30, 			\
+         _31,_32,_33,_34,_35,_36,_37,_38,_39,_40, 			\
+         _41,_42,_43,_44,_45,_46,_47,_48,_49,_50, 			\
+         _51, _52, _53, _54, _55, _56, _57, _58, _59, 		\
          _60, _61, _62, _63, name, ...) name
 
 
 /**
  * Macro that registers a single test suite given its ID.
  */
- #define REGISTER_SUITE(id) \
-     void suite_ ## id(); \
+ #define REGISTER_SUITE(id) 							\
+     void suite_ ## id(); 								\
      update_test_array((&cc_model), suite_ ## id)
 
 /**
@@ -479,12 +471,12 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
  * due to CPP limitations. This problem is easily solved by the use of two or more
  * consequent macro uses.
  */
-#define REGTESTS(...) GET_FE_NAME(__VA_ARGS__, FE_64, FE_63, FE_62, \
-    FE_61, FE_60, FE_59, FE_58, FE_57, FE_56, FE_55, FE_54, FE_53, FE_52, FE_51,FE_50, \
-    FE_49, FE_48, FE_47,FE_46,FE_45,FE_44,FE_43,FE_42,FE_41,FE_40, \
-    FE_39,FE_38,FE_37,FE_36,FE_35,FE_34,FE_33,FE_32,FE_31,FE_30, \
-    FE_29,FE_28,FE_27,FE_26,FE_25,FE_24,FE_23,FE_22,FE_21,FE_20, \
-    FE_19,FE_18,FE_17,FE_16,FE_15,FE_14,FE_13,FE_12,FE_11,FE_10, \
+#define REGTESTS(...) GET_FE_NAME(__VA_ARGS__, FE_64, FE_63, FE_62, 							\
+    FE_61, FE_60, FE_59, FE_58, FE_57, FE_56, FE_55, FE_54, FE_53, FE_52, FE_51,FE_50, 			\
+    FE_49, FE_48, FE_47,FE_46,FE_45,FE_44,FE_43,FE_42,FE_41,FE_40, 								\
+    FE_39,FE_38,FE_37,FE_36,FE_35,FE_34,FE_33,FE_32,FE_31,FE_30, 								\
+    FE_29,FE_28,FE_27,FE_26,FE_25,FE_24,FE_23,FE_22,FE_21,FE_20, 								\
+    FE_19,FE_18,FE_17,FE_16,FE_15,FE_14,FE_13,FE_12,FE_11,FE_10, 								\
     FE_9,FE_8,FE_7,FE_6,FE_5,FE_4,FE_3,FE_2,FE_1, FE_0)(REGISTER_SUITE, __VA_ARGS__)
 
 
