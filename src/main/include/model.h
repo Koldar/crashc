@@ -35,6 +35,12 @@ typedef struct crashc_model {
 	test_pointer tests_array[MAX_TESTS];
 
 	/**
+	 * The pointer to the global teardown function. This is NULL by default, and gets populated
+	 * with a function pointer whenever the user uses the AFTER_TESTS macro
+	 */
+	void (*ct_teardown)();
+
+	/**
 	 * This variable is used to keep track of the tests_array[] array dimension
 	 */
 	int suites_array_index;

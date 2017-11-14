@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+#include "main_model.h"
+
 /**
  * Prepare the test check to be used in a new crash c test
  */
@@ -26,11 +28,11 @@ void addCharacter(char ch);
  * Adds a string inside the test checker
  *
  * \note
- * it will also add the character set by ::setSplit
+ * it will also add the character set by ::setSplit if specified, substituting the added string NULL byte
  *
  * @param[in] str the string to add in the test checker
  */
-void addString(const char* str);
+void addString(const char* str, bool add_split_char);
 
 /**
  * Set the splot
@@ -60,5 +62,11 @@ bool checkTestCheckerAndReset(const char* expected);
  * @param[in] expected the string to check the test c hecker against
  */
 void assertTestCheckerAndReset(const char* expected);
+
+
+/**
+ * Updates the model in order to use the testing version of the report producer
+ */
+void ct_setup_testing_producer(crashc_model * model);
 
 #endif /* TEST_CHECKER_H_ */

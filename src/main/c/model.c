@@ -16,6 +16,7 @@ crashc_model setupDefaultMainModel() {
 
 	retVal.currentSection = NULL;
 	retVal.currentSnapshot = NULL;
+	retVal.ct_teardown = NULL;
 	retVal.test_reports_list = initList();
 	retVal.testCaseInvolved = NULL;
 	retVal.suites_array_index = 0;

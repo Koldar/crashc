@@ -352,6 +352,11 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 		registerSignalHandlerForSignals();
 
 /**
+ * This macro is used to register the teardown function. Note that the function itself must be written
+ * by the user
+ */
+#define AFTER_TESTS(x) (&cc_model)->ct_teardown = x
+/**
  * This macro is used to complete the mainfile main function and to start the execution
  * of the registered testsuites
  */
@@ -360,6 +365,9 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
     	(&cc_model)->tests_array[i](); 												\
     } 																				\
 	(&cc_model)->report_producer_implementation->report_producer(&cc_model);		\
+	if ((&cc_model)->ct_teardown != NULL) {											\
+		(&cc_model)->ct_teardown();													\
+	}																				\
 	tearDownDefaultModel(cc_model);													\
 } //main function closing bracket
 
