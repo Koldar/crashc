@@ -1,6 +1,7 @@
 #include "crashC.h"
 #include "test_checker.h"
 
+#ifdef TEST_0004
 /**
  * This in an example on how to use the testing report producer expected output.
  * The testing producer will output section reports in the format:
@@ -58,3 +59,5 @@ TESTSUITE(1) {
 	}	
 	
 }
+
+#endif

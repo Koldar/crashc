@@ -105,7 +105,7 @@ typedef struct crashc_model {
 	 * setjmp and longjmp when needed during faulty test execution.
 	 * By faulty test we mean tests which generate SIGSEGV or SIGFPE.
 	 */
-	jmp_buf signal_jump_point;
+	jmp_buf jump_point;
 
 	/**
 	 * A structure representing the flag intercepted by crashc

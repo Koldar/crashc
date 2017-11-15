@@ -53,6 +53,7 @@
 #include "testReport.h"
 #include "main_model.h"
 #include "report_producer.h"
+#include "ct_assert.h"
 
 /**
  * Callback representing a general condition that determine if we can access to a particular section
@@ -298,7 +299,7 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 																																									\
 				(model)->testCaseInvolved = (model)->currentSection;																								\
 				bool UV(signalDetected) = false;																													\
-				if (sigsetjmp((model)->signal_jump_point, 1)) {                                                                                  					\
+				if (sigsetjmp((model)->jump_point, 1)) {                                                                                  							\
 					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
 					markSectionAsSignalDetected((model)->currentSection);                                                                        					\
 					UV(signalDetected) = true; 																														\

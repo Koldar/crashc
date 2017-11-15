@@ -36,7 +36,7 @@ TESTSUITE(1) {
         	addCharacter('i');
         }
         addCharacter('j');
-        addString("");
+        addCharacter('\0');
     }
     assertTestCheckerAndReset("ab ");
 }

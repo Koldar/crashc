@@ -13,6 +13,7 @@
 #include "tag.h"
 #include "errors.h"
 #include "typedefs.h"
+#include "list.h"
 
 /**
  * Represents the type of this section
@@ -120,11 +121,9 @@ struct SectionSnapshot {
 	long elapsed_time;
 
 	/**
-	 * The id of the level of the section represented by the snapshot.
-	 * This is useful to derive the hierarchy of the sections involved in
-	 * a particular test without needing to store a tree.
+	 * The list of reports of the assertions executed in this snapshot
 	 */
-	SectionLevelId levelId;
+	list * assertion_reports;
 
 	/**
 	 * The pointer to the parent snapshot in the snapshot tree

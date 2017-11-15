@@ -39,7 +39,7 @@ TESTSUITE(1) {
 		addCharacter('m');
 		THEN("test2", "") {addCharacter('n');}
 		addCharacter('o');
-		addString("");
+		addCharacter(' ');
 	}
 
 	assertTestCheckerAndReset("abcdfghijkmno abdefghijkmno aijklmno ");

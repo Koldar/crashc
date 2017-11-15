@@ -9,6 +9,8 @@
 #include <string.h>
 
 #include "testReport.h"
+#include "list.h"
+#include "ct_assert.h"
 
 TestReport * initTestReport(Section * testcase) {
 	TestReport * retVal = malloc(sizeof(TestReport));
@@ -42,7 +44,7 @@ SectionSnapshot * initSectionSnapshot(Section * section) {
 	retVal->type          = section->type;
 	retVal->status        = SNAPSHOT_OK;
 	retVal->elapsed_time  = 0;
-	retVal->levelId 	  = section->levelId;
+	retVal->assertion_reports = initList();
 	retVal->parent = NULL;
 	retVal->next_sibling = NULL;
 	retVal->first_child = NULL;
@@ -52,6 +54,7 @@ SectionSnapshot * initSectionSnapshot(Section * section) {
 
 void destroySnapshotTree(SectionSnapshot * snapshot) {
 	free(snapshot->description);
+	destroyListWithElement(snapshot->assertion_reports, ct_destroy_assert_report);
 
 	SectionSnapshot * next_child = snapshot->first_child;
 	while (next_child != NULL) {

@@ -67,5 +67,5 @@ static void failsig_handler(int signum) {
 	(&cc_model)->currentSnapshot = NULL;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
-    siglongjmp((&cc_model)->signal_jump_point, 1);
+    siglongjmp((&cc_model)->jump_point, 1);
 }

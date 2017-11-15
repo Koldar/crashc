@@ -6,9 +6,10 @@
  */
 
 #include <unistd.h>
-#include "section.h"
 #include <stdio.h>
 #include <stdarg.h>
+
+#include "section.h"
 #include "macros.h"
 
 /**
