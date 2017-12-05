@@ -8,7 +8,7 @@
 #include "section.h"
 
 //Used by longjmp, no special meaning at the moment
-#define JMP_CODE 1
+#define SIGNAL_JUMP_CODE 1
 //Used by crashc_sigaction_struct to indicate an empty bitmask
 #define NO_FLAGS 0
 

@@ -18,7 +18,7 @@ crashc_model setupDefaultMainModel() {
 	retVal.currentSnapshot = NULL;
 	retVal.ct_teardown = NULL;
 	retVal.test_reports_list = initList();
-	retVal.testCaseInvolved = NULL;
+	retVal.jump_source_testcase = NULL;
 	retVal.suites_array_index = 0;
 	retVal.runOnlyIfTags = initHT();
 	retVal.excludeTags = initHT();

@@ -83,8 +83,8 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 	return getNSection(parent, parent->currentChild);
 }
 
-void resetFromSignalCurrentSectionTo(crashc_model* model, int signal, const Section* signaledSection, const Section* s) {
-	model->currentSection = s;
+void ct_reset_section_after_jump(crashc_model* model, const Section* jump_source_section, const Section* testcase_section) {
+	model->currentSection = testcase_section;
 }
 
 bool getAlwaysTrue(crashc_model * model, Section* section) {

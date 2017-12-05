@@ -143,7 +143,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
  * @param[in] signalSection the section that caused a signal
  * @param[in] s the section ::currentSection will be moved to
  */
-void resetFromSignalCurrentSectionTo(crashc_model* model, int signal, const Section* signaledSection, const Section* s);
+void ct_reset_section_after_jump(crashc_model* model, const Section* jump_source_section, const Section* testcase_section);
 
 /**
  * Compute the hash of a string
@@ -297,18 +297,17 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 				getAlwaysTrue, callbackEnteringTestcase, 																											\
 				doWorkAtEndCallbackResetContainer, callbackExitAccessGrantedTestcase,  doWorkAtEndCallbackDoNothing, 												\
 																																									\
-				(model)->testCaseInvolved = (model)->currentSection;																								\
-				bool UV(signalDetected) = false;																													\
-				if (sigsetjmp((model)->jump_point, 1)) {                                                                                  							\
-					/*we have caught a signal: here currentSection is the section where the signal was raised*/																							\
-					markSectionAsSignalDetected((model)->currentSection);                                                                        					\
-					UV(signalDetected) = true; 																														\
+				(model)->jump_source_testcase = (model)->currentSection;																							\
+				bool UV(jump_occurred) = false;																														\
+				if (sigsetjmp((model)->jump_point, 1)) {                                                                          					        		\
+					/*we have caught a signal or an assertion failed: here currentSection is the section where the signal was raised*/								\
+					UV(jump_occurred) = true; 																														\
 					/*we reset the currentSection to the test case*/																								\
-					resetFromSignalCurrentSectionTo((model), (model)->currentSection->signalDetected, (model)->currentSection, (model)->testCaseInvolved);			\
-				}                                                                                                                       							\
+					ct_reset_section_after_jump((model), (model)->currentSection, (model)->jump_source_testcase);													\
+				}																																					\
 				for (    																																			\
 						;																																			\
-						!UV(signalDetected) && sectionStillNeedsExecution((model)->currentSection)                                                   				\
+						!UV(jump_occurred) && sectionStillNeedsExecution((model)->currentSection)                                                   				\
 						;																																			\
 				)																																					\
 		)

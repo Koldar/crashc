@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "report_producer.h"
+#include "ct_assert.h"
 #include "errors.h"
 
 char * ct_snapshot_status_to_string(snapshot_status s) {
@@ -40,10 +41,12 @@ char * ct_section_type_to_string(section_type t) {
 //TODO: Check for errors due to FILE null pointer etc...
 void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level) {
 
+	FILE * file = model->output_file;
+
 	char * type_str = ct_section_type_to_string(snapshot->type);
 	char * status_str = ct_snapshot_status_to_string(snapshot->status);
-	printf("%s : %s -> %s\n", type_str, snapshot->description, status_str);
-	FILE * file = model->output_file;
+	fprintf(file, "%s : %s -> %s\n", type_str, snapshot->description, status_str);
+	ct_default_assertions_report(model, snapshot, level);
 
 	SectionSnapshot * child = snapshot->first_child;
 	while (child != NULL) {
@@ -81,10 +84,31 @@ void ct_default_report_summary(crashc_model * model) {
 
 }
 
+void ct_default_assertions_report(crashc_model* model, SectionSnapshot* snapshot, int level) {
+
+	FILE* file = model->output_file;
+	list* assertion_reports = snapshot->assertion_reports;
+
+	ITERATE_ON_LIST(assertion_reports, report_cell, report, ct_assert_report_t*) {
+		for (int i = 0; i < level; i++) {
+			putchar('\t');
+		}
+
+		if (report->passed) {
+			fprintf(file, "Assertion \"%s\" - OK\n", report->asserted);
+		}
+		else {
+			fprintf(file, "Assertion \"%s\" - FAILED - Expected: %s, Actual: %s\n", report->asserted, report->expected_str, report->actual_str);
+		}
+	}
+
+}
+
 void ct_default_report(crashc_model * model) {
 
 	list * report_list = model->test_reports_list;
 
+	//TODO: Move the stats-acquiring code away from the report producer
 	ITERATE_ON_LIST(report_list, report_cell, report, TestReport *) {
 		if (report->outcome == TEST_SUCCESS) {
 			model->statistics->successful_tests++;
@@ -126,6 +150,7 @@ ct_report_producer_t * initDefaultReportProducer() {
 	ret_val->test_reporter = ct_default_test_report;
 	ret_val->snapshot_tree_reporter = ct_default_snapshot_tree_report;
 	ret_val->summary_producer = ct_default_report_summary;
+	ret_val->assert_reporter = ct_default_assertions_report;
 	ret_val->report_producer = ct_default_report;
 
 	return ret_val;

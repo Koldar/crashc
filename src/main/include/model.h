@@ -78,7 +78,7 @@ typedef struct crashc_model {
 	 * field representing the test case crashC is handling right now.
 	 * Crash C can handle at most 1 test case per time
 	 */
-	Section* testCaseInvolved;
+	Section* jump_source_testcase;
 
 	/**
 	 * Represents the tags the user has specified as the only one that should be consider

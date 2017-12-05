@@ -52,6 +52,8 @@ struct ct_report_producer_t {
 
 	ct_summary_reporter_t summary_producer;
 
+	ct_assert_reporter_t assert_reporter;
+
 	ct_reporter_t report_producer;
 
 };
@@ -84,6 +86,11 @@ void ct_default_test_report(crashc_model * model, TestReport * report);
  * Prints a representation of a snapshot tree in a default format
  */
 void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level);
+
+/**
+ * Prints a default report for the assertions related to a specific snapshot
+ */
+void ct_default_assertions_report(crashc_model* model, SectionSnapshot* snapshot, int level);
 
 /**
  * Initializes and return a structure containing the statistics data related to the tests

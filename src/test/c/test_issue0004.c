@@ -20,7 +20,8 @@ void check_result() {
 	assertTestCheckerAndReset(											   	\
 		"OK-1|TC1|OK_2|OW|OK_3|IW1|OK_3|IT1|OK_2|OT|OK_3|IW2|OK_3|IT2|OK_ " \
 		"OK-1|TC2|OK_2|W1|OK_2|T|OK_ "										\
-		"NO-1|TC2|SIG_2|W2|SIG_ "
+		"NO-1|TC2|SIG_2|W2|SIG_ "											\
+		"OK-1|TC|OK_ "
 	);
 }
 
@@ -56,6 +57,11 @@ TESTSUITE(1) {
 		WHEN("W2", "") {int a = 7 / 0;}
 		WHEN("W3", "") {}
 		THEN("T", "") {}
+	}
+
+	//Empty testcase
+	TESTCASE("TC", "") {
+		
 	}	
 	
 }

@@ -177,23 +177,23 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
  * @param[in] _payload name of the variable representing <tt>cell->payload</tt>
  * @param[in] type type of the variable _payload
  */
-#define ITERATE_ON_LIST(_l, cell, _payload, type) \
-		list* UV(l) = (_l);\
-		list_cell* cell = getHeadInList(UV(l)); \
-		list_cell* UV(next) = NULL;\
-		type _payload = NULL;\
-		if (cell != NULL) {\
-			_payload = getPayloadInListCell(cell);\
-			if (getNextInListCell(cell) != NULL) {\
-				UV(next) = getNextInListCell(cell);\
-			}\
-		}\
-		for (\
-				;\
-				cell != NULL;\
-				cell = UV(next), \
-				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, \
-				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL\
+#define ITERATE_ON_LIST(_l, cell, _payload, type) 												\
+		list* UV(l) = (_l);																		\
+		list_cell* cell = getHeadInList(UV(l)); 												\
+		list_cell* UV(next) = NULL;																\
+		type _payload = NULL;																	\
+		if (cell != NULL) {																		\
+			_payload = getPayloadInListCell(cell);												\
+			if (getNextInListCell(cell) != NULL) {												\
+				UV(next) = getNextInListCell(cell);												\
+			}																					\
+		}																						\
+		for (																					\
+				;																				\
+				cell != NULL;																	\
+				cell = UV(next), 																\
+				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, 					\
+				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL					\
 		)
 
 /**

@@ -69,7 +69,8 @@ typedef enum {
 	 * Suppose the user chose to exclude sections whose tags contains "SKIP". If we encounter any section containing the tag "SKIP"
 	 * we need to mark it somehow. This status represents this very concept.
 	 */
-	SECTION_SKIPPED_BY_TAG
+	SECTION_SKIPPED_BY_TAG,
+
 } section_status_enum;
 
 
