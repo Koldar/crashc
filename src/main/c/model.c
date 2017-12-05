@@ -22,6 +22,7 @@ crashc_model setupDefaultMainModel() {
 	retVal.suites_array_index = 0;
 	retVal.runOnlyIfTags = initHT();
 	retVal.excludeTags = initHT();
+	retVal._crashc_sigaction = (struct sigaction) { 0 };
 	retVal.rootSection = initSection(ST_ROOT, 0, "root", "");
 	retVal.statistics = initStatistics();
 	retVal.report_producer_implementation = initDefaultReportProducer();
