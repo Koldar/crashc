@@ -47,7 +47,7 @@
 #include "errors.h"
 #include "hashtable.h"
 #include "section.h"
-#include "sigHandling.h"
+#include "sig_handling.h"
 #include "command_line.h"
 #include "model.h"
 #include "testReport.h"
@@ -349,7 +349,7 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
 #define TESTS_START int main(const int argc, const char** args) { 																\
 		cc_model = setupDefaultMainModel();																						\
 		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (&cc_model)->runOnlyIfTags, (&cc_model)->excludeTags); 		\
-		registerSignalHandlerForSignals();
+		ct_register_signal_handlers();
 
 /**
  * This macro is used to register the teardown function. Note that the function itself must be written

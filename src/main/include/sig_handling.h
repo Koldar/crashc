@@ -1,5 +1,5 @@
-#ifndef SIGHANDLING_H_
-#define SIGHANDLING_H_
+#ifndef SIG_HANDLING_H_
+#define SIG_HANDLING_H_
 
 #include <signal.h>
 #include <setjmp.h>
@@ -18,6 +18,6 @@
  * \post
  * 	\li ::_crashc_sigaction manages SIGFPE signal
  */
-void registerSignalHandlerForSignals();
+void ct_register_signal_handlers();
 
 #endif

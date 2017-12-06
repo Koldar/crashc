@@ -16,13 +16,13 @@
  *
  */
 
-#include "sigHandling.h"
+#include "sig_handling.h"
 #include "main_model.h"
 
-static void failsig_handler(int signum);
+static void ct_failsig_handler(int signum);
 
-void registerSignalHandlerForSignals() {
-	(&cc_model)->_crashc_sigaction.sa_handler = &failsig_handler;
+void ct_register_signal_handlers() {
+	(&cc_model)->_crashc_sigaction.sa_handler = ct_failsig_handler;
 	//register signals
 	//TODO add even this signals
 //	if (sigaction(SIGHUP, &sa, NULL) == -1) {
@@ -54,7 +54,7 @@ void registerSignalHandlerForSignals() {
  * @param signum an ID representing the signal detected
  *
  */
-static void failsig_handler(int signum) {
+static void ct_failsig_handler(int signum) {
 
 	//printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
     //Mark test as failed code
@@ -62,7 +62,7 @@ static void failsig_handler(int signum) {
 	(&cc_model)->currentSection->signalDetected = signum;
 
 	(&cc_model)->currentSnapshot->status = SNAPSHOT_SIGNALED;
-	TestReport * report = getLastElementOfList((&cc_model)->test_reports_list);
+	TestReport* report = getLastElementOfList((&cc_model)->test_reports_list);
 	updateTestOutcome(report, (&cc_model)->currentSnapshot);
 	(&cc_model)->currentSnapshot = NULL;
 
