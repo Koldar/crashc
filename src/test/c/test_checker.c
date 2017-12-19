@@ -17,10 +17,10 @@
 static char __TEST_CHECKER_BUFFER[1000];
 static int nextPosition;
 static char split = ' ';
-static void ct_testing_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level);
-static void ct_testing_summary_producer(crashc_model * model);
-static void ct_testing_report(crashc_model * model);
-static void ct_testing_test_report(crashc_model * model, ct_test_report_t* report);
+static void ct_testing_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level);
+static void ct_testing_summary_producer(ct_model_t * model);
+static void ct_testing_report(ct_model_t * model);
+static void ct_testing_test_report(ct_model_t * model, ct_test_report_t* report);
 static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome);
 static char * ct_testing_section_type_to_c(section_type type);
 static char * ct_testing_snapshot_status_to_s(snapshot_status status);
@@ -99,7 +99,7 @@ static char * ct_testing_snapshot_status_to_s(snapshot_status status) {
 	}
 }
 
-static void ct_testing_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level) {
+static void ct_testing_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level) {
 	char level_str[12];
 	sprintf(level_str, "%d", level);
 	addString(level_str, false);
@@ -116,11 +116,11 @@ static void ct_testing_snapshot_tree_report(crashc_model * model, SectionSnapsho
 	}
 }
 
-static void ct_testing_summary_producer(crashc_model * model) {
+static void ct_testing_summary_producer(ct_model_t * model) {
 	
 }
 
-static void ct_testing_report(crashc_model * model) {
+static void ct_testing_report(ct_model_t * model) {
 
 	list * report_list = model->test_reports_list;
 
@@ -130,14 +130,14 @@ static void ct_testing_report(crashc_model * model) {
 	
 }
 
-static void ct_testing_test_report(crashc_model * model, ct_test_report_t * report) {
+static void ct_testing_test_report(ct_model_t * model, ct_test_report_t * report) {
 	addString(ct_testing_outcome_to_s(report->outcome), false);
 	addCharacter('-');
 	ct_testing_snapshot_tree_report(model, report->testcase_snapshot, 1);
 	addCharacter(split);
 }
 
-void ct_setup_testing_producer(crashc_model * model) {
+void ct_setup_testing_producer(ct_model_t * model) {
 	ct_report_producer_t * old_producer = model->report_producer_implementation;
 
 	old_producer->snapshot_tree_reporter = ct_testing_snapshot_tree_report;

@@ -8,4 +8,4 @@
 
 #include "main_model.h"
 
-crashc_model cc_model;
+ct_model_t* ct_model;

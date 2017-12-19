@@ -17,6 +17,6 @@
  *
  * \ingroup globalVariables
  */
-extern crashc_model cc_model;
+extern ct_model_t* ct_model;
 
 #endif /* MAIN_MODEL_H_ */

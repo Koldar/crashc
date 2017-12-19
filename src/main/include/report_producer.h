@@ -71,26 +71,26 @@ char * ct_section_type_to_string(section_type type);
 /**
  * Prints the report of the executed tests in a default format
  */
-void ct_default_report(struct crashc_model * model);
+void ct_default_report(ct_model_t * model);
 /**
  * Prints the tests summary in a default format
  */
-void ct_default_report_summary(crashc_model * model);
+void ct_default_report_summary(ct_model_t * model);
 
 /**
  * Prints a the report of a single test with a default format
  */
-void ct_default_test_report(crashc_model * model, ct_test_report_t * report);
+void ct_default_test_report(ct_model_t * model, ct_test_report_t * report);
 
 /**
  * Prints a representation of a snapshot tree in a default format
  */
-void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level);
+void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level);
 
 /**
  * Prints a default report for the assertions related to a specific snapshot
  */
-void ct_default_assertions_report(crashc_model* model, SectionSnapshot* snapshot, int level);
+void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, int level);
 
 /**
  * Initializes and return a structure containing the statistics data related to the tests

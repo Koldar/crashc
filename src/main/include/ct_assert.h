@@ -106,7 +106,7 @@ typedef struct {
  * - asserted: pointer to the asserted variable/value
  * - stringer: the stringer to be used to convert raw bytes into a string
  */
-typedef void (*ct_assert_callback_t)(crashc_model* model);
+typedef void (*ct_assert_callback_t)(ct_model_t* model);
 
 
 /**
@@ -115,7 +115,7 @@ typedef void (*ct_assert_callback_t)(crashc_model* model);
  * a specific assertion type.
  */
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
-	addTailInList((model)->currentSnapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));			\
+	addTailInList((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
 	if ((asserted) != true) {																												\
 		failed_callback((model));																											\
 	}																																		\
@@ -127,7 +127,7 @@ typedef void (*ct_assert_callback_t)(crashc_model* model);
  * This macro is the basic form of a CrashC assertion.
  * It takes as an argument a boolean expression and fails if it evalues to false.
  */
-#define ASSERT(assertion) CT_ASSERTION(&cc_model, true, assertion, ct_assert_do_nothing, ct_general_assert_failed)
+#define ASSERT(assertion) CT_ASSERTION(ct_model, true, assertion, ct_assert_do_nothing, ct_general_assert_failed)
 
 /**
  * Initializes an assertion report and returns a pointer to it.
@@ -143,11 +143,11 @@ void ct_destroy_assert_report(ct_assert_report_t * report);
 /**
  * Function used as a callback when an assertion doesn't need to do anything
  */
-void ct_assert_do_nothing(crashc_model * model);
+void ct_assert_do_nothing(ct_model_t * model);
 
 /**
  * Function used by the general ASSERT macro to handle its failure
  */
-void ct_general_assert_failed(crashc_model * model);
+void ct_general_assert_failed(ct_model_t * model);
 
 #endif /* CT_ASSERT_H_ */

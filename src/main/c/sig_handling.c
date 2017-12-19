@@ -22,7 +22,7 @@
 static void ct_failsig_handler(int signum);
 
 void ct_register_signal_handlers() {
-	(&cc_model)->_crashc_sigaction.sa_handler = ct_failsig_handler;
+	(ct_model)->_crashc_sigaction.sa_handler = ct_failsig_handler;
 	//register signals
 	//TODO add even this signals
 //	if (sigaction(SIGHUP, &sa, NULL) == -1) {
@@ -37,7 +37,7 @@ void ct_register_signal_handlers() {
 //		perror("Error: cannot handle SIGINT"); //should not happen
 //	}
 	//TODO do not register signal if it  is already registers by the program under test itself
-	if (sigaction(SIGFPE, &((&cc_model)->_crashc_sigaction), NULL) == -1) {
+	if (sigaction(SIGFPE, &((ct_model)->_crashc_sigaction), NULL) == -1) {
 		perror("Error: cannot handle SIGFPE"); //should not happen
 	}
 }
@@ -56,16 +56,16 @@ void ct_register_signal_handlers() {
  */
 static void ct_failsig_handler(int signum) {
 
-	//printf("marking section \"%s\" as signal detected!\n", (&cc_model)->currentSection->description);
+	//printf("marking section \"%s\" as signal detected!\n", (ct_model)->current_section->description);
     //Mark test as failed code
-	markSectionAsSignalDetected((&cc_model)->currentSection);
-	(&cc_model)->currentSection->signalDetected = signum;
+	markSectionAsSignalDetected((ct_model)->current_section);
+	(ct_model)->current_section->signalDetected = signum;
 
-	(&cc_model)->currentSnapshot->status = SNAPSHOT_SIGNALED;
-	ct_test_report_t* report = getLastElementOfList((&cc_model)->test_reports_list);
-	ct_update_test_outcome(report, (&cc_model)->currentSnapshot);
-	(&cc_model)->currentSnapshot = NULL;
+	(ct_model)->current_snapshot->status = SNAPSHOT_SIGNALED;
+	ct_test_report_t* report = getLastElementOfList((ct_model)->test_reports_list);
+	ct_update_test_outcome(report, (ct_model)->current_snapshot);
+	(ct_model)->current_snapshot = NULL;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
-    siglongjmp((&cc_model)->jump_point, SIGNAL_JUMP_CODE);
+    siglongjmp((ct_model)->jump_point, SIGNAL_JUMP_CODE);
 }

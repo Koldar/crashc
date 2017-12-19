@@ -39,7 +39,7 @@ char * ct_section_type_to_string(section_type t) {
 
 
 //TODO: Check for errors due to FILE null pointer etc...
-void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level) {
+void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level) {
 
 	FILE * file = model->output_file;
 
@@ -59,7 +59,7 @@ void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * sna
 
 }
 
-void ct_default_test_report(crashc_model * model, ct_test_report_t * report) {
+void ct_default_test_report(ct_model_t * model, ct_test_report_t * report) {
 
 	FILE * file = model->output_file;
 
@@ -72,7 +72,7 @@ void ct_default_test_report(crashc_model * model, ct_test_report_t * report) {
 
 }
 
-void ct_default_report_summary(crashc_model * model) {
+void ct_default_report_summary(ct_model_t * model) {
 
 	FILE * file = model->output_file;
 	ct_test_statistics_t * stats = model->statistics;
@@ -84,7 +84,7 @@ void ct_default_report_summary(crashc_model * model) {
 
 }
 
-void ct_default_assertions_report(crashc_model* model, SectionSnapshot* snapshot, int level) {
+void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
 	list* assertion_reports = snapshot->assertion_reports;
@@ -104,7 +104,7 @@ void ct_default_assertions_report(crashc_model* model, SectionSnapshot* snapshot
 
 }
 
-void ct_default_report(crashc_model * model) {
+void ct_default_report(ct_model_t * model) {
 
 	list * report_list = model->test_reports_list;
 

@@ -40,13 +40,13 @@ void ct_destroy_assert_report(ct_assert_report_t * report) {
 	free(report);
 }
 
-void ct_assert_do_nothing(crashc_model * model) {
+void ct_assert_do_nothing(ct_model_t * model) {
 
 }
 
-void ct_general_assert_failed(crashc_model * model) {
+void ct_general_assert_failed(ct_model_t * model) {
 
-	SectionSnapshot* snapshot = model->currentSnapshot;
+	SectionSnapshot* snapshot = model->current_snapshot;
 	ct_assert_report_t* report = getTailOfList(snapshot->assertion_reports);
 	ct_test_report_t* test_report = getTailOfList(model->test_reports_list);
 
@@ -60,7 +60,7 @@ void ct_general_assert_failed(crashc_model * model) {
 	ct_update_test_outcome(test_report, snapshot);
 
 	//We then need to reset the current snapshot to start a new snapshot tree
-	model->currentSnapshot = NULL;
+	model->current_snapshot = NULL;
 
 	//We jump out of this flow of execution to go back at the beginning of the test case and go on with the execution of the other tests
 	siglongjmp(model->jump_point, ASSERT_JUMP_CODE);

@@ -35,7 +35,7 @@ TESTS_END
 TESTSUITE(1) {
 
 	//Here we set up the special report producer used for testing
-	ct_setup_testing_producer(&cc_model);
+	ct_setup_testing_producer(ct_model);
 
 	//Now we have the usual test code
 

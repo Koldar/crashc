@@ -3,12 +3,12 @@
 #include "main_model.h"
 #include "list.h"
 
-void update_test_array(crashc_model * model, test_pointer func) {
+void update_test_array(ct_model_t * model, test_pointer func) {
 	model->tests_array[model->suites_array_index] = func;
 	model->suites_array_index++;
 }
 
-bool runOnceAndCheckAccessToSection(crashc_model * model, Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
+bool runOnceAndCheckAccessToSection(ct_model_t * model, Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags) {
 	if (!section->loop2) {
 		return false;
 	}
@@ -41,7 +41,7 @@ bool runOnceAndCheckAccessToSection(crashc_model * model, Section* section, cond
 	return section->accessGranted;
 }
 
-bool runOnceAndDoWorkAtEnd(crashc_model * model, Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
+bool runOnceAndDoWorkAtEnd(ct_model_t * model, Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback) {
 	if (section->loop1) {
 		return true;
 	}
@@ -83,44 +83,44 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 	return getNSection(parent, parent->currentChild);
 }
 
-void ct_reset_section_after_jump(crashc_model* model, const Section* jump_source_section, const Section* testcase_section) {
-	model->currentSection = testcase_section;
+void ct_reset_section_after_jump(ct_model_t* model, const Section* jump_source_section, const Section* testcase_section) {
+	model->current_section = testcase_section;
 }
 
-bool getAlwaysTrue(crashc_model * model, Section* section) {
+bool getAlwaysTrue(ct_model_t * model, Section* section) {
 	return true;
 }
 
-void doWorkAtEndCallbackGoToParentAndThenToNextSibling(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackGoToParentAndThenToNextSibling(ct_model_t * model, Section** pointerToSetAsParent, Section* section) {
 	//we finish a section. we return to the parent
 	*pointerToSetAsParent = section->parent;
 	//we go to the next sibling of child
 	(*pointerToSetAsParent)->currentChild += 1;
 }
 
-void doWorkAtEndCallbackChildrenNumberComputed(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackChildrenNumberComputed(ct_model_t * model, Section** pointerToSetAsParent, Section* section) {
 	//we executed the section. Hence we can safely say we know the child number of such section
 	if (!section->childrenNumberComputed) {
 		section->childrenNumberComputed = true;
 	}
 	section->currentChild = 0;
 
-	ct_update_snapshot_status(model->currentSection, model->currentSnapshot);
+	ct_update_snapshot_status(model->current_section, model->current_snapshot);
 
-	model->currentSnapshot = model->currentSnapshot->parent;
+	model->current_snapshot = model->current_snapshot->parent;
 }
 
-void doWorkAtEndCallbackResetContainer(crashc_model * model, Section** pointerToSetAsParent, Section* child) {
+void doWorkAtEndCallbackResetContainer(ct_model_t * model, Section** pointerToSetAsParent, Section* child) {
 	//we finished a section. Hence now we know the number of children that section have
 	child->childrenNumberComputed = true;
 	child->currentChild = 0;
 }
 
-void doWorkAtEndCallbackDoNothing(crashc_model * model, Section** pointerToSetAsParent, Section* section) {
+void doWorkAtEndCallbackDoNothing(ct_model_t * model, Section** pointerToSetAsParent, Section* section) {
 
 }
 
-bool getAccess_When(crashc_model * model, Section * section) {
+bool getAccess_When(ct_model_t * model, Section * section) {
 	//section is the WHEN we're considering right now
 
 	//we don't enter in this WHEN if we have already entered in another WHEN of the parent
@@ -136,57 +136,57 @@ bool getAccess_When(crashc_model * model, Section * section) {
 	return true;
 }
 
-void callbackDoNothing(crashc_model * model, Section* section) {
+void callbackDoNothing(ct_model_t * model, Section* section) {
 
 }
 
-void callbackEnteringThen(crashc_model * model, Section * section) {
+void callbackEnteringThen(ct_model_t * model, Section * section) {
 	updateCurrentSnapshot(model, section);
 }
 
-void callbackEnteringWhen(crashc_model * model, Section * section) {
+void callbackEnteringWhen(ct_model_t * model, Section * section) {
 	section->parent->alreadyFoundWhen = true;
 
 	updateCurrentSnapshot(model, section);
 }
 
-void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerToSetAsParent, Section * section) {
+void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToSetAsParent, Section * section) {
 	ct_test_report_t * report = getLastElementOfList(model->test_reports_list);
-	SectionSnapshot * last_snapshot = model->currentSnapshot;
+	SectionSnapshot * last_snapshot = model->current_snapshot;
 
-	ct_update_snapshot_status(section, model->currentSnapshot);
+	ct_update_snapshot_status(section, model->current_snapshot);
 	ct_update_test_outcome(report, last_snapshot);
 
-	//Resets the currentSnapshot pointer to NULL to indicate the end of the test
-	model->currentSnapshot = NULL;
+	//Resets the current_snapshot pointer to NULL to indicate the end of the test
+	model->current_snapshot = NULL;
 }
 
 /**
- * This functions updates the currentSnapshot. More precisely:
- *  - if currentSnapshot is NULL it means we just started a new test, so it simply takes a section snapshot and sets it
- *  	as the currentSnapshot
- *  - if currentSnapshot is not NULL it means we are not in a new test, so we take a snapshot and adds it to the test report tree
+ * This functions updates the current_snapshot. More precisely:
+ *  - if current_snapshot is NULL it means we just started a new test, so it simply takes a section snapshot and sets it
+ *  	as the current_snapshot
+ *  - if current_snapshot is not NULL it means we are not in a new test, so we take a snapshot and adds it to the test report tree
  */
 
-void updateCurrentSnapshot(crashc_model * model, Section * section) {
+void updateCurrentSnapshot(ct_model_t * model, Section * section) {
 	SectionSnapshot * snapshot = ct_init_section_snapshot(section);
 
-	if (model->currentSnapshot == NULL) {
-		model->currentSnapshot = snapshot;
+	if (model->current_snapshot == NULL) {
+		model->current_snapshot = snapshot;
 	}
 	else {
-		model->currentSnapshot = ct_add_snapshot_to_tree(snapshot, model->currentSnapshot);
+		model->current_snapshot = ct_add_snapshot_to_tree(snapshot, model->current_snapshot);
 	}
 
 }
 
-void callbackEnteringTestcase(crashc_model * model, Section * section) {
-	ct_test_report_t * report = ct_init_test_report(model->currentSnapshot);
+void callbackEnteringTestcase(ct_model_t * model, Section * section) {
+	ct_test_report_t * report = ct_init_test_report(model->current_snapshot);
 	addTailInList(model->test_reports_list, report);
 
-	updateCurrentSnapshot(model, model->currentSection);
+	updateCurrentSnapshot(model, model->current_section);
 
-	report->testcase_snapshot = model->currentSnapshot;
+	report->testcase_snapshot = model->current_snapshot;
 }
 
 void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
