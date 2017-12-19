@@ -50,7 +50,7 @@
 #include "sig_handling.h"
 #include "command_line.h"
 #include "model.h"
-#include "testReport.h"
+#include "test_report.h"
 #include "main_model.h"
 #include "report_producer.h"
 #include "ct_assert.h"

@@ -59,7 +59,7 @@ void ct_default_snapshot_tree_report(crashc_model * model, SectionSnapshot * sna
 
 }
 
-void ct_default_test_report(crashc_model * model, TestReport * report) {
+void ct_default_test_report(crashc_model * model, ct_test_report_t * report) {
 
 	FILE * file = model->output_file;
 
@@ -109,7 +109,7 @@ void ct_default_report(crashc_model * model) {
 	list * report_list = model->test_reports_list;
 
 	//TODO: Move the stats-acquiring code away from the report producer
-	ITERATE_ON_LIST(report_list, report_cell, report, TestReport *) {
+	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
 		if (report->outcome == TEST_SUCCESS) {
 			model->statistics->successful_tests++;
 		}

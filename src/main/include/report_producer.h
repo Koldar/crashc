@@ -9,10 +9,10 @@
 #define REPORT_PRODUCER_H_
 
 #include <stdio.h>
+#include <test_report.h>
 
 #include "section.h"
 #include "list.h"
-#include "testReport.h"
 #include "typedefs.h"
 #include "model.h"
 
@@ -80,7 +80,7 @@ void ct_default_report_summary(crashc_model * model);
 /**
  * Prints a the report of a single test with a default format
  */
-void ct_default_test_report(crashc_model * model, TestReport * report);
+void ct_default_test_report(crashc_model * model, ct_test_report_t * report);
 
 /**
  * Prints a representation of a snapshot tree in a default format

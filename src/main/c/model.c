@@ -6,8 +6,8 @@
  */
 
 #include <stdlib.h>
+#include <test_report.h>
 
-#include "testReport.h"
 #include "report_producer.h"
 #include "model.h"
 
@@ -35,7 +35,7 @@ void tearDownDefaultModel(crashc_model ccm) {
 	destroySection(ccm.rootSection);
 	destroyHTWithElements(ccm.excludeTags, destroyTag);
 	destroyHTWithElements(ccm.runOnlyIfTags, destroyTag);
-	destroyListWithElement(ccm.test_reports_list, destroyTestReport);\
+	destroyListWithElement(ccm.test_reports_list, ct_destroy_test_report);
 	destroyStatistics(ccm.statistics);
 	destroyDefaultReportProducer(ccm.report_producer_implementation);
 	fclose(ccm.output_file);

@@ -20,8 +20,8 @@ static char split = ' ';
 static void ct_testing_snapshot_tree_report(crashc_model * model, SectionSnapshot * snapshot, int level);
 static void ct_testing_summary_producer(crashc_model * model);
 static void ct_testing_report(crashc_model * model);
-static void ct_testing_test_report(crashc_model * model, TestReport * report);
-static char * ct_testing_outcome_to_s(test_outcome outcome);
+static void ct_testing_test_report(crashc_model * model, ct_test_report_t* report);
+static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome);
 static char * ct_testing_section_type_to_c(section_type type);
 static char * ct_testing_snapshot_status_to_s(snapshot_status status);
 
@@ -70,7 +70,7 @@ void assertTestCheckerAndReset(const char* expected) {
 	clearTestChecker();
 }
 
-static char * ct_testing_outcome_to_s(test_outcome outcome) {
+static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome) {
 	if (outcome == TEST_SUCCESS) {
 		return "OK";
 	}
@@ -124,13 +124,13 @@ static void ct_testing_report(crashc_model * model) {
 
 	list * report_list = model->test_reports_list;
 
-	ITERATE_ON_LIST(report_list, report_cell, report, TestReport *) {
+	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
 		ct_testing_test_report(model, report);
 	}
 	
 }
 
-static void ct_testing_test_report(crashc_model * model, TestReport * report) {
+static void ct_testing_test_report(crashc_model * model, ct_test_report_t * report) {
 	addString(ct_testing_outcome_to_s(report->outcome), false);
 	addCharacter('-');
 	ct_testing_snapshot_tree_report(model, report->testcase_snapshot, 1);

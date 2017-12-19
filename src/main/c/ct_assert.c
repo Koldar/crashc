@@ -7,11 +7,11 @@
 
 #include <string.h>
 #include <setjmp.h>
+#include <test_report.h>
 
 #include "ct_assert.h"
 #include "errors.h"
 #include "section.h"
-#include "testReport.h"
 
 ct_assert_report_t* ct_init_assert_report(bool is_mandatory, char* asserted_text, char* file, unsigned int line) {
 	ct_assert_report_t * ret_val = malloc(sizeof(ct_assert_report_t));
@@ -48,7 +48,7 @@ void ct_general_assert_failed(crashc_model * model) {
 
 	SectionSnapshot* snapshot = model->currentSnapshot;
 	ct_assert_report_t* report = getTailOfList(snapshot->assertion_reports);
-	TestReport* test_report = getTailOfList(model->test_reports_list);
+	ct_test_report_t* test_report = getTailOfList(model->test_reports_list);
 
 	//Update the assertion report
 	report->passed = false;
@@ -57,7 +57,7 @@ void ct_general_assert_failed(crashc_model * model) {
 
 	//Update the status of the snapshot which contained this assertion and of the test
 	snapshot->status = SNAPSHOT_FAILED;
-	updateTestOutcome(test_report, snapshot);
+	ct_update_test_outcome(test_report, snapshot);
 
 	//We then need to reset the current snapshot to start a new snapshot tree
 	model->currentSnapshot = NULL;

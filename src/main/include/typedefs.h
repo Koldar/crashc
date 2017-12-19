@@ -12,7 +12,7 @@
 
 struct crashc_model;
 struct Section;
-struct TestReport;
+struct ct_test_report;
 struct SectionSnapshot;
 struct ct_test_statistics_t;
 struct ct_report_producer_t;
@@ -21,7 +21,7 @@ struct ct_report_producer_t;
 typedef struct Section Section;
 typedef struct SectionSnapshot SectionSnapshot;
 typedef struct crashc_model crashc_model;
-typedef struct TestReport TestReport;
+typedef struct ct_test_report ct_test_report_t;
 typedef struct ct_test_statistics_t ct_test_statistics_t;
 typedef struct ct_report_producer_t ct_report_producer_t;
 
@@ -40,7 +40,7 @@ typedef void (*test_pointer)(void);
  * This type defines the function pointer to the function used to  produce the report of a single test.
  * This function usually calls a ct_snapshot_tree_reporter.
  */
-typedef void (*ct_test_reporter_t)(crashc_model *, TestReport *);
+typedef void (*ct_test_reporter_t)(crashc_model *, ct_test_report_t *);
 
 /**
  * This type defines the function pointer to the function used to produce the report of a snapshot tree

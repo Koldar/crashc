@@ -105,7 +105,7 @@ void doWorkAtEndCallbackChildrenNumberComputed(crashc_model * model, Section** p
 	}
 	section->currentChild = 0;
 
-	updateSnapshotStatus(model->currentSection, model->currentSnapshot);
+	ct_update_snapshot_status(model->currentSection, model->currentSnapshot);
 
 	model->currentSnapshot = model->currentSnapshot->parent;
 }
@@ -151,11 +151,11 @@ void callbackEnteringWhen(crashc_model * model, Section * section) {
 }
 
 void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerToSetAsParent, Section * section) {
-	TestReport * report = getLastElementOfList(model->test_reports_list);
+	ct_test_report_t * report = getLastElementOfList(model->test_reports_list);
 	SectionSnapshot * last_snapshot = model->currentSnapshot;
 
-	updateSnapshotStatus(section, model->currentSnapshot);
-	updateTestOutcome(report, last_snapshot);
+	ct_update_snapshot_status(section, model->currentSnapshot);
+	ct_update_test_outcome(report, last_snapshot);
 
 	//Resets the currentSnapshot pointer to NULL to indicate the end of the test
 	model->currentSnapshot = NULL;
@@ -169,19 +169,19 @@ void callbackExitAccessGrantedTestcase(crashc_model * model, Section ** pointerT
  */
 
 void updateCurrentSnapshot(crashc_model * model, Section * section) {
-	SectionSnapshot * snapshot = initSectionSnapshot(section);
+	SectionSnapshot * snapshot = ct_init_section_snapshot(section);
 
 	if (model->currentSnapshot == NULL) {
 		model->currentSnapshot = snapshot;
 	}
 	else {
-		model->currentSnapshot = addSnapshotToTree(snapshot, model->currentSnapshot);
+		model->currentSnapshot = ct_add_snapshot_to_tree(snapshot, model->currentSnapshot);
 	}
 
 }
 
 void callbackEnteringTestcase(crashc_model * model, Section * section) {
-	TestReport * report = initTestReport(model->currentSnapshot);
+	ct_test_report_t * report = ct_init_test_report(model->currentSnapshot);
 	addTailInList(model->test_reports_list, report);
 
 	updateCurrentSnapshot(model, model->currentSection);

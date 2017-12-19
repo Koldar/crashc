@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef TESTREPORT_H_
-#define TESTREPORT_H_
+#ifndef TEST_REPORT_H_
+#define TEST_REPORT_H_
 
 #include <string.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@
 typedef enum {
 	TEST_SUCCESS,
 	TEST_FAILURE
-} test_outcome;
+} ct_test_outcome_t;
 
 /**
  * This struct represents the actual test report.
@@ -51,11 +51,11 @@ typedef enum {
  * 2) inner when 2 -> then
  *
  * These are what CrashC considers to be tests.
- * This implies that the informations stored in the TestReport struct are related to the flow of execution, not to a given section.
- * This is the reason why the TestReport struct needs an auxiliary struct, SectionSnapshot, to hold the information on the statuses of
+ * This implies that the informations stored in the ct_test_report_t struct are related to the flow of execution, not to a given section.
+ * This is the reason why the ct_test_report_t struct needs an auxiliary struct, SectionSnapshot, to hold the information on the statuses of
  * the sections involved in the test at the moment they were executed.
  */
-struct TestReport {
+struct ct_test_report {
 
 	/**
 	 * The name of the file that contained this test
@@ -71,7 +71,7 @@ struct TestReport {
 	 /**
 	  * The outcome of the test. Can be SUCCESS or FAILURE
 	  */
-	 test_outcome outcome;
+	 ct_test_outcome_t outcome;
 
 	/**
 	 * The time that it took to complete the test
@@ -84,16 +84,16 @@ struct TestReport {
 };
 
 
-TestReport * initTestReport(struct Section * testcase);
-void destroyTestReport(TestReport * report);
-SectionSnapshot * initSectionSnapshot(Section * section);
-void destroySnapshotTree(SectionSnapshot * snapshot);
+ct_test_report_t* ct_init_test_report(struct Section* testcase);
+void ct_destroy_test_report(ct_test_report_t* report);
+SectionSnapshot* ct_init_section_snapshot(Section* section);
+void ct_destroy_snapshot_tree(SectionSnapshot* snapshot);
 
 /**
  * This function adds the given section to the section tree and automatically
  * reorganize the tree's children
  */
-SectionSnapshot * addSnapshotToTree(SectionSnapshot * to_add, SectionSnapshot * tree);
+SectionSnapshot* ct_add_snapshot_to_tree(SectionSnapshot* to_add, SectionSnapshot* tree);
 
 /**
  * This functions checks the status of the section associated to a given snapshot
@@ -101,12 +101,12 @@ SectionSnapshot * addSnapshotToTree(SectionSnapshot * to_add, SectionSnapshot * 
  * that every snapshot is created when entering at the beginning of the section and by default
  * is set as SNAPSHOT_OK, so it discovers if any error occourred only at the end, by checking the section.
  */
-void updateSnapshotStatus(Section * section, SectionSnapshot * snapshot);
+void ct_update_snapshot_status(Section* section, SectionSnapshot* snapshot);
 
 /**
  * This functions checks the status of the last executed snapshot in the test tree and sets the
  * status of the test as needed
  */
-void updateTestOutcome(TestReport * report, SectionSnapshot * last_snapshot);
+void ct_update_test_outcome(ct_test_report_t* report, SectionSnapshot* last_snapshot);
 
-#endif /* TESTREPORT_H_ */
+#endif /* TEST_REPORT_H_ */

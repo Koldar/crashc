@@ -62,8 +62,8 @@ static void ct_failsig_handler(int signum) {
 	(&cc_model)->currentSection->signalDetected = signum;
 
 	(&cc_model)->currentSnapshot->status = SNAPSHOT_SIGNALED;
-	TestReport* report = getLastElementOfList((&cc_model)->test_reports_list);
-	updateTestOutcome(report, (&cc_model)->currentSnapshot);
+	ct_test_report_t* report = getLastElementOfList((&cc_model)->test_reports_list);
+	ct_update_test_outcome(report, (&cc_model)->currentSnapshot);
 	(&cc_model)->currentSnapshot = NULL;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
