@@ -1,0 +1,29 @@
+digraph {
+ 		rankdir="TB";
+		TC1 [label="test case 1"];
+
+		subgraph {
+			rank="same";
+			WHEN1 [label="when 1"];
+			WHEN2 [label="when 2"];
+			WHEN3 [label="when 3"];
+		}
+
+		subgraph {
+			rank="same";
+			THEN1 [label="then 1"];
+			THEN2 [label="then 2"];
+			THEN3 [label="then 3"];
+			THEN4 [label="then 4"];
+			THEN5 [label="then 5"];
+		}
+
+		TC1 -> WHEN1;
+		WHEN1 -> WHEN2;
+		WHEN2 -> WHEN3;
+		WHEN2 -> THEN1;
+		THEN1 -> THEN2;
+		WHEN3 -> THEN3;
+		THEN3 -> THEN4;
+		THEN4 -> THEN5;
+}

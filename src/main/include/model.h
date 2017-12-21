@@ -84,7 +84,7 @@ typedef struct ct_model {
 	 * Represents the tags the user has specified as the only one that should be consider
 	 *
 	 * A test is run only if it declares at least one tag inside this container.
-	 * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence.
+	 * If the test is in conflict with ct_model::excludeTags, ct_model::excludeTags has the precedence.
 	 *
 	 * If this hashtable is empty, then we consider as if the check does't need to happen
 	 */
@@ -94,7 +94,7 @@ typedef struct ct_model {
 	 * Represents the tags the user has specified as the ones that excludes tests
 	 *
 	 * A test is skipped if it declares at least one tag inside this container.
-	 * If the test is in conflict with ::excludeTags, ::ecludeTags has the precedence
+	 * If the test is in conflict with ct_model::excludeTags, ct_model::excludeTags has the precedence
 	 *
 	 * If this hashtable is empty, then we consider as if the check does't need to happen
 	 */

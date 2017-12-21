@@ -1,5 +1,7 @@
-/*
- * command_line.h
+/**
+ * @file
+ *
+ * Module for handling command line arguments
  *
  *  Created on: Oct 9, 2017
  *      Author: koldar

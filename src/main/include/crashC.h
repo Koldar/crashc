@@ -87,6 +87,7 @@ void update_test_array(ct_model_t * model, test_pointer func);
  * the condition check of the for loop and ensures the loop behaves like an if: this is necessary because for loops condition has to be checked twice: one
  * to check if we can access to the section and one (if we have entered inside the loop) to exit from the loop itself
  *
+ * @param[inout] model the model containing all the data representing the automatic testing
  * @param[in] section the section we want to access in
  * @param[in] cs the condition we need to satisfy in order to access the section
  * @param[in] callback the code to execute if the system grant us access to the section. Note that in this way the code is called \b before entering in the section
@@ -106,6 +107,7 @@ bool runOnceAndCheckAccessToSection(ct_model_t * model, Section* section, condit
  * first call is always true whilst the second one is always false (this ensure the "if" behaviour"). Moreover we want to perform additional
  * code.
  *
+ * @param[inout] model the model containing all the data representing the automatic testing
  * @param[in] section the section we want to fetch the associated parent from
  * @param[in] pointerToSetAsParent a pointer that we has to set to <tt>section->parent</tt> in this call. <b>This has to be done by exactly one of the callbacks</b>
  * @param[in] callback function always called after we have check the access to the section: if we have access, this function is called \b after we entered inside the section source code
@@ -127,21 +129,20 @@ bool runOnceAndDoWorkAtEnd(ct_model_t * model, Section* section, Section** point
 Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags);
 
 /**
- * Reset the ::current_section global variable to the given one after we have detected a signal
+ * Reset the ct_model_t::current_section global variable to the given one after we have detected a signal
  *
- * Sometimes it happens that we need to abrutely break the flow of ::current_section.
+ * Sometimes it happens that we need to abrutely break the flow of ct_model_t::current_section.
  * For example when we detect an unhandled signal in one of the sections, we don't need to return to the parent of the section involved,
- * but immediately go to the ::TESTCASE.
+ * but immediately go to the \c TESTCASE.
  *
  * This function allows you to set all the metadata to ensure that such "unorthodox" flow is valid.
  *
  * \post
- * 	\li ::current_section is valid and refers to \c s
+ * 	\li ct_model_t::current_section is valid and refers to \c testcase_section
  *
- * @param[inout] model the model to update
- * @param[in] signal the signal raised
- * @param[in] signalSection the section that caused a signal
- * @param[in] s the section ::current_section will be moved to
+ * @param[inout] model the model containing all the data representing the automatic testing
+ * @param[in] jump_source_section the section where a signal has been raised
+ * @param[in] testcase_section the section representing a test case we need to reset the ct_model_t:current_section to
  */
 void ct_reset_section_after_jump(ct_model_t* model, Section* const jump_source_section, Section* const testcase_section);
 
@@ -163,24 +164,26 @@ int hash(const char* str);
 /**
  * We use this function to check whether or not we need to enter in the
  * given WHEN section
+ *
+ * @param[in] model the model involved
+ * @param[in] section the section we're trying to access
+ * @return
+ * 	\li true if we can access to section \c section;
+ * 	\li false otherwise
  */
 bool getAccess_When(ct_model_t * model, Section * section);
 
 /**
  * Grants always access
  *
- * @param[in] section the section involved
+ * @param[in] model the model involved
+ * @param[in] section the section we're trying to access
+ * @return
+ * 	\li true if we can access to section \c section;
+ * 	\li false otherwise
  */
 bool getAlwaysTrue(ct_model_t * model, Section* section);
 
-/**
- * Grant access only to one section type per ::LOOPER loop
- *
- * Grant access only if:
- * \li we're still computing the number of children and we are in the first children;
- * \li we have already computed the number of children and the children we're analyzing is the one in the head of ::Section::sectionToRunList
- */
-bool getAccessSequentially(Section* section);
 
 ///@}
 
@@ -246,9 +249,25 @@ void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToS
 //END
 
 /**
- * Main macro of the test suite
+ * Main macro of CrashC
  *
- * @param[inout] model variable of type pointer of ::ct_model_t containing all the data to manage
+ * \definition Containable Section
+ * A containable section is a piece of developer code. Containable sections may be hierarchical organized; access to containable section
+ * may be granted depending on specific conditions. Containable sections allows to forcefully change the flow of the developer code,
+ * regardless on how the code may appear from the outside. For example, code in \c WHEN sections seems to be executable just after the code
+ * shown before it. Actually code in \c WHEN section is executed depending on a much more complex condition.
+ *
+ * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[in] parent the ::Section this CONTAINABLESECTION is contained
+ * @param[in] sectionType (<tt>section_type</tt>) the type of the ::Section representing this CONTAINABLESECTION
+ * @param[in] description (<tt>char*</tt>) a brief description of this CONTAINABLE SCTION
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ * @param[in] condition the condition you need to clear in order to gain access to the internal test code of the CONTAINABLE SECTION
+ * @param[in] accessGrantedCallBack a set of instruction to execute if you gain access to the internal test code. This function will be execute before executing the actual test code
+ * @param[in] getBackToParentCallBack a callback executed when you're surpassing this CONTAINABLE SECTION. Note that this function will be called regardless if you actually enter inside the code or not.
+ * @param[in] exitFromContainerAccessGrantedCallback a callback to execute if you entered inside the test code of the CONTAINABLE SECTION. Called after \c getBackToParentCallBack;
+ * @param[in] exitFromContainerAccessDeniedCallback a callback to execute if you didnt' enter inside the test code of the CONTAINABLE SECTION. Called after \c getBackToParentCallBack;
+ * @param[in] setupCode a piece of C code to paste in the source code before starting all the reasoning for the CONTAINABLE SECTION. ct_model_t::current_section for this CONTAINABLE_SECTION is already populated though.
  */
 #define CONTAINABLESECTION(model, parent, sectionType, description, tags, condition, accessGrantedCallBack, getBackToParentCallBack, exitFromContainerAccessGrantedCallback, exitFromContainerAccessDeniedCallback, setupCode)	\
 		/**
@@ -284,11 +303,21 @@ void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToS
 				markSectionAsExecuted((model)->current_section)																											\
 		)
 
+/**
+ * Convenience macro for a NOOP
+ */
 #define NOCODE
 
 /**
- * @param[inout] model a variable of type ::ct_model_t containing all the data needed by crashc
- * @param[in] parent a variable of type ::Section representing the parent section of this section
+ * A CONTAINABLE SECTION which embed a loop.
+ *
+ * The loop keeps going until the CONTAINABLE SECTION is fully visited
+ *
+ * @param[inout] model a variable of type ::ct_model containing all the data needed by crashc
+ * @param[in] parent a variable of type ::Section representing the parent section of this CONTAINABLE SECTION
+ * @param[in] sectionType a value of type ::section_type representing the type of this CONTAINABLE SECTION
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
 #define LOOPER(model, parent, sectionType, description, tags)																										\
 		CONTAINABLESECTION(																																			\

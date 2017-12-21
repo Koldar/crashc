@@ -1,6 +1,5 @@
 /**
- * \file hashtable.h
- *
+ * @file
  * Implements hashtables
  *
  * This module is just a front end to uthash
@@ -137,7 +136,7 @@ void destroyHTWithElements(HT* ht, ct_destructor_t d);
 void deleteHTCell(HT* ht, HTCell* htCell);
 
 /**
- * like ::destroyHTCell but it delete from the memory also the element inside the cell
+ * like ::deleteHTCell but it delete from the memory also the element inside the cell
  *
  * @param[in] htCell the cell to remove from the memory
  * @param[in] d the destructor to use to remove the data inside the \c htCell

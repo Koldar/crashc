@@ -1,0 +1,13 @@
+digraph {
+	A[label="A\\nEXEC"]; 
+	B[label="B\\SIGNAL_DETECTED"]; 
+	C[label="C\\nDONE"];
+	D[label="UNEXEC"]; 
+	E[label="E\\nUNEXEC"];
+	F[label="F\\nUNEXEC"];
+	
+	A -> B -> C; 
+	B -> D; 
+	A -> E; 
+	A -> F;
+}

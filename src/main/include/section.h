@@ -1,8 +1,10 @@
-/*
- * section.h
+/**
+ * @file
  *
- *  Created on: Feb 16, 2017
- *      Author: koldar
+ * Represents metadata representing a piece of testing code
+ *
+ * @date Feb 16, 2017
+ * @author koldar
  */
 
 #ifndef SECTION_H_
@@ -16,9 +18,9 @@
 #include "list.h"
 
 /**
- * Represents the type of this section
+ * Represents the type of a section
  *
- * secton type can be used to uniquely determine the behaviour of the section itself
+ * section type can be used to uniquely determine the behaviour of the section itself
  */
 typedef enum section_type {
 	/**
@@ -43,23 +45,35 @@ typedef enum section_type {
 	ST_THEN
 } section_type;
 
+/**
+ * Represents each state a ::Section can have
+ */
 typedef enum {
+	/**
+	 * Represents a section CrashC knows exits, but it didn't visited it at all
+	 */
 	SECTION_UNEXEC,
+	/**
+	 * Represents a section CrashC has visited, but it didn't fully visited
+	 *
+	 * Partially visited sections are sections where at least one direct or indirect children have not been visited
+	 */
 	SECTION_EXEC,
+	/**
+	 * Represents a section CrashC has fully explored
+	 *
+	 * Fully visited sections are sections where all their direct and indirect children have been fully visited
+	 */
 	SECTION_DONE,
 	/**
 	 * A section has this state when inside its body the program encountered a signal
 	 *
 	 * The status is set only when the code **directed** owned by the section generates a signal. So for example in
 	 * the figure below the signal was raised during the source code of section "B", after executing section "C" but before section "D"
-	 * @dot
-	 * \digraph {
-	 *  A[label="A\\nEXEC"]; B[label="B\\SIGNAL_DETECTED"]; C[label="C\\nDONE"] D[label="UNEXEC"]; E[label="E\\nUNEXEC"]; F[label="F\\nUNEXEC"];
-	 *	A -> B -> C; B -> D; A -> E; A -> F;
-	 * }
-	 * @enddot
 	 *
-	 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNEXEC,
+	 * @dotfile signalDetectedTree.dot
+	 *
+	 * Sections with this status should not be visited anymore (so even if there are undirect children with status SECTION_UNEXEC,
 	 * those section will never be run at all.
 	 */
 	SECTION_SIGNAL_DETECTED,
@@ -146,7 +160,10 @@ struct SectionSnapshot {
 /**
  * Main structure representing a piece of testable code
  *
- * Examples of sections may be \c TESTCASE, \c WHEN, \c THEN and so on. Whilst this structure <b>does not contain</b>
+ * @definition Section
+ * Sections are metadata representing a ::CONTAINABLESECTION.
+ *
+ * Examples of sections may be \c TESTCASE, \c WHEN, \c THEN and so on. Whilst this structure **does not contain**
  * any of the code inside the section, it represents the metadata of such code. An example of metadata is the number of
  * subsections a section has. We need them in order to generate useful statistics.
  *
@@ -184,37 +201,7 @@ struct SectionSnapshot {
  *
  * Sections can be organized as in a tree, like this:
  *
- * @dot
- * 	digraph {
- * 		rankdir="TB";
- *		TC1 [label="test case 1"];
- *
- *		subgraph {
- *			rank="same";
- *			WHEN1 [label="when 1"];
- *			WHEN2 [label="when 2"];
- *			WHEN3 [label="when 3"];
- *		}
- *
- *		subgraph {
- *			rank="same";
- *			THEN1 [label="then 1"];
- *			THEN2 [label="then 2"];
- *			THEN3 [label="then 3"];
- *			THEN4 [label="then 4"];
- *			THEN5 [label="then 5"];
- *		}
- *
- *		TC1 -> WHEN1;
- *		WHEN1 -> WHEN2;
- *		WHEN2 -> WHEN3;
- *		WHEN2 -> THEN1;
- *		THEN1 -> THEN2;
- *		WHEN3 -> THEN3;
- *		THEN3 -> THEN4;
- *		THEN4 -> THEN5;
- * 	}
- * @enddot
+ * @dotfile sectionTree.dot
  *
  * Note that the code inside when2 (for example, is all the code between the thens plus the THENs themselves
  */
@@ -255,7 +242,7 @@ struct Section {
 	 * The field is true if we have already scanned the section content at least once. This means
 	 * that we explore it and we whether there are subsections inside it. Since we explored it
 	 * we also know the number of children the section has, hence we can safely use
-	 * ::Section::childNumber and  ::Section::firstChild
+	 * Section::childrenNumber and  Section::firstChild
 	 */
 	bool childrenNumberComputed;
 	/**
@@ -368,7 +355,7 @@ Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent);
  * get the n-th child of a given ::Section
  *
  * @param[in] parent the parent involved
- * @param[in] the number of the child we want to fetch
+ * @param[in] nChild the number of the child we want to fetch
  * @return
  * 	\li the n-th child of parent;
  * 	\li NULL if such child does not exist
@@ -384,7 +371,7 @@ Section* getNSection(const Section* parent, int nChild);
  * @param[in] levelId the level of this section
  * @param[in] description a text describing briefly the section
  * @param[in] tags a single string containing all the tags associated to the section. See \ref tags
- * @return the new ::Section instance jsut created
+ * @return the new ::Section instance just created
  */
 Section* initSection(section_type type, SectionLevelId levelId, const char* description, const char* tags);
 /**
@@ -394,11 +381,11 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
  * The function will destory all the sections which have parent (directly or indirectly) \c section.
  * Formally, the function will free from the memory the subtree generate by \c section (\c section included).
  *
- * There is only a ::Section that won't be freed by this functions: all the sections with ::Section::levelId set to 0 won't be touched.
- * Normally this isn't a problem because there is only one ::Section with such an id: ::rootSection. The rationale is that such variable is global one
+ * There is only a ::Section that won't be freed by this functions: all the sections with Section::levelId set to 0 won't be touched.
+ * Normally this isn't a problem because there is only one ::Section with such an id: Section::rootSection. The rationale is that such variable is global one
  * allocated in the \b stack, so freeing such a variable is illegal.
  *
- * @param[in] the section to free
+ * @param[in] section the section to free
  */
 void destroySection(Section* section);
 
@@ -495,7 +482,7 @@ bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2);
  *
  * @param[in] s the section whose string representation we want to retrieve
  * @param[in] spaceLeft the size of the buffer
- * @param[inout] the buffer itself
+ * @param[inout] buffer the buffer itself
  * @return the number of characters added in the buffer. So after this operation, the space left in the buffer will be \f$ spaceLeft - retVal \f$;
  */
 int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer);
@@ -505,7 +492,7 @@ int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer)
  *
  * @param[in] ss the section status to print
  * @param[in] spaceLeft the size of the buffer
- * @param[inout] the buffer to populate
+ * @param[inout] buffer the buffer to populate
  * @return number of characters filled in the buffer
  */
 int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer);
