@@ -54,7 +54,7 @@ TESTSUITE(1) {
 	//Signaled testcase
 	TESTCASE("TC2", "") {
 		WHEN("W1", "") {}
-		WHEN("W2", "") {int a = 7 / 0;}
+		WHEN("W2", "") {int b = 5; b -= 5; int a = 7 / b;}
 		WHEN("W3", "") {}
 		THEN("T", "") {}
 	}
