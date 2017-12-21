@@ -83,7 +83,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 	return getNSection(parent, parent->currentChild);
 }
 
-void ct_reset_section_after_jump(ct_model_t* model, const Section* jump_source_section, const Section* testcase_section) {
+void ct_reset_section_after_jump(ct_model_t* model, Section* const jump_source_section, Section* const testcase_section) {
 	model->current_section = testcase_section;
 }
 
