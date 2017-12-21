@@ -148,7 +148,7 @@ if(PARENTDIR STREQUAL "Debug")
     #-fno-stack-protector: to debug stack smashing (https://stackoverflow.com/a/1347464/1887602)
     add_definitions(-DQUICK_LOG=5 -DDEBUG -Werror=implicit-function-declaration -fno-stack-protector)
 endif(PARENTDIR STREQUAL "Debug")
-add_definitions(-Wfatal-errors)
+add_definitions(-Wfatal-errors -Werror)
 
 # ****************** SUB DIRECTORIES *************************
 add_subdirectory(src/main/c)
