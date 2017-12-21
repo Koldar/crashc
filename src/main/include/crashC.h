@@ -143,7 +143,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
  * @param[in] signalSection the section that caused a signal
  * @param[in] s the section ::current_section will be moved to
  */
-void ct_reset_section_after_jump(ct_model_t* model, const Section* jump_source_section, const Section* testcase_section);
+void ct_reset_section_after_jump(ct_model_t* model, Section* const jump_source_section, Section* const testcase_section);
 
 /**
  * Compute the hash of a string
@@ -346,7 +346,7 @@ void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToS
  * Macro used to contain all test declarations and to generate the main function for the
  * execution of the various tests
  */
-#define TESTS_START int main(const int argc, const char** args) { 																\
+#define TESTS_START int main(const int argc, char* const args[]) { 																\
 		ct_model = ct_setup_default_model();																					\
 		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (ct_model)->run_only_if_tags, (ct_model)->exclude_tags); 		\
 		ct_register_signal_handlers();

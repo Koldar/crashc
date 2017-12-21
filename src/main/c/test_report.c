@@ -12,7 +12,7 @@
 #include "list.h"
 #include "ct_assert.h"
 
-ct_test_report_t* ct_init_test_report(Section* testcase) {
+ct_test_report_t* ct_init_test_report(SectionSnapshot* section_snapshot) {
 	ct_test_report_t* ret_val = malloc(sizeof(ct_test_report_t));
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
@@ -54,7 +54,7 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 
 void ct_destroy_snapshot_tree(SectionSnapshot* snapshot) {
 	free(snapshot->description);
-	destroyListWithElement(snapshot->assertion_reports, ct_destroy_assert_report);
+	destroyListWithElement(snapshot->assertion_reports, (void(*)(void*)) ct_destroy_assert_report);
 
 	SectionSnapshot* next_child = snapshot->first_child;
 	while (next_child != NULL) {

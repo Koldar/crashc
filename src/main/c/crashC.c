@@ -83,7 +83,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
 	return getNSection(parent, parent->currentChild);
 }
 
-void ct_reset_section_after_jump(ct_model_t* model, const Section* jump_source_section, const Section* testcase_section) {
+void ct_reset_section_after_jump(ct_model_t* model, Section* const jump_source_section, Section* const testcase_section) {
 	model->current_section = testcase_section;
 }
 
@@ -181,7 +181,7 @@ void updateCurrentSnapshot(ct_model_t * model, Section * section) {
 }
 
 void callbackEnteringTestcase(ct_model_t * model, Section * section) {
-	ct_test_report_t * report = ct_init_test_report(model->current_snapshot);
+	ct_test_report_t* report = ct_init_test_report(model->current_snapshot);
 	addTailInList(model->test_reports_list, report);
 
 	updateCurrentSnapshot(model, model->current_section);

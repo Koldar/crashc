@@ -92,7 +92,7 @@ int getHashOfString(const char* str);
  * @param[inout] output a buffer that will contain the token just read
  * @return the first character of rhe next new token or 0 if we reached the end of the string
  */
-char* computeNextTagInStr(const char* str, char separator, char* charactersToIgnore, char* output);
+const char* computeNextTagInStr(const char* const str, char separator, char* charactersToIgnore, char* output);
 
 /**
  * adds in \c output all the tags inside the stream of tags
@@ -104,6 +104,6 @@ char* computeNextTagInStr(const char* str, char separator, char* charactersToIgn
  * @param[in] tags a string containing tags, each of them separated by \c separator
  * @param[in] separator a character separating 2 tags. No double separators allwoed
  */
-void populateTagsHT(tag_ht* output, const char* tags, char separator);
+void populateTagsHT(tag_ht* output, const char* const tags, char separator);
 
 #endif /* TAG_H_ */

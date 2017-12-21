@@ -80,7 +80,7 @@ void printHelp(FILE* fout) {
 	}
 }
 
-void parseCommandLineArguments(const int argc, const char* args[], char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags) {
+void parseCommandLineArguments(const int argc, char* const* args, char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags) {
 
 	while (true) {
 		/* getopt_long stores the option index here. */

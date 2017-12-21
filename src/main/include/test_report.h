@@ -84,7 +84,7 @@ struct ct_test_report {
 };
 
 
-ct_test_report_t* ct_init_test_report(struct Section* testcase);
+ct_test_report_t* ct_init_test_report(struct SectionSnapshot* testcase);
 void ct_destroy_test_report(ct_test_report_t* report);
 SectionSnapshot* ct_init_section_snapshot(Section* section);
 void ct_destroy_snapshot_tree(SectionSnapshot* snapshot);

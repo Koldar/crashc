@@ -111,10 +111,10 @@ void destroySection(Section* section) {
 		return;
 	}
 
-	destroyHTWithElements(section->tags, destroyTag);
+	destroyHTWithElements(section->tags, (void(*)(void*))(destroyTag));
 	//destroyListWithElement(section->sectionToRunList, destroySection);
-	free(section->description);
-	free(section);
+	free((void*)section->description);
+	free((void*)section);
 }
 
 /** Checks whether we are still computing the number of a section's children and returns

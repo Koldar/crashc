@@ -12,7 +12,7 @@
 #include "errors.h"
 
 
-static HTCell* initHTCell(const void* e, unsigned long key);
+static HTCell* initHTCell(void* const data, unsigned long key);
 static void destroyHTCell(HTCell* htCell);
 
 HT* initHT() {
@@ -205,18 +205,18 @@ void clearHTWithElements(HT* ht, void(*destructor)(void*)) {
  * \note
  * The data is added in the cell <b>by reference</b>
  *
- * @param[in] e the data to put inside the cell
+ * @param[in] data the data to put inside the cell
  * @param[in] f a function with one parameter <tt>void*</tt> returning the hash of the value, aka an int
  * @return a cell of an hash table. You still need to manually add it in the hash table though
  */
-static HTCell* initHTCell(const void* e, unsigned long key) {
+static HTCell* initHTCell(void* const data, unsigned long key) {
 	HTCell* retVal = malloc(sizeof(HTCell));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
 	retVal->id = key;
-	retVal->data = e;
+	retVal->data = data;
 
 	return retVal;
 }
