@@ -111,7 +111,7 @@ void destroySection(Section* section) {
 		return;
 	}
 
-	destroyHTWithElements(section->tags, (void(*)(void*))(destroyTag));
+	destroyHTWithElements(section->tags, (ct_destructor_t)(destroyTag));
 	//destroyListWithElement(section->sectionToRunList, destroySection);
 	free((void*)section->description);
 	free((void*)section);

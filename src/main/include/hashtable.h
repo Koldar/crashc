@@ -31,6 +31,7 @@
 
 #include <stdbool.h>
 
+#include "typedefs.h"
 #include "uthash.h"
 #include "macros.h"
 
@@ -123,7 +124,7 @@ void addItemInHTWithKey(HT* ht, unsigned long key, void* data);
 
 void destroyHT(HT* ht);
 
-void destroyHTWithElements(HT* ht, void(*destructor)(void*));
+void destroyHTWithElements(HT* ht, ct_destructor_t d);
 
 /**
  * Delete a cell inside the hashtable
@@ -142,11 +143,11 @@ void deleteHTCell(HT* ht, HTCell* htCell);
  * @param[in] htCell the cell to remove from the memory
  * @param[in] d the destructor to use to remove the data inside the \c htCell
  */
-void destroyHTCellWithElement(HTCell* htCell, void(*destructor)(void*));
+void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d);
 
 bool deleteItemInHT(HT* ht, unsigned long key);
 
-bool deleteItemInHTWithElement(HT* ht, unsigned long key, void(*destructor)(void*));
+bool deleteItemInHTWithElement(HT* ht, unsigned long key, ct_destructor_t d);
 
 bool isHTEmpty(const HT* ht);
 
@@ -199,7 +200,7 @@ void clearHT(HT* ht);
  * @param[inout] ht the hashtable to clear
  * @param[in] d the function to use to destroy the paylaod of the hashtable
  */
-void clearHTWithElements(HT* ht, void(*destructor)(void*));
+void clearHTWithElements(HT* ht, ct_destructor_t d);
 
 //#define ITERATE_ON_HT(ht, pair) \
 //	HT** UV(_ht) = *(ht);\

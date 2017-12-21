@@ -38,9 +38,9 @@ ct_model_t* ct_setup_default_model() {
 
 void ct_teardown_default_model(ct_model_t* ccm) {
 	destroySection(ccm->root_section);
-	destroyHTWithElements(ccm->exclude_tags, (void(*)(void*))destroyTag);
-	destroyHTWithElements(ccm->run_only_if_tags, (void(*)(void*))destroyTag);
-	destroyListWithElement(ccm->test_reports_list, (void(*)(void*))ct_destroy_test_report);
+	destroyHTWithElements(ccm->exclude_tags, (ct_destructor_t)destroyTag);
+	destroyHTWithElements(ccm->run_only_if_tags, (ct_destructor_t)destroyTag);
+	destroyListWithElement(ccm->test_reports_list, (ct_destructor_t)ct_destroy_test_report);
 	destroyStatistics(ccm->statistics);
 	destroyDefaultReportProducer(ccm->report_producer_implementation);
 	fclose(ccm->output_file);

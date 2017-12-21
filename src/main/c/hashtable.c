@@ -87,13 +87,13 @@ void destroyHT(HT* ht) {
 	}
 }
 
-void destroyHTWithElements(HT* ht, void(*destructor)(void*)) {
+void destroyHTWithElements(HT* ht, ct_destructor_t d) {
 	HTCell* s;
 	HTCell* tmp;
 
 	HASH_ITER(hh, ht->head, s, tmp) {
 		HASH_DEL(ht->head, s);
-		destructor(s->data);
+		d(s->data);
 		destroyHTCell(s);
 	}
 }
@@ -104,8 +104,8 @@ void deleteHTCell(HT* ht, HTCell* htCell) {
 	destroyHTCell(htCell);
 }
 
-void destroyHTCellWithElement(HTCell* htCell, void(*destructor)(void*)) {
-	destructor(htCell->data);
+void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d) {
+	d(htCell->data);
 	free(htCell);
 }
 
@@ -121,7 +121,7 @@ bool deleteItemInHT(HT* ht, unsigned long key) {
 	return true;
 }
 
-bool deleteItemInHTWithElement(HT* ht, unsigned long key, void(*destructor)(void*)) {
+bool deleteItemInHTWithElement(HT* ht, unsigned long key, ct_destructor_t d) {
 	HTCell* tmp;
 
 	HASH_FIND(hh, ht->head, &key, sizeof(unsigned long), tmp);
@@ -129,7 +129,7 @@ bool deleteItemInHTWithElement(HT* ht, unsigned long key, void(*destructor)(void
 		return false;
 	}
 	HASH_DEL(ht->head, tmp);
-	destructor(tmp->data);
+	d(tmp->data);
 	destroyHTCell(tmp);
 	return true;
 }
@@ -188,13 +188,13 @@ void clearHT(HT* ht) {
 	ht->head = NULL;
 }
 
-void clearHTWithElements(HT* ht, void(*destructor)(void*)) {
+void clearHTWithElements(HT* ht, ct_destructor_t d) {
 	HTCell* s;
 	HTCell* tmp;
 
 	HASH_ITER(hh, ht->head, s, tmp) {
 		HASH_DEL(ht->head, s);
-		destructor(s->data);
+		d(s->data);
 		destroyHTCell(s);
 	}
 	ht->head = NULL;

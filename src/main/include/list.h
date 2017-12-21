@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 
+#include "typedefs.h"
 #include "stdbool.h"
 #include "macros.h"
 #include "errors.h"
@@ -56,7 +57,7 @@ list* initList();
 
 void destroyList(list* l);
 
-void destroyListWithElement(list* l, void(*destructor)(void*));
+void destroyListWithElement(list* l, ct_destructor_t d);
 
 void clearList(list* l);
 

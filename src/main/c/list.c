@@ -65,9 +65,9 @@ void destroyList(list* lst) {
 	free(lst);
 }
 
-void destroyListWithElement(list* lst, void(*destructor)(void*)) {
+void destroyListWithElement(list* lst, ct_destructor_t d) {
 	ITERATE_ON_LIST(lst, cell, value, void*) {
-		destructor(cell->payload);
+		d(cell->payload);
 		free(cell);
 	}
 	free(lst);

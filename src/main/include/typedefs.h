@@ -32,6 +32,13 @@ typedef struct ct_report_producer_t ct_report_producer_t;
 typedef int SectionLevelId;
 
 /**
+ * Represents the signature of a function which release a structure from the memory
+ *
+ * \li The first parameter is the structure to release from the memory
+ */
+typedef void (*ct_destructor_t)(void*);
+
+/**
  * Function pointer used to point at the functions which contain the testsuites.
  */
 typedef void (*test_pointer)(void);
