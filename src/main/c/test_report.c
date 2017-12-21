@@ -54,7 +54,7 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 
 void ct_destroy_snapshot_tree(SectionSnapshot* snapshot) {
 	free(snapshot->description);
-	destroyListWithElement(snapshot->assertion_reports, ct_destroy_assert_report);
+	destroyListWithElement(snapshot->assertion_reports, (void(*)(void*)) ct_destroy_assert_report);
 
 	SectionSnapshot* next_child = snapshot->first_child;
 	while (next_child != NULL) {

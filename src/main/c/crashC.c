@@ -182,7 +182,7 @@ void updateCurrentSnapshot(ct_model_t * model, Section * section) {
 
 void callbackEnteringTestcase(ct_model_t * model, Section * section) {
 	updateCurrentSnapshot(model, model->current_section);
-	ct_test_report_t * report = ct_init_test_report(model->current_snapshot);
+	ct_test_report_t* report = ct_init_test_report(model->current_snapshot);
 	addTailInList(model->test_reports_list, report);
 }
 

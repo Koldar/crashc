@@ -65,10 +65,10 @@ int getHashOfString(const char* str) {
 	return hash;
 }
 
-char* computeNextTagInStr(const char* str, char separator, char* charactersToIgnore, char* output) {
+const char* computeNextTagInStr(const char* const str, char separator, char* charactersToIgnore, char* output) {
 	char* outputIndex = NULL;
 	char ch = '\0';
-	char* input = NULL;
+	const char* input = NULL;
 	bool toSkip = false;
 
 	//I don't use strtok because I don't want to use something with side effects
@@ -107,12 +107,12 @@ char* computeNextTagInStr(const char* str, char separator, char* charactersToIgn
 	return input;
 }
 
-void populateTagsHT(tag_ht* output, const char* tags, char separator) {
+void populateTagsHT(tag_ht* output, const char* const tags, char separator) {
 	char token[100];
 	char* positionToWriteInBuffer = NULL;
 	int tokenId;
 
-	char* tokenString = tags;
+	const char* tokenString = tags;
 
 	while (*tokenString != '\0') {
 		tokenString = computeNextTagInStr(tokenString, separator, "", token);

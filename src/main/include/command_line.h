@@ -20,7 +20,7 @@
  * @param[inout] runIfTags hashtable from crashc model
  * @param[inout] excludeTags hashtable from crashc model
  */
-void parseCommandLineArguments(const int argc, const char* args[], char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags);
+void parseCommandLineArguments(const int argc, char* const* args, char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags);
 
 /**
  * Print the help

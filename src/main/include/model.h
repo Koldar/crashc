@@ -129,7 +129,7 @@ typedef struct ct_model {
 	 */
 	FILE* output_file;
 
-};
+} ct_model_t;
 
 /**
  * Create a model correctly initialized

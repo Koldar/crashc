@@ -5,7 +5,7 @@
  *      Author: noodles
  */
 
-char * ct_file_basename(const char * filename) {
+char* const ct_file_basename(char* const filename) {
 	int i = 0;
 	int last_slash_index = 0;
 	char c = filename[0];
