@@ -181,12 +181,9 @@ void updateCurrentSnapshot(ct_model_t * model, Section * section) {
 }
 
 void callbackEnteringTestcase(ct_model_t * model, Section * section) {
+	updateCurrentSnapshot(model, model->current_section);
 	ct_test_report_t * report = ct_init_test_report(model->current_snapshot);
 	addTailInList(model->test_reports_list, report);
-
-	updateCurrentSnapshot(model, model->current_section);
-
-	report->testcase_snapshot = model->current_snapshot;
 }
 
 void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
