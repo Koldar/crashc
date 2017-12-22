@@ -33,6 +33,7 @@ set(CMAKE_FILE_ALTERED_COMMAND
     " - added project variable 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID'" "\n"
     " - 'THEPROJECT_AUTOMATED_TEST_ISSUE_ID' default to TEST_0001" "\n"
     " - create 'CREATE ALL IN ONE HEADER' section in src/test/c file" "\n"
+    " - created 'make doc' target\n"
 )
 #Represents the version of the building process version. You can use this value to understand what this cmake building process can and can't do
 #For example in building processes before the "1.0" "sudo make install" of exectuables wasn't supported.
@@ -149,6 +150,19 @@ if(PARENTDIR STREQUAL "Debug")
     add_definitions(-DQUICK_LOG=5 -DDEBUG -Werror=implicit-function-declaration -fno-stack-protector)
 endif(PARENTDIR STREQUAL "Debug")
 add_definitions(-Wfatal-errors -Werror)
+
+# *********************** CREATE DOC TARGET ***********************
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/doc.script.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/doc.script.cmake
+  COPYONLY
+)
+add_custom_target(doc
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/doc.script.cmake
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+	COMMENT "Create documentation of the project"
+)
 
 # ****************** SUB DIRECTORIES *************************
 add_subdirectory(src/main/c)

@@ -1,0 +1,14 @@
+#we're in build/Debug
+#doxygen shows warning in the stderr by default
+execute_process(
+	COMMAND doxygen CrashC.doxyfile
+	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../../" 
+	ERROR_VARIABLE stderr
+)
+message("output is '${stderr}'")
+if(NOT "${stderr}" STREQUAL "")
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(Red         "${Esc}[31m")
+  message(FATAL_ERROR "${Red}while executing doxygen, we detected some warnings:\n${stderr}${ColourReset}")
+endif()
