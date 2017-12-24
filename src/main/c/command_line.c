@@ -1,8 +1,8 @@
-/*
- * command_line.c
+/**
+ * @file
  *
- *  Created on: Oct 9, 2017
- *      Author: koldar
+ * @author koldar
+ * @date Oct 9, 2017
  */
 
 #include <stdio.h>
