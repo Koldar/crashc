@@ -1,5 +1,7 @@
 /**
-\page tags
+@page tags
+
+Tags is an easy mechanism to filter the tests CrashC needs to execute
 
 TAGS
 ====
@@ -11,14 +13,18 @@ Tags are little strings you can use to create groups of tests. A single section 
 can have multiple sections associated with it.
 
 Tags are important when you want to filter tests: suppose you have a graph library which can compute the shortest path between 2 nodes.
-Suppose you have tagged every test involving the shortest path  with "path" tag.
+Suppose you have tagged every test involving the shortest path with "path" tag.
 If you change the code of the shortest path algorithm, you might want to rerun only the tests that may be afftected by this change (and not
-the whole bunch; i.e. there might be lots of tests). With the tags you can easily do so
+the whole bunch; i.e. there might be lots of tests). With the tags you can easily do so.
+
+Thus, tags allows you to focus the automated testing only on a subpart of the tests, namely the ones you have probably broken after adding your
+code contribution: testing a subpart of the tests allows you to have a much quicker response. After you have ensured every is find on
+a set of test, you can order CrashC to run on the whole bunch of tests.  
 
 HOW TO DEFINE THEM
 ------------------
 
-\c TESTCASE, \c WHEN, \c THEN can have several tags associated. To define them, just add as many substrings, separated by ' ', in the second input paramters:
+\c TESTCASE, \c WHEN, \c THEN can have several tags associated. To define them, just add as many substrings, separated by ' ', in the second input parameters:
 
 @code
 	//test case with only a tag called "long-test"
