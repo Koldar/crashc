@@ -316,10 +316,10 @@ void updateCurrentSnapshot(ct_model_t * model, Section * section);
  * updates ct_model_t::current_section and increases the children of the parent by 1
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
- * @param[in] section the section representing the @containablesection you have just exit from (hence it's the child section).
+ * @param[inout] pointerToSetAsParent a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void doWorkAtEndCallbackGoToParentAndThenToNextSibling(ct_model_t * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackGoToParentAndThenToNextSibling(ct_model_t * model, Section** pointerToSetAsParent, Section* child);
 /**
  * Update section tree metadata whenever you have successfully entered in a child @containablesection
  *
@@ -329,10 +329,10 @@ void doWorkAtEndCallbackGoToParentAndThenToNextSibling(ct_model_t * model, Secti
  *  \li Updates ct_model_t::current_snapshot;
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
- * @param[in] section the section representing the @containablesection you have just exit from (hence it's the child section).
+ * @param[inout] pointerToSetAsParent a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void doWorkAtEndCallbackChildrenNumberComputed(ct_model_t * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackChildrenNumberComputed(ct_model_t * model, Section** pointerToSetAsParent, Section* child);
 //TODO remove not used
 void doWorkAtEndCallbackUpdateSectionToRun(ct_model_t * model, Section** pointerToSetAsParent, Section* section);
 //TODO removed not used
@@ -342,8 +342,8 @@ void doWorkAtEndCallbackUpdateSectionAndMarkChildrenComputedToRun(ct_model_t * m
  * like ::doWorkAtEndCallbackChildrenNumberComputed but it doesn't update the ct_model_t::current_snapshot
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
- * @param[in] section the section representing the @containablesection you have just exit from (hence it's the child section).
+ * @param[inout] pointerToSetAsParent a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
 void doWorkAtEndCallbackResetContainer(ct_model_t * model, Section** pointerToSetAsParent, Section* child);
 //TODO remove not used
@@ -352,10 +352,10 @@ void doWorkAtEndCallbackChildrenNumberComputedListGoToParentAndThenToNextSibling
  * Do nothing
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
- * @param[in] section the section representing the @containablesection you have just exit from (hence it's the child section).
+ * @param[inout] pointerToSetAsParent a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void doWorkAtEndCallbackDoNothing(ct_model_t * model, Section** pointerToSetAsParent, Section* section);
+void doWorkAtEndCallbackDoNothing(ct_model_t * model, Section** pointerToSetAsParent, Section* child);
 
 /**
  * Finalize operations when a @testcase is finished.
@@ -364,8 +364,8 @@ void doWorkAtEndCallbackDoNothing(ct_model_t * model, Section** pointerToSetAsPa
  * and resets the ct_model_t::current_snapshot pointer back to NULL to indicate that the current test is over
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
- * @param[in] child the section representing the @containablesection you'have just exit from.
+ * @param[inout] pointerToSetAsParent a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] section the section representing the @containablesection you'have just exit from.
  */
 void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToSetAsParent, Section * section);
 
@@ -380,7 +380,7 @@ void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToS
  * Does nothing
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[in] sectionGranted the section representing the @containablesection you're going to access (hence the child).
+ * @param[in] section the section representing the @containablesection you're going to access (hence the child).
  */
 void callbackDoNothing(ct_model_t * model, Section* section);
 
@@ -391,7 +391,7 @@ void callbackDoNothing(ct_model_t * model, Section* section);
  * adds it to the test reports list and takes the snapshot of the testcase.
  *
  * @param[inout] model the global ct_model_t crashC model you manage
- * @param[in] sectionGranted the section representing the @containablesection you're going to access (hence the child).
+ * @param[in] section the section representing the @containablesection you're going to access (hence the child).
  */
 void callbackEnteringTestcase(ct_model_t * model, Section * section);
 
@@ -515,12 +515,32 @@ void callbackEnteringTestcase(ct_model_t * model, Section * section);
 
 
 //TODO the parent of the test case is not the root section, but the "suite section". We need to include them in the section tree as well!
+/**
+ * Represents a @containablesection which keeps being executed until every direct and undirect @containablesection within it has been executed
+ *
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ */
 #define TESTCASE(description, tags) LOOPER(ct_model, ((ct_model)->root_section), ST_TESTCASE, description, tags)
+/**
+ * like ::TESTCASE but with the default \c tags value of ""
+ *
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ */
 #define EZ_TESTCASE(description) TESTCASE(description, "")
 
+//TODO remove
 //#define TESTCASE(description, tags)	TEST_FUNCTION(testcase ## __LINE__, LOOPER(&rootSection, 1, description, tags))
 //#define EZ_TESTCASE(description) TESTCASE(description, "")
 
+/**
+ * A @containablesection where you always gain access to
+ *
+ * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[in] sectionType (whose type is ::section_type) the type of the ::Section representing this @containablesection
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ */
 #define ALWAYS_ENTER(model, sectionType, description, tags) CONTAINABLESECTION(															\
 		(model), 																														\
 		(model)->current_section, sectionType, description, tags,																		\
@@ -529,6 +549,15 @@ void callbackEnteringTestcase(ct_model_t * model, Section * section);
 		NOCODE																															\
 )
 
+/**
+ * A @containablesection where you gain access to only if has
+ * not been fully visited and you didn't access to a similar section yet in the same parent.
+ *
+ * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[in] sectionType (whose type is ::section_type) the type of the ::Section representing this @containablesection
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ */
 #define ENTER_ONE_PER_LOOP(model, sectionType, description, tags) CONTAINABLESECTION(													\
 		(model), 																														\
 		(model)->current_section, sectionType, description, tags,																		\
@@ -537,29 +566,65 @@ void callbackEnteringTestcase(ct_model_t * model, Section * section);
 		NOCODE 																															\
 )
 
+/**
+ * Represents a @containablesection with 2 access conditions:
+ *
+ * \li it has not been fully visited yet;
+ * \li you still have not accessed to a @when in the same container
+ *
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ */
 #define WHEN(description, tags) ENTER_ONE_PER_LOOP((ct_model), ST_WHEN, description, tags)
+/**
+ * like ::WHEN but with the default \c tags value of ""
+ */
 #define EZ_WHEN(description) WHEN(description, "")
+/**
+ * Represents a @containablesection you need always to access to
+ *
+ * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
+ * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
+ */
 #define THEN(description, tags) ALWAYS_ENTER((ct_model), ST_THEN, description, tags)
+/**
+ * like ::THEN but with the default \c tags value of ""
+ */
 #define EZ_THEN(description) THEN(description, "")
 
 //TODO all those functions should be included in the only one global models
 /**
- * Macro used to contain all test declarations and to generate the main function for the
- * execution of the various tests
+ * Represents the default entry point for @crashc main executable
+ *
+ * The macro is used to contain all test declarations and to generate the main function for the
+ * execution of the various tests.
+ *
+ * The macro is actually masking a \c main function
+ *
  */
 #define TESTS_START int main(const int argc, char* const args[]) { 																\
 		ct_model = ct_setup_default_model();																					\
 		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (ct_model)->run_only_if_tags, (ct_model)->exclude_tags); 		\
 		ct_register_signal_handlers();
 
+///@defgroup hooks CrashC developer hooks
+///@brief Represents a list of utility APIs you can use to fully customize @crashc testing execution
+///@{
+
 /**
- * This macro is used to register the teardown function. Note that the function itself must be written
- * by the user
+ * Used to register a teardown function
+ *
+ * Use this function to perform additional operations **just before** ct_model_t model is fully disposed.
+ * Usually you can use this function to release from memory any additional resources you've created.
  */
 #define AFTER_TESTS(x) (ct_model)->ct_teardown = x
+
+///@}
+
 /**
- * This macro is used to complete the mainfile main function and to start the execution
- * of the registered testsuites
+ * Complete the \c main function created with ::TESTS_START
+ *
+ * Furthermore, it also start the execution of the registered testsuites
  */
 #define TESTS_END 																	\
     for (int i = 0; i < (ct_model)->suites_array_index; i++) { 						\
@@ -573,9 +638,12 @@ void callbackEnteringTestcase(ct_model_t * model, Section * section);
 } //main function closing bracket
 
 /**
- * This macro is used to contain a test suite, which can contain an arbitrary number
- * of testcases. Every TESTSUITE must be given a unique ID. IDs must be valid C identifiers.
- * Progressive numerical IDs are strongly reccomended as the framework provides a few
+ * Specifies a function prototype representing a test suite.
+ *
+ * @testsuite can contain an arbitrary number
+ * of testcases. Every ::TESTSUITE must be given a unique ID, namely either a valid C identifier
+ * or a non negative integer number. Such ID uniquely represents a @testsuite.
+ * Progressive numerical IDs are strongly recomended as the framework provides a few
  * really useful macros to easily register their testsuites.
  * Note that ID coherency is left as a user responsability.
  */
