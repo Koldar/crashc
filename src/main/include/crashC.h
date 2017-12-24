@@ -1,5 +1,9 @@
 /**
- * \file crashC.h
+ * @file
+ *
+ * Represents the main file of the framework
+ *
+ * The file contains all the main macro definition used to provide crashC features to the developer
  *
  * TEST CASE
  * ---------
@@ -56,36 +60,73 @@
 #include "ct_assert.h"
 
 /**
- * Callback representing a general condition that determine if we can access to a particular section
+ * Callback type of a function representing a general condition that determine if we can access to a particular @containablesection source code
  *
- * the parameter is the section to check whilst the return value is
- * true if the software grant us access to the section, false otherwise
+ * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[in] section the section representing the @containablesection you want to access
+ * @return
+ * 	\li @true whenever the testing framework decided that the code can enter in the @containablesection source code;
+ * 	\li @false otherwise.
  */
 typedef bool (*condition_section)(ct_model_t * model, Section*);
+
+/**
+ * Callback signature representing a callback to execute as soon as you **exit** from the @containablesection source code
+ *
+ * For example, suppose the following. Suppose you have exited from \c WHEN. The ct_model_t::current_section variable needs to be
+ * reset from \c WHEN to its parent, namely \c TESTCASE. The function prototype allows you to code that
+ *
+ * @code
+ * 	TESTCASE("","") {
+ * 		WHEN("","") {
+ * 		}
+ * 	}
+ * @endcode
+ *
+ * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] parentPosition a pointer **you** need to set to the parent of the section representing the @containablesection
+ * @param[in] child the section representing the @containablesection you'have just exit from.
+ */
 typedef void (*AfterExecutedSectionCallBack)(ct_model_t * model, Section** parentPosition, Section* child);
+
+/**
+ * Callback prototype for any function executing addtional code before entering in a @containablesection
+ *
+ * For example, asume you are in \c TESTCASE and assume the framework gave you access to \c WHEN @containablesection.
+ * Before actually enter in the section, you might want to perform additional code. The prototype has been specified for this very reason
+ * @code
+ * 	TESTCASE("","") {
+ * 		WHEN("","") {
+ * 		}
+ * 	}
+ * @endcode
+ *
+ * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[in] sectionGranted the section representing the @containablesection you're going to access (hence the child).
+ */
 typedef void (*BeforeStartingSectionCallBack)(ct_model_t * model, Section* sectionGranted);
 
 /**
- * This function registers a testsuite by storing its function pointer into
- * the global array. The function automatically updates the variable used to
- * keep track of the array dimension.
+ * Register a new @testsuite in the @crashc ecosystem
+ *
+ * C language doesn't have anything allowing you to fetch all defined functions within a file or a group of file (something like
+ * Java's annotation or Python introspection). So, in order to detect all the suite the tests defined, one need to manually
+ * register them in a data structure (like an array).
+ *
+ * This function goal is precisely this: it allows you to register a @testsuite within @crashc framework.
+ *
  * TODO: Add control on duplicates testsuites
  *
  * \post
- * 	\li \c func added in the index
+ * 	\li \c func added in the register
  *
- * @param[in] func the function to register
  * @param[inout] model the model where we operate on
+ * @param[in] func the function to register
  */
 void update_test_array(ct_model_t * model, test_pointer func);
 
 /**
- * Function to run in the access cycle
- *
- * ::CONTAINABLESECTION is composed by 2 loops: the most inner one is the <b>access cycle</b> that checks if we can actually enter in the section
- * or not. The for is implementing an "if" condition with the added feature to execute call code at the end. This function has to be called inside
- * the condition check of the for loop and ensures the loop behaves like an if: this is necessary because for loops condition has to be checked twice: one
- * to check if we can access to the section and one (if we have entered inside the loop) to exit from the loop itself
+ * Function to concretely perform the **access cycle**
  *
  * @param[inout] model the model containing all the data representing the automatic testing
  * @param[in] section the section we want to access in
@@ -94,37 +135,50 @@ void update_test_array(ct_model_t * model, test_pointer func);
  * @param[in] runOnlyIfTags an hash table containing all the tags allowed. If a section does not have a tag inside this set, it won't be run
  * @param[in] excludeIfTags an hash table containing all the tags prohibited. If a section has at least one tag inside this set, it won't be run
  * @return
- * 	\li true if the section has to be explored;
- * 	\li false otherwise;
+ * 	\li @true if the section has to be visited;
+ * 	\li @false otherwise;
  */
 bool runOnceAndCheckAccessToSection(ct_model_t * model, Section* section, condition_section cs, BeforeStartingSectionCallBack callback, const tag_ht* restrict runOnlyIfTags, const tag_ht* restrict excludeIfTags);
 /**
- * Function supposed to run in the parentSwitcher cycle
- *
- * ::CONTAINABLESECTION is a 2 nested cycle. The outermost is the <b>parent switcher</b>, allowing you to return to the section parent
- * after you have analyzed the section (analyzed doesn't mean access to the section, but merely check the access).
- * Just like ::runOnceAndCheckAccessToSection, we model the if with a for loop. Since the for loop condition is run twice, we need to ensure the
- * first call is always true whilst the second one is always false (this ensure the "if" behaviour"). Moreover we want to perform additional
- * code.
+ * Function supposed to run in the **parent switcher** cycle
  *
  * @param[inout] model the model containing all the data representing the automatic testing
  * @param[in] section the section we want to fetch the associated parent from
  * @param[in] pointerToSetAsParent a pointer that we has to set to <tt>section->parent</tt> in this call. <b>This has to be done by exactly one of the callbacks</b>
- * @param[in] callback function always called after we have check the access to the section: if we have access, this function is called \b after we entered inside the section source code
+ * @param[in] callback function **always called after we have check the access** to the section: if we have access, this function is called **after** we entered inside the section source code
  * @param[in] accessGrantedCallback function called \b afrer \c callback if the software has entered in the section source code
  * @param[in] accessDeniedCallback function called \b afrer \c callback if the software hasn't entered in the section source code
+ * @return
+ *	\li @true if this is the first iteration of the **parent switcher** cycle.
+ *	\li @false if this si the second iteration of the  **parent switcher cycle.
  */
 bool runOnceAndDoWorkAtEnd(ct_model_t * model, Section* section, Section** pointerToSetAsParent, AfterExecutedSectionCallBack callback, AfterExecutedSectionCallBack accessGrantedCallback, AfterExecutedSectionCallBack accessDeniedCallback);
 
 /**
- * @param[in] parent the section containing the one we're creating. For example if we're in the test code of <tt>TESTCASE</tt> and we see a  <tt>WHEN</tt> clause
- * 				this attribute is set to the metadata representing <tt>TESTCASE</tt>.
+ * Fetches the section representing a particular @containablesection. If not present, it creates it.
+ *
+ * @code
+ * 	TESTCASE("","") {
+ * 		WHEN("a","") {
+ * 		}
+ * 		WHEN("b","") {
+ * 		}
+ * 	}
+ * @endcode
+ * For example, this function creates the section representing the @containablesection \c WHEN "a" if there is no section inside the section tree
+ * of @testcase representing it; otherwise, it just fetches such Section.
+ *
+ * \post
+ * 	\li a ::Section representing the given @containablesection now exists within the section tree.
+ *
+ * @param[in] parent the section containing the one we're creating. For example if we're in the test code of @testcase and we see a @when clause
+ * 				this attribute is set to the metadata representing @testcase.
  * @param[in] type the kind of section to fetch
  * @param[in] decription a brief string explaining what this section is and does
  * @param[in] tags a list of tags. See \ref tags for further information
  * @return
  * 	\li a newly created section if we're still computing the children of \c parent
- * 	\li the ::Section::currentChild -th child of \c parent otherwise
+ * 	\li the Section::currentChild -th child of \c parent otherwise
  */
 Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const char* decription, const char* tags);
 
@@ -133,7 +187,7 @@ Section* getSectionOrCreateIfNotExist(Section* parent, section_type type, const 
  *
  * Sometimes it happens that we need to abrutely break the flow of ct_model_t::current_section.
  * For example when we detect an unhandled signal in one of the sections, we don't need to return to the parent of the section involved,
- * but immediately go to the \c TESTCASE.
+ * but we need to immediately go to the @testcase.
  *
  * This function allows you to set all the metadata to ensure that such "unorthodox" flow is valid.
  *
@@ -157,19 +211,41 @@ void ct_reset_section_after_jump(ct_model_t* model, Section* const jump_source_s
  */
 int hash(const char* str);
 
-///\defgroup accessConditions function that can be used as ::condition_section
+///@defgroup accessConditions Access Condition Functions
+///@brief Functions that can be used as ::condition_section concrete values.
+///Use these functions to develop new @containablesection. These group of functions defines the pool of ::condition_section you can use
+///to create new @containablesection s.
 ///@{
 
 
 /**
- * We use this function to check whether or not we need to enter in the
- * given WHEN section
+ * We give access to a @when only if it's the first @when we're giving access to in the current level of the section tree
+ *
+ * We use this function to check whether or not we need to enter in the given WHEN section.
+ * You gain the access to a @when if:
+ *
+ * \li the @when has not been fully visited;
+ * \li given the parent @containablesection, it's the first @when you can access to;
+ *
+ * To clarify, consider the following situation:
+ *
+ * @dotfile accessWhen
+ *
+ * -# At first you enter in @when 1, then you enter in @when 1,1. After that you avoid both @when 1,2 and @when 1,3 because in the current
+ * @testcase cycle, you've already accessed to a @when within the @containablesection called @when 1. The same can be said for @when 2:
+ * in the current @testcase cycle, you've already accessed to a @when within the @containablesection called @testcase.
+ * -# In the second @testcase cycle, you still enter in @when 1 but, since @when 1,1 has already been visited, you gain the access to @when 1,2.
+ * Again, you avoid entering in @when 1,3 since you've already gained access to a @when in the same level (namely @when 1,2). @when 2 follows the
+ * same principle, since you've entered in @when 1.
+ * -# In the third loop, you gain access, as per usual, to @when 1 (since it's not fully visited yet). Within it, you access to @when 1,3. After it, @when 1
+ * is finally fully visited. Again, you don't access to @when 2 since you've visited @when 1 in this @testcase cycle loop.
+ * -# Finally you avoid entering in @when 1 since it's fully visited but you access to @when 2.
  *
  * @param[in] model the model involved
  * @param[in] section the section we're trying to access
  * @return
- * 	\li true if we can access to section \c section;
- * 	\li false otherwise
+ * 	\li \true if we can access to section \c section;
+ * 	\li \false otherwise
  */
 bool getAccess_When(ct_model_t * model, Section * section);
 
@@ -251,11 +327,33 @@ void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToS
 /**
  * Main macro of CrashC
  *
- * \definition Containable Section
- * A containable section is a piece of developer code. Containable sections may be hierarchical organized; access to containable section
- * may be granted depending on specific conditions. Containable sections allows to forcefully change the flow of the developer code,
+ * @definition
+ * A containable section is defined as a piece of developer code you might want to test. To delimit it, containable section
+ * are often wrap in curly brackets. Containable sections may be hierarchical organized: that is, one containable section X may contain
+ * multiple "children" containable sections, which have one and only parent containable section, namely X.
+ * Access to containable section may be granted depending on **specific conditions**.
+ * The main goal of containable sections is to forcefully change the flow of the developer code,
  * regardless on how the code may appear from the outside. For example, code in \c WHEN sections seems to be executable just after the code
  * shown before it. Actually code in \c WHEN section is executed depending on a much more complex condition.
+ * Concretely a @containablesection is 2 nested for...loop cycle that, at the end, are just 2 masked \c if conditions.
+ *
+ *
+ * @definition
+ * ::CONTAINABLESECTION is 2 nested for...loop cycles. The outermost is the **parent switcher**, allowing you to keep synchronized the
+ * @containablesection the code is actually in with the metadata representing @containablesection, namely the tree formed by ::Section.
+ * This syncronization is a two-pass system: first it change the ct_model_t::current_section from the parent @containablesection to the child one,
+ * **regardless** if you have the access to the child. After fully execute the **access cycle**, it repairs ct_model_t::current_section by updating
+ * it from the child to the parent. Code-wise, just like ::runOnceAndCheckAccessToSection, we model the if with a for loop. Since the for loop condition is run twice, we need to ensure the
+ * cycle condition is in the first call @true whilst in the second one @false (this ensure the "if" behaviour"). Moreover we want to perform additional
+ * code. Such operation is done by ::runOnceAndDoWorkAtEnd.
+ *
+ *
+ * @definition
+ * ::CONTAINABLESECTION is composed by 2 loops: the most inner one is the **access cycle** that checks if we can **actually enter** in the @containablesection
+ * represented by a  Section data structure. If the condition is not surpassed, the access cycle immediately release the control to the **parent switcher**. Otherwise
+ * the @containablesection source code is executed. The for is implementing an \c if condition with the added feature to execute call code at the end. This function has to be called inside
+ * the condition check of the for loop and ensures the loop behaves like an \c if: this is necessary because for loops condition has to be checked twice: one
+ * to check if we can access to the section and one (if we have entered inside the loop) to exit from the loop itself
  *
  * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
  * @param[in] parent the ::Section this CONTAINABLESECTION is contained
