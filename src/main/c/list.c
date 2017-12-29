@@ -17,18 +17,18 @@
 
 
 typedef struct list_cell {
-	///represents the payload inside this cell of the ct_list_t
+	///represents the payload inside this cell of the list
 	void* payload;
-	///a pointer to the next element of the ct_list_t. Can be NULL
+	///a pointer to the next element of the list. Can be NULL
 	struct list_cell* next;
 } ct_list_cell_t;
 
 typedef struct list {
-	///number of elements inside the ct_list_t. Allows count operation to be O(1)
+	///number of elements inside the list. Allows count operation to be O(1)
 	int size;
-	///pointer to the first element of the ct_list_t. Can be NULL
+	///pointer to the first element of the list. Can be NULL
 	ct_list_cell_t* head;
-	///pointer to the last element of the ct_list_t. Can be NULL
+	///pointer to the last element of the list. Can be NULL
 	ct_list_cell_t* tail;
 } ct_list_t;
 
@@ -203,7 +203,7 @@ void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** restrict previou
 		lst->tail = previous;
 		free(cell_to_remove);
 	} else {
-		//we're removing an element inside the ct_list_t
+		//we're removing an element inside the list
 		previous->next = cell_to_remove->next;
 		lst->size--;
 		free(cell_to_remove);
