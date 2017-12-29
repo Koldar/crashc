@@ -1,7 +1,7 @@
 /*
  * \file list.h
  *
- * Represents a list. The list implemented is a simple one (not double-linked).
+ * Represents a list. The implemented list is a simple one (not double-linked).
  * In the memory, it might resemble to:
  *
  * \dot
@@ -24,48 +24,42 @@
 #define LIST_H_
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "typedefs.h"
-#include "stdbool.h"
 #include "macros.h"
 #include "errors.h"
 
 
-typedef struct list list;
-typedef struct list_cell list_cell;
+typedef struct list ct_list_t;
+typedef struct list_cell ct_list_cell_t;
 
-/**
- * a list of integers.
- * Integers are stored inside the pointer to a structure itself
- */
-typedef list int_list;
+ct_list_cell_t* ct_next_list_cell(const ct_list_cell_t* cell);
 
-list_cell* getNextInListCell(const list_cell* cell);
+void* ct_list_cell_payload(const ct_list_cell_t* cell);
 
-void* getPayloadInListCell(const list_cell* cell);
-
-list_cell* getHeadInList(const list* l);
+ct_list_cell_t* ct_list_head_cell(const ct_list_t* l);
 
 /**
  * Initialize a new list inside the memory.
  *
- * Use ::destroyList or ::destroyListWithElement to release the memory from the list
+ * Use ::ct_destroy_list or ::ct_destroy_list_with_elements to release the memory from the ct_list_t
  *
- * @return the list requested
+ * @return the requested list
  */
-list* initList();
+ct_list_t* ct_init_list();
 
-void destroyList(list* l);
+void ct_destroy_list(ct_list_t* l);
 
-void destroyListWithElement(list* l, ct_destructor_t d);
+void ct_destroy_list_with_elements(ct_list_t* l, ct_destructor_t d);
 
-void clearList(list* l);
+void ct_clear_list(ct_list_t* l);
 
-void addHeadInList(list* l, void* el);
+void ct_add_head_in_list(ct_list_t* l, void* el);
 
-void addTailInList(list* l, void* el);
+void ct_add_tail_in_list(ct_list_t* l, void* el);
 
-int getLengthOfList(const list* l);
+int ct_list_length(const ct_list_t* l);
 
 /**
  * Adds all the elements of \c src into \c dst
@@ -76,7 +70,7 @@ int getLengthOfList(const list* l);
  * @param[inout] dst the list that will accept all the elements inside \c scc;
  * @param[inout] src the list whose elements will be tranferred to \c
  */
-void moveListContents(list* restrict dst, list* restrict src);
+void ct_move_list_contents(ct_list_t* restrict dst, ct_list_t* restrict src);
 
 /**
  * Get the tail of the list
@@ -84,7 +78,7 @@ void moveListContents(list* restrict dst, list* restrict src);
  * @param [in] l the list to handle
  * @return the tail of the list or NULL if the list is empty
  */
-void* getLastElementOfList(const list* l);
+void* ct_list_last_element(const ct_list_t* l);
 
 /**
  *
@@ -95,17 +89,17 @@ void* getLastElementOfList(const list* l);
  * 	\li true if \c l is empty;
  * 	\li false otherwises
  */
-bool isEmptyList(const list* l);
+bool ct_is_list_empty(const ct_list_t* l);
 
 /**
  * Get and remove the head from the list \c l
  *
- * @param[in] l the list involved
+ * @param[in] l the involved list
  * @return
- * 	\li the payload at the head of the list;
- * 	\li NULL if the list is empty;
+ * 	\li The payload at the head of the list;
+ * 	\li NULL Wheter the list is empty;
  */
-void* popFromList(list* l);
+void* ct_pop_from_list(ct_list_t* l);
 
 /**
  * Fetch the head of the list
@@ -115,7 +109,7 @@ void* popFromList(list* l);
  * 	\li the head fo the list;
  * 	\li NULL if \c l is empty;
  */
-void* getHeadOfList(const list* l);
+void* ct_list_head(const ct_list_t* l);
 
 /**
  * Fetch the tail of the list
@@ -125,7 +119,7 @@ void* getHeadOfList(const list* l);
  * 	\li the tail of the list;
  * 	\li NULL if \c l is empty
  */
-void* getTailOfList(const list* l);
+void* ct_list_tail(const ct_list_t* l);
 
 /**
  * Get the n-th element of the list
@@ -141,10 +135,10 @@ void* getTailOfList(const list* l);
  * 	\li the payload
  * 	\li NULL if the length of \c list is smaller than \c index itself;
  */
-void* getNthElementOfList(const list* list, int index);
+void* ct_get_list_element(const ct_list_t* list, int index);
 
 /**
- * Removes the cell \c cellToRemove in the list
+ * Removes the cell \c cell_to_remove in the list
  *
  * \attention
  * You should use this function only inside ::VARIABLE_ITERATE_ON_LIST. Other uses may (and often will) lead to **undefined behaviour**!
@@ -155,23 +149,23 @@ void* getNthElementOfList(const list* list, int index);
  * \code
  * VARIABLE_ITERATE_ON_LIST(&list, previous, cell, payload) {
  * 	if (conditionToPayload()) {
- * 		removeElementInList(&list, &previous, cell);
+ * 		ct_remove_element_list_cell(&list, &previous, cell);
  * 	}
  * }
  * \endcode
  *
  * @param[in] l the list to change
- * @param[inout] previousCell the cell that is positioned just before the one to remove. After this, previousCell pointer will contain NULL
- * @param[in] cellToRemove the cell you want to remove
+ * @param[inout] previous_cell the cell that is positioned just before the one to remove. After this, previous_cell pointer will contain NULL
+ * @param[in] cell_to_remove the cell you want to remove
  *
  */
-void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cell* restrict cellToRemove);
+void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** restrict previous_cell, ct_list_cell_t* restrict cell_to_remove);
 
 /**
  * Allows you to transparently iterate through a list
  *
  * This macro is *slightly* faster than ::VARIABLE_ITERATE_ON_LIST but it doesn't allow you to
- * safely remove ::list_cell while iterating
+ * safely remove ::ct_list_cell_t while iterating
  *
  * @param[in] _l a double point to the list you want to iterate through;
  * @param[in] cell name of the variable that will represent the cell under analysis
@@ -179,69 +173,69 @@ void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cel
  * @param[in] type type of the variable _payload
  */
 #define ITERATE_ON_LIST(_l, cell, _payload, type) 												\
-		const list* UV(l) = (_l);																		\
-		list_cell* cell = getHeadInList(UV(l)); 												\
-		list_cell* UV(next) = NULL;																\
+		const ct_list_t* UV(l) = (_l);															\
+		ct_list_cell_t* cell = ct_list_head_cell(UV(l)); 										\
+		ct_list_cell_t* UV(next) = NULL;														\
 		type _payload = NULL;																	\
 		if (cell != NULL) {																		\
-			_payload = getPayloadInListCell(cell);												\
-			if (getNextInListCell(cell) != NULL) {												\
-				UV(next) = getNextInListCell(cell);												\
+			_payload = ct_list_cell_payload(cell);												\
+			if (ct_next_list_cell(cell) != NULL) {												\
+				UV(next) = ct_next_list_cell(cell);												\
 			}																					\
 		}																						\
 		for (																					\
 				;																				\
 				cell != NULL;																	\
 				cell = UV(next), 																\
-				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, 					\
-				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL					\
+				UV(next) = (cell != NULL) ? ct_next_list_cell(cell) : NULL, 					\
+				_payload = (cell != NULL) ? ct_list_cell_payload(cell) : NULL					\
 		)
 
 /**
  * Allows you to transparently iterate through a list
  *
  * This macro is *slightly* slower than ::ITERATE_ON_LIST but allows you to
- * safely remove ::list_cell while iterating.
+ * safely remove ::ct_list_cell_t while iterating.
  *
  * A typical example might be:
  *
  * \code
  * VARIABLE_ITERATE_ON_LIST(&list, previous, cell, payload) {
  * 	if (conditionToPayload()) {
- * 		removeElementInList(&list, &previous, cell);
+ * 		ct_remove_element_list_cell(&list, &previous, cell);
  * 	}
  * }
  * \endcode
  *
- * @param[in] _l a double point to the list you want to iterate through;
- * @param[in] previousCell name of the variable that will represent the cell just analyzed.
+ * @param[in] _l a double point to the ct_list_t you want to iterate through;
+ * @param[in] previous_cell name of the variable that will represent the cell just analyzed.
  * @param[in] cell name of the variable that will represent the cell under analysis
  * @param[in] _payload name of the variable representing <tt>cell->payload</tt>
  * @param[in] type type of the variable _payload
  */
-#define VARIABLE_ITERATE_ON_LIST(_l, previousCell, cell, _payload, type) \
-		list* UV(l) = (_l);\
-		list_cell* UV(next) = NULL;\
-		type _payload = NULL;\
-		if (getHeadInList(UV(l)) != NULL) {\
-			_payload = getPayloadInListCell(getHeadInList(UV(l)));\
-			if (getNextInListCell(getHeadInList(UV(l))) != NULL) {\
-				UV(next) = getNextInListCell(getHeadInList(UV(l)));\
-			}\
-		}\
-		for (\
-				list_cell \
-				*previousCell = NULL, \
-				*UV(previousCellTmp) = NULL, \
-				*cell = getHeadInList(UV(l)) \
-				; \
-				cell != NULL \
-				; \
-				UV(previousCellTmp) = previousCell == NULL ? UV(previousCellTmp) : cell, \
-				previousCell = UV(previousCellTmp), \
-				cell = UV(next), \
-				UV(next) = (cell != NULL) ? getNextInListCell(cell) : NULL, \
-				_payload = (cell != NULL) ? getPayloadInListCell(cell) : NULL\
+#define VARIABLE_ITERATE_ON_LIST(_l, previous_cell, cell, _payload, type) 						\
+		ct_list_t* UV(l) = (_l);																\
+		ct_list_cell_t* UV(next) = NULL;														\
+		type _payload = NULL;																	\
+		if (ct_list_head_cell(UV(l)) != NULL) {													\
+			_payload = ct_list_cell_payload(ct_list_head_cell(UV(l)));							\
+			if (ct_next_list_cell(ct_list_head_cell(UV(l))) != NULL) {							\
+				UV(next) = ct_next_list_cell(ct_list_head_cell(UV(l)));							\
+			}																					\
+		}																						\
+		for (																					\
+				ct_list_cell_t 																	\
+				*previous_cell = NULL, 															\
+				*UV(previous_cell_tmp) = NULL, 													\
+				*cell = ct_list_head_cell(UV(l)) 												\
+				; 																				\
+				cell != NULL 																	\
+				; 																				\
+				UV(previous_cell_tmp) = previous_cell == NULL ? UV(previous_cell_tmp) : cell, 	\
+				previous_cell = UV(previous_cell_tmp), 											\
+				cell = UV(next), 																\
+				UV(next) = (cell != NULL) ? ct_next_list_cell(cell) : NULL, 					\
+				_payload = (cell != NULL) ? ct_list_cell_payload(cell) : NULL					\
 		)
 
 

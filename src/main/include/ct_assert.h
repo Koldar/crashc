@@ -115,7 +115,7 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
  * a specific assertion type.
  */
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
-	addTailInList((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
+	ct_add_tail_in_list((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
 	if ((asserted) != true) {																												\
 		failed_callback((model));																											\
 	}																																		\

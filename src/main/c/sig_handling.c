@@ -62,7 +62,7 @@ static void ct_failsig_handler(int signum) {
 	(ct_model)->current_section->signalDetected = signum;
 
 	(ct_model)->current_snapshot->status = SNAPSHOT_SIGNALED;
-	ct_test_report_t* report = getLastElementOfList((ct_model)->test_reports_list);
+	ct_test_report_t* report = ct_list_last_element((ct_model)->test_reports_list);
 	ct_update_test_outcome(report, (ct_model)->current_snapshot);
 	(ct_model)->current_snapshot = NULL;
 

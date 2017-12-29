@@ -87,7 +87,7 @@ void ct_default_report_summary(ct_model_t * model) {
 void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
-	list* assertion_reports = snapshot->assertion_reports;
+	ct_list_t* assertion_reports = snapshot->assertion_reports;
 
 	ITERATE_ON_LIST(assertion_reports, report_cell, report, ct_assert_report_t*) {
 		for (int i = 0; i < level; i++) {
@@ -106,7 +106,7 @@ void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, 
 
 void ct_default_report(ct_model_t * model) {
 
-	list * report_list = model->test_reports_list;
+	ct_list_t * report_list = model->test_reports_list;
 
 	//TODO: Move the stats-acquiring code away from the report producer
 	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
@@ -119,7 +119,7 @@ void ct_default_report(ct_model_t * model) {
 		ct_default_test_report(model, report);
 	}
 
-	model->statistics->total_tests = getLengthOfList(report_list);
+	model->statistics->total_tests = ct_list_length(report_list);
 	ct_default_report_summary(model);
 
 }

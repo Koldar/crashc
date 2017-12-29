@@ -138,7 +138,7 @@ struct SectionSnapshot {
 	/**
 	 * The list of reports of the assertions executed in this snapshot
 	 */
-	list * assertion_reports;
+	ct_list_t * assertion_reports;
 
 	/**
 	 * The pointer to the parent snapshot in the snapshot tree

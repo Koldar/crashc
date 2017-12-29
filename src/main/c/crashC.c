@@ -151,7 +151,7 @@ void callbackEnteringWhen(ct_model_t * model, Section * section) {
 }
 
 void callbackExitAccessGrantedTestcase(ct_model_t * model, Section ** pointerToSetAsParent, Section * section) {
-	ct_test_report_t * report = getLastElementOfList(model->test_reports_list);
+	ct_test_report_t * report = ct_list_last_element(model->test_reports_list);
 	SectionSnapshot * last_snapshot = model->current_snapshot;
 
 	ct_update_snapshot_status(section, model->current_snapshot);
@@ -183,7 +183,7 @@ void updateCurrentSnapshot(ct_model_t * model, Section * section) {
 void callbackEnteringTestcase(ct_model_t * model, Section * section) {
 	updateCurrentSnapshot(model, model->current_section);
 	ct_test_report_t* report = ct_init_test_report(model->current_snapshot);
-	addTailInList(model->test_reports_list, report);
+	ct_add_tail_in_list(model->test_reports_list, report);
 }
 
 void signalCallback_doNothing(int signal, Section* signalledSection, Section* section, Section* targetSection) {
