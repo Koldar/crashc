@@ -585,7 +585,7 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  */
 #define TESTS_START int main(const int argc, char* const args[]) { 																\
 		ct_model = ct_setup_default_model();																					\
-		parseCommandLineArguments(argc, args, CC_TAGS_SEPARATOR, (ct_model)->run_only_if_tags, (ct_model)->exclude_tags); 		\
+		ct_parse_args(argc, args, CC_TAGS_SEPARATOR, (ct_model)->run_only_if_tags, (ct_model)->exclude_tags); 		\
 		ct_register_signal_handlers();
 
 ///@defgroup hooks CrashC developer hooks
