@@ -627,6 +627,8 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  * Progressive numerical IDs are strongly recomended as the framework provides a few
  * really useful macros to easily register their testsuites.
  * Note that ID coherency is left as a user responsability.
+ *
+ * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
 #define TESTSUITE(id) void suite_ ## id()
 
@@ -712,7 +714,14 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
 
 
 /**
- * Macro that registers a single test suite given its ID.
+ * Macro registering a single test suite given its ID
+ *
+ * \pre
+ * 	\li test suite generated with ::TESTSUITE macro with the same \c id needs to have been delcared
+ * \post
+ * 	\li the @testsuite with id set to \c id has been register in @crashC framework
+ *
+ * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
  #define REGISTER_SUITE(id) 								\
      void suite_ ## id(); 								\
@@ -720,14 +729,24 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
 
 /**
  * Alias of ::REGISTER_SUITE
+ *
+ * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
 #define REG_SUITE(id) REGISTER_SUITE(id)
 
 /**
- * Registers all the TESTSUITES whose ID is specified in the macro arguments.
+ * Register a batch of test suites all in one
+ *
+ * This macro accepts a variadic arguments. Each argument represents the \c id of a @testsuite to register.
+ *
+ * \pre
+ * 	\li every \c id within the variadic argument needs to have a corresponding ::TEST_SUITE call with the same \c id
+ *
  * Note that for a single use of the macro the maximum number of specified IDs is 64
  * due to CPP limitations. This problem is easily solved by the use of two or more
  * consequent macro uses.
+ *
+ * @param[in] ... a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
 #define REGTESTS(...) GET_FE_NAME(__VA_ARGS__, FE_64, FE_63, FE_62, 							\
     FE_61, FE_60, FE_59, FE_58, FE_57, FE_56, FE_55, FE_54, FE_53, FE_52, FE_51,FE_50, 			\
