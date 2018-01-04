@@ -165,7 +165,7 @@ bool ct_run_once_final_work(ct_model_t* model, Section* section, Section** point
  * 		}
  * 	}
  * @endcode
- * For example, this function creates the section representing the @containablesection \c WHEN "a" if there is no section inside the section tree
+ * For example, this function creates the section representing the @containablesection @when "a" if there is no section inside the section tree
  * of @testcase representing it; otherwise, it just fetches such Section.
  *
  * \post
@@ -418,7 +418,7 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  * @param[in] section_type (whose type is ::section_type) the type of the ::Section representing this @containablesection
  * @param[in] description (whose type is <tt>char*</tt>) a brief description of this @containablesection
  * @param[in] tags a value (whose type is <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
- * @param[in] condition the condition (whose type is ::condition_section)you need to clear in order to gain access to the internal test code of the @containablesection
+ * @param[in] condition the condition (whose type is ::ct_access_callback_t)you need to clear in order to gain access to the internal test code of the @containablesection
  * @param[in] access_granted_callback a callback (whose type is ::ct_enter_callback_t) representing a set of instructions to execute if you gain access to the internal test code. This function will be execute before executing the actual test code
  * @param[in] back_to_parent_callback a callback (whose type is ::ct_exit_callback_t) executed when you're surpassing this @containablesection. Note that this function will be called regardless if you actually enter inside the code or not.
  * @param[in] exit_access_granted_callback a callback (whose type is ::ct_exit_callback_t)to execute if you entered inside the test code of the @containablesection. Called after \c back_to_parent_callback;
@@ -717,9 +717,9 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  * Macro registering a single test suite given its ID
  *
  * \pre
- * 	\li test suite generated with ::TESTSUITE macro with the same \c id needs to have been delcared
+ * 	\li test suite generated with ::TESTSUITE macro with the same \c id needs to have been declared
  * \post
- * 	\li the @testsuite with id set to \c id has been register in @crashC framework
+ * 	\li the @testsuite with id set to \c id has been register in @crashc framework
  *
  * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
@@ -740,7 +740,7 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  * This macro accepts a variadic arguments. Each argument represents the \c id of a @testsuite to register.
  *
  * \pre
- * 	\li every \c id within the variadic argument needs to have a corresponding ::TEST_SUITE call with the same \c id
+ * 	\li every \c id within the variadic argument needs to have a corresponding ::TESTSUITE call with the same \c id
  *
  * Note that for a single use of the macro the maximum number of specified IDs is 64
  * due to CPP limitations. This problem is easily solved by the use of two or more
