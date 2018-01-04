@@ -147,7 +147,7 @@ bool updateItemInHT(HT* ht, unsigned long key, void* data);
  * undefined behaviour if the key already exists in the hashtable
  *
  *
- * @param[in] ht the hashtable to handle
+ * @param[inout] ht the hashtable to handle
  * @param[in] key the key of \c data
  * @param[in] data the actual value to store in the hastable
  */
@@ -159,7 +159,7 @@ void addItemInHTWithKey(HT* ht, unsigned long key, void* data);
  * \note
  * if the values in the hastable are in the memory as well, they won't be freed at all
  *
- * @param[in] ht the hashtable to remove
+ * @param[inout] ht the hashtable to remove
  * @see destroyHTWithElements
  */
 void destroyHT(HT* ht);
@@ -167,7 +167,7 @@ void destroyHT(HT* ht);
 /**
  * like ::destroyHT but it destory the values in the hashtable from the memory as well
  *
- * @param[in] ht the hashtable to remove
+ * @param[inout] ht the hashtable to remove
  * @param[in] d a function to use to dispose of the elements in the hashtable
  */
 void destroyHTWithElements(HT* ht, ct_destructor_t d);
@@ -178,7 +178,7 @@ void destroyHTWithElements(HT* ht, ct_destructor_t d);
  * \post
  * 	\li don't use \c htCell after this call because it will cause an invalid read
  *
- * @param[in] ht the hash table to change
+ * @param[inout] ht the hash table to change
  * @param[in] htCell the cell to remove
  */
 void deleteHTCell(HT* ht, HTCell* htCell);
@@ -186,7 +186,7 @@ void deleteHTCell(HT* ht, HTCell* htCell);
 /**
  * like ::deleteHTCell but it delete from the memory also the element inside the cell
  *
- * @param[in] htCell the cell to remove from the memory
+ * @param[inout] htCell the cell to remove from the memory
  * @param[in] d the destructor to use to remove the data inside the \c htCell
  */
 void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d);
@@ -197,7 +197,7 @@ void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d);
  * \note
  * the element won't be removed from the memory at all
  *
- * @param[in] ht the hashtable to handle
+ * @param[inout] ht the hashtable to handle
  * @param[in] key the key of the value to remove from the hashtable
  * @see deleteItemInHTWithElement
  */
@@ -206,7 +206,7 @@ bool deleteItemInHT(HT* ht, unsigned long key);
 /**
  * like ::deleteItemInHT but it removed the value from memory as well
  *
- * @param[in] ht the hashtable to handle
+ * @param[inout] ht the hashtable to handle
  * @param[in] key the key of the value to remove from the hashtable
  * @param[in] d the function to use to dispose of the value removed from the hashtable
  */
@@ -238,7 +238,7 @@ void* getFirstItemInHT(const HT* ht);
  * If one key does not exist in the hashtable, after this operation it will exist whilst the
  * former one will be removed
  *
- * @param[in] ht the ht to handle
+ * @param[inout] ht the ht to handle
  * @param[in] key1 the first key
  * @param[in] key2 the second key
  * @return
