@@ -16,56 +16,55 @@
 #include "errors.h"
 
 
-
 typedef struct list_cell {
-	///represents the paylaod inside this cell of the list
+	///represents the payload inside this cell of the list
 	void* payload;
 	///a pointer to the next element of the list. Can be NULL
 	struct list_cell* next;
-} list_cell;
+} ct_list_cell_t;
 
 typedef struct list {
 	///number of elements inside the list. Allows count operation to be O(1)
 	int size;
 	///pointer to the first element of the list. Can be NULL
-	list_cell* head;
+	ct_list_cell_t* head;
 	///pointer to the last element of the list. Can be NULL
-	list_cell* tail;
-} list;
+	ct_list_cell_t* tail;
+} ct_list_t;
 
-list_cell* getNextInListCell(const list_cell* cell) {
+ct_list_cell_t* ct_next_list_cell(const ct_list_cell_t* cell) {
 	return cell->next;
 }
 
-void* getPayloadInListCell(const list_cell* cell) {
+void* ct_list_cell_payload(const ct_list_cell_t* cell) {
 	return cell->payload;
 }
 
-list_cell* getHeadInList(const list* l) {
+ct_list_cell_t* ct_list_head_cell(const ct_list_t* l) {
 	return l->head;
 }
 
-list* initList() {
-	list* retVal = malloc(sizeof(list));
-	if (retVal == NULL) {
+ct_list_t* ct_init_list() {
+	ct_list_t* ret_val = malloc(sizeof(ct_list_t));
+	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->head = NULL;
-	retVal->size = 0;
-	retVal->tail = NULL;
+	ret_val->head = NULL;
+	ret_val->size = 0;
+	ret_val->tail = NULL;
 
-	return retVal;
+	return ret_val;
 }
 
-void destroyList(list* lst) {
+void ct_destroy_list(ct_list_t* lst) {
 	ITERATE_ON_LIST(lst, cell, value, void*) {
 		free(cell);
 	}
 	free(lst);
 }
 
-void destroyListWithElement(list* lst, ct_destructor_t d) {
+void ct_destroy_list_with_elements(ct_list_t* lst, ct_destructor_t d) {
 	ITERATE_ON_LIST(lst, cell, value, void*) {
 		d(cell->payload);
 		free(cell);
@@ -73,7 +72,7 @@ void destroyListWithElement(list* lst, ct_destructor_t d) {
 	free(lst);
 }
 
-void clearList(list* l) {
+void ct_clear_list(ct_list_t* l) {
 	ITERATE_ON_LIST(l, cell, value, void*) {
 		free(cell);
 	}
@@ -82,8 +81,8 @@ void clearList(list* l) {
 	l->tail = NULL;
 }
 
-void addHeadInList(list* l, void* el) {
-	list_cell* new_cell = malloc(sizeof(list_cell));
+void ct_add_head_in_list(ct_list_t* l, void* el) {
+	ct_list_cell_t* new_cell = malloc(sizeof(ct_list_cell_t));
 	if (new_cell == NULL) {
 		MALLOCERRORCALLBACK();
 	}
@@ -98,8 +97,8 @@ void addHeadInList(list* l, void* el) {
 	}
 }
 
-void addTailInList(list* l, void* el) {
-	list_cell* new_cell = malloc(sizeof(list_cell));
+void ct_add_tail_in_list(ct_list_t* l, void* el) {
+	ct_list_cell_t* new_cell = malloc(sizeof(ct_list_cell_t));
 	if (new_cell == NULL) {
 		MALLOCERRORCALLBACK();
 	}
@@ -118,13 +117,13 @@ void addTailInList(list* l, void* el) {
 
 }
 
-int getLengthOfList(const list* l) {
+int ct_list_length(const ct_list_t* l) {
 	return l->size;
 }
 
-void moveListContents(list* restrict dst, list* restrict src) {
+void ct_move_list_contents(ct_list_t* restrict dst, ct_list_t* restrict src) {
 	//*********** DST **********
-	dst->size += getLengthOfList(src);
+	dst->size += ct_list_length(src);
 	if (dst->head == NULL) {
 		dst->head = src->head;
 	} else {
@@ -138,27 +137,27 @@ void moveListContents(list* restrict dst, list* restrict src) {
 	src->tail = NULL;
 }
 
-void* getLastElementOfList(const list* l) {
+void* ct_list_last_element(const ct_list_t* l) {
 	if (l->tail == NULL) {
 		return NULL;
 	}
 	return l->tail->payload;
 }
 
-bool isEmptyList(const list* l) {
+bool ct_is_list_empty(const ct_list_t* l) {
 	return l->size == 0;
 }
 
-void* popFromList(list* l) {
-	if (isEmptyList(l)) {
+void* ct_pop_from_list(ct_list_t* l) {
+	if (ct_is_list_empty(l)) {
 		return NULL;
 	}
 
-	list_cell* cell = l->head;
+	ct_list_cell_t* cell = l->head;
 	void* retVal = cell->payload;
 	l->head = l->head->next;
 	l->size--;
-	if (isEmptyList(l)) {
+	if (ct_is_list_empty(l)) {
 		l->tail = NULL;
 	}
 
@@ -166,21 +165,21 @@ void* popFromList(list* l) {
 	return retVal;
 }
 
-void* getHeadOfList(const list* l) {
-	if (isEmptyList(l)) {
+void* ct_list_head(const ct_list_t* l) {
+	if (ct_is_list_empty(l)) {
 		return NULL;
 	}
 	return l->head->payload;
 }
 
-void* getTailOfList(const list* l) {
-	if (isEmptyList(l)) {
+void* ct_list_tail(const ct_list_t* l) {
+	if (ct_is_list_empty(l)) {
 		return NULL;
 	}
 	return l->tail->payload;
 }
 
-void* getNthElementOfList(const list* l, int index) {
+void* ct_get_list_element(const ct_list_t* l, int index) {
 	ITERATE_ON_LIST(l, cell, payload, void*) {
 		if (index == 0) {
 			return payload;
@@ -190,25 +189,25 @@ void* getNthElementOfList(const list* l, int index) {
 	return NULL;
 }
 
-void removeElementInListCell(list* l,list_cell** restrict previousCell, list_cell* restrict cellToRemove) {
-	list* lst = l;
-	list_cell* previous = *previousCell;
+void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** restrict previous_cell, ct_list_cell_t* restrict cell_to_remove) {
+	ct_list_t* lst = l;
+	ct_list_cell_t* previous = *previous_cell;
 
 	if (previous == NULL) {
 		//we're removing the head
-		popFromList(l);
-	} else if (cellToRemove->next == NULL){
+		ct_pop_from_list(l);
+	} else if (cell_to_remove->next == NULL){
 		//we're removing the tail
 		previous->next = NULL;
 		lst->size--;
 		lst->tail = previous;
-		free(cellToRemove);
+		free(cell_to_remove);
 	} else {
 		//we're removing an element inside the list
-		previous->next = cellToRemove->next;
+		previous->next = cell_to_remove->next;
 		lst->size--;
-		free(cellToRemove);
+		free(cell_to_remove);
 	}
 
-	*previousCell = NULL;
+	*previous_cell = NULL;
 }

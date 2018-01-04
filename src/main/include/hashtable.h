@@ -1,5 +1,6 @@
 /**
  * @file
+ *
  * Implements hashtables
  *
  * This module is just a front end to uthash
@@ -21,8 +22,8 @@
  * destroyHTWithElements(&ht, free);
  * ```
  *
- *  Created on: Jan 24, 2017
- *      Author: koldar
+ * @author koldar
+ * @date Jan 24, 2017
  */
 
 #ifndef HASHTABLE_H_
@@ -39,12 +40,29 @@
  * see <a href="http://troydhanson.github.io/uthash/userguide.html">uthash</a> for further information
  */
 typedef struct HTCell {
+	/**
+	 * the key of a particular value
+	 */
 	unsigned long id;
+	/**
+	 * the value in the hashtable
+	 */
 	void* data;
+	/**
+	 * A field required by \c uthash project to correctly work
+	 */
 	UT_hash_handle hh;
 } HTCell;
 
+/**
+ * Structure representing the facet of the hashtable data structure
+ */
 typedef struct HT {
+	/**
+	 * **head** of the hashtable
+	 *
+	 * \c uthash hashtables are retrieved by a particular ::HTCell called **head**. This field is exactly that
+	 */
 	HTCell* head;
 } HT;
 
@@ -56,6 +74,8 @@ typedef struct HT {
 HT* initHT();
 
 /**
+ * number of item in the hashtable
+ *
  * \note
  * This operation is a O(1)
  *
@@ -76,11 +96,13 @@ int getSizeOfHT(const HT* ht);
 void* getItemInHT(const HT* ht, unsigned long key);
 
 /**
+ * Check if a value in the hashtable has a particular key
+ *
  * @param[in] ht the ht involved
  * @param[in] key the key involved
  * @return
- * 	\li true if there is a value within the hashtable whoe key is \c key;
- * 	\li false otheriwse
+ * 	\li @true if there is a value within the hashtable whose key is \c key;
+ * 	\li @false otheriwse
  */
 bool containsItemInHT(const HT* ht, unsigned long key);
 
@@ -98,8 +120,8 @@ bool containsItemInHT(const HT* ht, unsigned long key);
  * @param[in] key the key of the element to update
  * @param[in] data the new data to overwrite the old one
  * @return
- * 	\li true if a new element is created;
- * 	\li false if we overwrote the previous one
+ * 	\li @true if a new element is created;
+ * 	\li @false if we overwrote the previous one
  */
 bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data);
 
@@ -113,15 +135,41 @@ bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data);
  * @param[in] key the key referring to the element to update
  * @param[in] data the new data that will replace the old one
  * @return
- * 	\li true if we have update with success the data;
- * 	\li false if we couldn't find any cell indexed with \c key;
+ * 	\li @true if we have update with success the data;
+ * 	\li @false if we couldn't find any cell indexed with \c key;
  */
 bool updateItemInHT(HT* ht, unsigned long key, void* data);
 
+/**
+ * Insert a new value within the hashtable
+ *
+ * \note
+ * undefined behaviour if the key already exists in the hashtable
+ *
+ *
+ * @param[in] ht the hashtable to handle
+ * @param[in] key the key of \c data
+ * @param[in] data the actual value to store in the hastable
+ */
 void addItemInHTWithKey(HT* ht, unsigned long key, void* data);
 
+/**
+ * Release the hashtable from the memory
+ *
+ * \note
+ * if the values in the hastable are in the memory as well, they won't be freed at all
+ *
+ * @param[in] ht the hashtable to remove
+ * @see destroyHTWithElements
+ */
 void destroyHT(HT* ht);
 
+/**
+ * like ::destroyHT but it destory the values in the hashtable from the memory as well
+ *
+ * @param[in] ht the hashtable to remove
+ * @param[in] d a function to use to dispose of the elements in the hashtable
+ */
 void destroyHTWithElements(HT* ht, ct_destructor_t d);
 
 /**
@@ -143,21 +191,44 @@ void deleteHTCell(HT* ht, HTCell* htCell);
  */
 void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d);
 
+/**
+ * Remove an element from the hashtable
+ *
+ * \note
+ * the element won't be removed from the memory at all
+ *
+ * @param[in] ht the hashtable to handle
+ * @param[in] key the key of the value to remove from the hashtable
+ * @see deleteItemInHTWithElement
+ */
 bool deleteItemInHT(HT* ht, unsigned long key);
 
+/**
+ * like ::deleteItemInHT but it removed the value from memory as well
+ *
+ * @param[in] ht the hashtable to handle
+ * @param[in] key the key of the value to remove from the hashtable
+ * @param[in] d the function to use to dispose of the value removed from the hashtable
+ */
 bool deleteItemInHTWithElement(HT* ht, unsigned long key, ct_destructor_t d);
 
+/**
+ * checks if the hashtable contains no values
+ *
+ * @param[in] ht the hashtable to handle
+ * @return @true if the hashtable contains no values; @false otherwise;
+ */
 bool isHTEmpty(const HT* ht);
 
 /**
  * Fetch the first item the program can find within the hashtable.
  *
- * Nothing is said about what the softwar epicks up: <b>don't assume it was the first one you have added in the hashtable!</b>
+ * Nothing is said about what the softwar epicks up: **don't assume it was the first one you have added in the hashtable!**
  *
- * @param[in] ht the ht invovled
+ * @param[in] ht the hashtable invovled
  * @return
  * 	\li an item inside the \c ht;
- * 	\li NULL if the \c ht is empty;
+ * 	\li @null if the \c ht is empty;
  */
 void* getFirstItemInHT(const HT* ht);
 
@@ -171,8 +242,8 @@ void* getFirstItemInHT(const HT* ht);
  * @param[in] key1 the first key
  * @param[in] key2 the second key
  * @return
- * 	\li true if a swap is performed;
- * 	\li false if both keys are not present;
+ * 	\li @true if a swap is performed;
+ * 	\li @false if both keys are not present;
  */
 bool swapValuesInHT(HT* ht, unsigned long key1, unsigned long key2);
 
@@ -200,11 +271,6 @@ void clearHT(HT* ht);
  */
 void clearHTWithElements(HT* ht, ct_destructor_t d);
 
-//#define ITERATE_ON_HT(ht, pair) \
-//	HT** UV(_ht) = *(ht);\
-//	HTCell* UV(tmp);\
-//	HASH_ITER(hh, UV(_ht), pair, UV(tmp))
-
 //Picked up from uthash HASH_ITER Definition
 #define ITERATE_ON_HT(_head,el)   \
 	HTCell* UV(head) = ((HT*)(_head))->head;\
@@ -223,6 +289,7 @@ for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));     
   (el) != NULL; ((el)=(tmp)), ((tmp)=DECLTYPE(el)((tmp!=NULL)?(tmp)->hh.next:NULL)))
 #endif
 
+//TODO replace this code with the correct code in Cutils!!!!
 /**
  * Macro allowing you to go through every element of hashtable
  *

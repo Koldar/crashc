@@ -23,8 +23,8 @@ static struct option long_options[] = {
 	{0,					0,					0,	0}
 };
 
-void printHelp(FILE* fout) {
-	int i=0;
+void ct_print_help(FILE* fout) {
+	int i = 0;
 	struct option o;
 
 	while (true) {
@@ -80,7 +80,7 @@ void printHelp(FILE* fout) {
 	}
 }
 
-void parseCommandLineArguments(const int argc, char* const* args, char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags) {
+void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht* run_tags, tag_ht* exclude_tags) {
 
 	while (true) {
 		/* getopt_long stores the option index here. */
@@ -98,24 +98,24 @@ void parseCommandLineArguments(const int argc, char* const* args, char tagSepara
 			break;
 		}
 		case 'h': {
-			printHelp(stdout);
+			ct_print_help(stdout);
 			exit(0);
 			break;
 		}
 		case 'i': {
-			addTagNameInTagHashTable(runIfTags, optarg);
+			addTagNameInTagHashTable(run_tags, optarg);
 			break;
 		}
 		case 'e': {
-			addTagNameInTagHashTable(excludeTags, optarg);
+			addTagNameInTagHashTable(exclude_tags, optarg);
 			break;
 		}
 		case 'I': {
-			populateTagsHT(runIfTags, optarg, tagSeparator);
+			populateTagsHT(run_tags, optarg, tag_separator);
 			break;
 		}
 		case 'E': {
-			populateTagsHT(excludeTags, optarg, tagSeparator);
+			populateTagsHT(exclude_tags, optarg, tag_separator);
 			break;
 		}
 		case '?': {

@@ -47,8 +47,8 @@ void ct_assert_do_nothing(ct_model_t * model) {
 void ct_general_assert_failed(ct_model_t * model) {
 
 	SectionSnapshot* snapshot = model->current_snapshot;
-	ct_assert_report_t* report = getTailOfList(snapshot->assertion_reports);
-	ct_test_report_t* test_report = getTailOfList(model->test_reports_list);
+	ct_assert_report_t* report = ct_list_tail(snapshot->assertion_reports);
+	ct_test_report_t* test_report = ct_list_tail(model->test_reports_list);
 
 	//Update the assertion report
 	report->passed = false;

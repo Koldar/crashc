@@ -19,17 +19,17 @@
  *
  * @param[in] argc \c argc from main
  * @param[in] args \c args from main
- * @param[in] tagSeparator the character used to separate tags in the command line parsing (eg. -I or -E). See \ref tags for further information
- * @param[inout] runIfTags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
- * @param[inout] excludeTags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
+ * @param[in] tag_separator the character used to separate tags in the command line parsing (eg. -I or -E). See \ref tags for further information
+ * @param[inout] run_tags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
+ * @param[inout] exclude_tags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
  */
-void parseCommandLineArguments(const int argc, char* const* args, char tagSeparator, tag_ht* runIfTags, tag_ht* excludeTags);
+void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht* run_tags, tag_ht* exclude_tags);
 
 /**
  * Print the help of the command line
  *
  * @param[inout] fout the file where to write the help on
  */
-void printHelp(FILE* fout);
+void ct_print_help(FILE* fout);
 
 #endif /* COMMAND_LINE_H_ */
