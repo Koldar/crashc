@@ -1,23 +1,22 @@
-/*
- * \file list.h
+/**
+ * @file
  *
- * Represents a list. The list implemented is a simple one (not double-linked).
+ * Basic linked-list implementation
+ *
+ * The list implemented is a simple one (**not** double-linked).
  * In the memory, it might resemble to:
  *
- * \dot
- * 	digraph {
- * 		A;
- * 		B;
- * 		C;
+ * @dot
+ * digraph {
+ * 	rankdir="LR";
+ * 	A -> B -> C;
+ * }
+ * @enddot
  *
- * 		A -> B -> C;
- * 	}
- * \enddot
+ * The list is composed by "cells": each cells contains a pointer to the value in the list and a pointer to the next cell
  *
- *
- *
- *  Created on: May 17, 2017
- *      Author: koldar
+ * @author koldar
+ * @date May 17, 2017
  */
 
 #ifndef LIST_H_
@@ -36,14 +35,36 @@ typedef struct list_cell list_cell;
 
 /**
  * a list of integers.
+ *
  * Integers are stored inside the pointer to a structure itself
  */
 typedef list int_list;
 
+//TODO hide this function
+/**
+ * get the next element of the list
+ *
+ * @param[in] cell the current element of the list
+ * @return a cell containing the next element of the list or @null if we are currently on the tail of the list
+ */
 list_cell* getNextInListCell(const list_cell* cell);
 
+//TODO hide this function
+/**
+ * get the payload of the given list_cell
+ *
+ * @param[in] cell the cell to handle
+ * @return the paylaod within the cell. @null values doesn't necessary mean there is no attached value in the cell: for istance, a list of integer may
+ * have such values representing a simple 0.
+ */
 void* getPayloadInListCell(const list_cell* cell);
 
+/**
+ * get the first element of the list
+ *
+ * @param[in] l the list to handle
+ * @return the first element of the list
+ */
 list_cell* getHeadInList(const list* l);
 
 /**
@@ -55,12 +76,41 @@ list_cell* getHeadInList(const list* l);
  */
 list* initList();
 
+/**
+ * Destroy the list
+ *
+ * \note
+ * The payload within it won't be release from the memory **at all**!
+ *
+ * @param[inout] l the list to handle
+ * @see destroyListWithElement
+ */
 void destroyList(list* l);
 
+/**
+ * like ::destroyList but it releases from the memory all the elements within the list as well
+ *
+ * @param[inout] l the list to handle
+ * @param[in] d a function used to dispose all values within the list from memory
+ */
 void destroyListWithElement(list* l, ct_destructor_t d);
 
+/**
+ * Remove from the list all the payloads
+ *
+ * \note
+ * list items won't be removed from memory at all
+ *
+ * @param[inout] l the list to handle
+ */
 void clearList(list* l);
 
+/**
+ * Adds a new element at the beginning of the list
+ *
+ * @param[inout] l the list we need to prepend a new item in
+ * @param[in] el the item to prepend
+ */
 void addHeadInList(list* l, void* el);
 
 void addTailInList(list* l, void* el);
