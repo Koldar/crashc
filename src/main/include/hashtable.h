@@ -94,7 +94,7 @@ bool containsItemInHT(const HT* ht, unsigned long key);
  * After this operation the old data will be totally overwritten! Be sure to still have a backup reference
  * of the previous object, otherwise memory leak will likely to happen!
  *
- * @param[in] ht the hashtable to analyze
+ * @param[inout] ht the hashtable to analyze
  * @param[in] key the key of the element to update
  * @param[in] data the new data to overwrite the old one
  * @return
@@ -109,7 +109,7 @@ bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data);
  * \note
  * If there is no element indexed with \c key in the hashtable, this function does nothing
  *
- * @param[in] ht the hashtable to alter
+ * @param[inout] ht the hashtable to alter
  * @param[in] key the key referring to the element to update
  * @param[in] data the new data that will replace the old one
  * @return
