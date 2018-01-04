@@ -183,7 +183,7 @@ ct_assert_report_t* ct_init_assert_report(bool is_mandatory, char* asserted_text
 void ct_destroy_assert_report(ct_assert_report_t * report);
 
 /**
- * @defgroup assertCallbacks Assert Outcome Callbacks
+ * @defgroup assertCallbacks "Assert Outcome Callbacks"
  * @brief represents a group of callbacks designed to be passed to ::CT_ASSERTION macro
  * @{
  */
