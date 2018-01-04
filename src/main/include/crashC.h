@@ -180,7 +180,7 @@ bool ct_run_once_final_work(ct_model_t* model, Section* section, Section** point
  * 	\li a newly created section if we're still computing the children of \c parent
  * 	\li the Section::currentChild -th child of \c parent otherwise
  */
-Section* ct_fetch_section(Section* parent, section_type type, const char* decription, const char* tags);
+Section* ct_fetch_section(Section* parent, section_type type, const char* description, const char* tags);
 
 /**
  * Reset the ct_model_t::current_section global variable to the given one after we have detected a signal

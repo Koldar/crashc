@@ -76,10 +76,10 @@ bool ct_run_once_final_work(ct_model_t* model, Section* section, Section** point
  *  @param[in] type the kind of section we're getting.
  *  @see ::section_type
  */
-Section* ct_fetch_section(Section* parent, section_type type, const char* decription, const char* tags) {
+Section* ct_fetch_section(Section* parent, section_type type, const char* description, const char* tags) {
 	if (areWeComputingChildren(parent)) {
 		parent->childrenNumber += 1;
-		return addSectionToParent(initSection(type, parent->levelId + 1, decription, tags), parent);
+		return addSectionToParent(initSection(type, parent->levelId + 1, description, tags), parent);
 	}
 	return getNSection(parent, parent->currentChild);
 }
