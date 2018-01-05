@@ -33,6 +33,9 @@
 
 /**
  * A collection of required variables used by a run of @crashc to soundly operate
+ *
+ * @definition @crashc model
+ * It's a collection of all the needed variables a single thread of @crashc needs
  */
 typedef struct ct_model_t {
 	/**
