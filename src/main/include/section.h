@@ -169,35 +169,7 @@ struct SectionSnapshot {
  *
  * For example the following code is structure as exposed in the graph:
  *
- * @code
- * 	TESTCASE("tc1", "") {
- * 		WHEN("w1", "") {
- * 			// code inside when 1
- * 		}
- * 		WHEN("w2", "") {
- * 			//code
- * 			THEN("t1", "") {
- * 				//code inside then 1
- * 			}
- * 			//code
- * 			THEN("t2", "") {
- * 				//code inside then 2
- * 			}
- * 			//code
- * 		}
- * 		WHEN("w3", "") {
- * 			THEN("t3", "") {
- * 				//code inside then 3
- * 			}
- * 			THEN("t4", "") {
- * 				//code inside then 4
- * 			}
- * 			THEN("t5", "") {
- * 				//code inside then 5
- * 			}
- * 		}
- * 	}
- * @endcode
+ *
  *
  * Sections can be organized as in a tree, like this:
  *

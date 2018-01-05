@@ -1,0 +1,27 @@
+TESTCASE("test case 1", "") {
+ 		WHEN("when 1", "") {
+ 			// code inside when 1
+		}
+ 		WHEN("when 2", "") {
+ 			//code
+ 			THEN("then 1", "") {
+ 				//code inside then 1
+ 			}
+			//code
+ 			THEN("then 2", "") {
+ 				//code inside then 2
+ 			}
+ 			//code
+ 		}
+ 		WHEN("when 3", "") {
+ 			THEN("then 3", "") {
+ 				//code inside then 3
+ 			}
+ 			THEN("then 4", "") {
+ 				//code inside then 4
+			}
+ 			THEN("then 5", "") {
+ 				//code inside then 5
+ 			}
+ 		}
+ 	}
