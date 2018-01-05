@@ -37,7 +37,7 @@
  * @definition @crashc model
  * It's a collection of all the needed variables a single thread of @crashc needs
  */
-typedef struct ct_model_t {
+typedef struct ct_model {
 	/**
 	 * Array containing the pointers to the testsuites functions
 	 */
