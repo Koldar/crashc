@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * Module containing function related to signal handling
+ * Module containing functions related to signal handling
  *
  * @author noodles
  * @date Jul 17, 2017
