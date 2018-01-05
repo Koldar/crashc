@@ -1,3 +1,20 @@
 /**
-	@page section_tree
+	@page section_tree Section tree
+	@brief explanation of what exactly is a section tree
+	
+	@definition
+	The section tree is an in-memory representation of the hirerarchically positioned @containablesection
+	
+	Consider the classic example of @crashc test code:
+	
+	@include exampleOfTestCase.dox
+
+	The section tree is a tree where each node represents a @containablesection. The root is a @testcase, while a node children are all
+	the @containablesection physically (in the C code) contained in a @containablesection.
+	
+	2 C code @containablesection can overlaps, hence the graph obtained is a tree.
+	
+	@crashc exploits such tree to efficiently visit the test code in an elegant way.  
+
+	@dotfile exampleOfTestCase.dot
 */

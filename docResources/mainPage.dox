@@ -4,11 +4,8 @@
 Welcome to CrashC official developer documentation!
 ===================================================
 
-Container loop
---------------
-
-Suppose you're inside a container, a test case, and there are 5 "when" clauses, each of them with 3 "then" clauses.
-You need to run the container a total of 5*3 = 15 times. There is only \b one for loop that needs to handle all
-the possible combinations
+If you want to get comfortable with the underlying concepts of @crashc frameoork, visit the *Related pages*: there is an interesting page where you can see all
+the relevant definitions of @crashc.
+If you want to go directly to the source of @crashc, visit *Modules* and *Files* tabs.
 
 */
