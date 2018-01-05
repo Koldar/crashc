@@ -34,15 +34,11 @@ struct ct_test_statistics_t {
 	/**
 	 * The number of passed tests
 	 *
-	 * @definition Passed Test
-	 * It's a **test** containing no failed assertions
 	 */
 	unsigned int successful_tests;
 	/**
 	 * The number of  failed tests
 	 *
-	 * @definition Failed Test
-	 * It's a **test** which is not a **passed test**.
 	 */
 	unsigned int failed_tests;
 };

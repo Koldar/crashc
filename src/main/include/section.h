@@ -118,7 +118,9 @@ typedef enum {
  *
  * @definition Section Snapshot
  * Represents the in-test information a given ::Section has. Note that one ::Section may actually have several, different, section shapshot, since
- * a @containablesection represented by a ::Section can be run multiple times in a @testcase.
+ * a @containablesection represented by a ::Section can be run multiple times in a @testcase. A section snapshot is tree because it is a run
+ * of a single cycle of a ::LOOPER, like @testcase: in it, the section are organized as a **tree**, not just as a list. For example a @then may have multiple
+ * but different subsection @then.
  *
  * Such information are then used by the test reports to yield to the user a more detailed set of informations about a given test.
  * Note that this structure contains only the fields of a ::Section which are subject to changes during the execution
