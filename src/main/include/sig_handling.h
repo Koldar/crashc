@@ -1,3 +1,12 @@
+/**
+ * @file
+ *
+ * Module containing function related to signal handling
+ *
+ * @author noodles
+ * @date Jul 17, 2017
+ */
+
 #ifndef SIG_HANDLING_H_
 #define SIG_HANDLING_H_
 
@@ -7,16 +16,20 @@
 #include "crashC.h"
 #include "section.h"
 
-//Used by longjmp, no special meaning at the moment
+/**
+ * Used by longjmp, no special meaning at the moment
+ */
 #define SIGNAL_JUMP_CODE 1
-//Used by crashc_sigaction_struct to indicate an empty bitmask
+/**
+ * Used by ct_model_t::_crashc_sigaction to indicate an empty bitmask
+ */
 #define NO_FLAGS 0
 
 /**
- * Registers all the signal CRASHC test framework wants to handle
+ * Registers all the signal @crashc test framework wants to handle
  *
  * \post
- * 	\li ::_crashc_sigaction manages SIGFPE signal
+ * 	\li ct_model_t::_crashc_sigaction manages all signals
  */
 void ct_register_signal_handlers();
 
