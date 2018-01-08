@@ -47,6 +47,7 @@ cd ${CRASHC_BUILD_DEBUG}
 		#sed -i "s/add_definitions(-DTEST_[0-9][0-9]*)/add_definitions(-D${define_value})/" "${CRASHC_MAINFOLDER}/CMakeLists.txt"
 		#now we compile everything
 
+		#example of ${define_value} might be TEST_0015
 		cmake -DU_AUTOMATED_TEST_ISSUE_ID:STRING=${define_value} ../..
 		make
 		if test $? -ne 0
@@ -55,6 +56,14 @@ cd ${CRASHC_BUILD_DEBUG}
 			exit 1
 		fi
 		./CrashCTest > "output.${issueID}.txt"
+		ERROR_CODE=$?
+		#if the run gave a wrong status code exit
+		if test ${ERROR_CODE} -ne 0
+		then
+			echo "Error: the file \"output.${issueID}.txt\" return the error code of ${ERROR_CODE}!"
+			cd ${CRASHC_MAIN_FOLDER}
+			exit 1
+		fi
 		#the file needs to contain something
 		if test `cat output.${issueID}.txt | wc -l` -eq 0
 		then
