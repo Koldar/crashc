@@ -25,6 +25,7 @@ static void computeDotFileOfSectionTree(FILE* fout, const Section* section);
 static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section);
 static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section* section);
 
+//TODO remove this documentation!
 
 /** Adds the given section as a children to the specified parent section.
  *  The function also automatically reorganize the internal sections tree

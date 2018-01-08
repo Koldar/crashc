@@ -669,14 +669,7 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  *
  * @param[in] ... a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
-//#define REGTESTS(...) VARIADIC_MACRO(REGISTER_SUITE, ## __VA_ARGS__)
-#define REGTESTS(...) GET_FE_NAME(__VA_ARGS__, FE_64, FE_63, FE_62, 							\
-    FE_61, FE_60, FE_59, FE_58, FE_57, FE_56, FE_55, FE_54, FE_53, FE_52, FE_51,FE_50, 			\
-    FE_49, FE_48, FE_47,FE_46,FE_45,FE_44,FE_43,FE_42,FE_41,FE_40, 								\
-    FE_39,FE_38,FE_37,FE_36,FE_35,FE_34,FE_33,FE_32,FE_31,FE_30, 								\
-    FE_29,FE_28,FE_27,FE_26,FE_25,FE_24,FE_23,FE_22,FE_21,FE_20, 								\
-    FE_19,FE_18,FE_17,FE_16,FE_15,FE_14,FE_13,FE_12,FE_11,FE_10, 								\
-    FE_9,FE_8,FE_7,FE_6,FE_5,FE_4,FE_3,FE_2,FE_1, FE_0)(REGISTER_SUITE, __VA_ARGS__)
+#define REGTESTS(...) VARIADIC_MACRO(REGISTER_SUITE, ## __VA_ARGS__)
 
 
 #endif
