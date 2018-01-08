@@ -154,6 +154,7 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
 		passed_callback((model));																											\
 	}																																		\
 
+//TODO complete the documentation here
 /**
  * This macro is the basic form of a CrashC assertion.
  *
