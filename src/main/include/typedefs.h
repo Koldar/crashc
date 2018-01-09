@@ -34,9 +34,10 @@ typedef int SectionLevelId;
 /**
  * Represents the signature of a function which release a structure from the memory
  *
- * @param[inout] obj the structure to release from the memory
+ * @param[inout] obj the structure to release from the memory. See <a ref="http://yarchive.net/comp/const.html">Linus thread</a>
+ * for the rationale behind *const*.
  */
-typedef void (*ct_destructor_t)(void* obj);
+typedef void (*ct_destructor_t)(const void* obj);
 
 /**
  * Function signature used to point at the functions which represent @testsuite
