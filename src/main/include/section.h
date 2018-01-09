@@ -55,21 +55,21 @@ typedef enum {
 	/**
 	 * Represents a section @crashc knows exists, but it didn't visited it at all
 	 */
-	SECTION_UNEXEC,
+	SECTION_UNVISITED,
 	/**
 	 * Represents a section @crashc has visited, but it didn't fully visited
 	 *
 	 * @definition Partially visited section
 	 * It's a section where at least one **direct** or **indirect** child section has not been visited
 	 */
-	SECTION_EXEC,
+	SECTION_PARTIALLY_VISITED,
 	/**
 	 * Represents a section CrashC has fully explored
 	 *
 	 * @definition Fully visited section
 	 * It's a section where all its direct and indirect children sections have been fully visited
 	 */
-	SECTION_DONE,
+	SECTION_FULLY_VISITED,
 	/**
 	 * A section has this state when inside its body the program encountered a signal
 	 *
@@ -78,7 +78,7 @@ typedef enum {
 	 *
 	 * @dotfile signalDetectedTree.dot
 	 *
-	 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNEXEC,
+	 * Sections with this status should not be visited anymore (so even if there are undirect children with status ::SECTION_UNVISITED,
 	 * those section will never be run at all.
 	 */
 	SECTION_SIGNAL_DETECTED,
@@ -149,7 +149,7 @@ struct SectionSnapshot {
 	 *
 	 * This pretty much just mimic the status the section to which this snapshot
 	 * refers to, but without some section status which makes no sense in the
-	 * context of the snapshot: for example SECTION_UNEXEC, SECTION_EXEC are one of them
+	 * context of the snapshot: for example SECTION_UNVISITED, SECTION_PARTIALLY_VISITED are one of them
 	 */
 	snapshot_status status;
 	/**
@@ -471,8 +471,8 @@ void markSectionAsSkippedByTag(Section* section);
  *
  * @param[in] section the section to manage
  * @return
- *  \li @true if the status is either ::SECTION_UNEXEC or ::SECTION_EXEC;
- *  \li @false iff the status is either ::SECTION_SKIPPED_BY_TAG, ::SECTION_DONE or ::SECTION_SIGNAL_DETECTED;
+ *  \li @true if the status is either ::SECTION_UNVISITED or ::SECTION_PARTIALLY_VISITED;
+ *  \li @false iff the status is either ::SECTION_SKIPPED_BY_TAG, ::SECTION_FULLY_VISITED or ::SECTION_SIGNAL_DETECTED;
  */
 bool sectionStillNeedsExecution(Section * section);
 

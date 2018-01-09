@@ -130,7 +130,7 @@ bool ct_get_access_when(ct_model_t* model, Section* section) {
 	}
 
 	//we don't access this WHEN if we have already completed it or if it generated a SECTION_SIGNAL
-	if (section->status == SECTION_DONE || section->status == SECTION_SIGNAL_DETECTED) {
+	if (section->status == SECTION_FULLY_VISITED || section->status == SECTION_SIGNAL_DETECTED) {
 		return false;
 	}
 

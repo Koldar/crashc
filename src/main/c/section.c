@@ -82,7 +82,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->alreadyFoundWhen = false;
 	retVal->childrenNumber = 0;
 	retVal->childrenNumberComputed = false;
-	retVal->status = SECTION_UNEXEC;
+	retVal->status = SECTION_UNVISITED;
 	retVal->currentChild = 0;
 	retVal->description = strdup(description);
 	retVal->firstChild = NULL;
@@ -137,9 +137,9 @@ int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer)
 int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer) {
 	int i = 0;
 	switch (ss) {
-	case SECTION_DONE: { i += snprintf(&buffer[i], spaceLeft - i, "DONE"); break; }
-	case SECTION_EXEC: { i += snprintf(&buffer[i], spaceLeft - i, "EXECUTED"); break; }
-	case SECTION_UNEXEC: { i += snprintf(&buffer[i], spaceLeft - i, "UNEXECUTED"); break; }
+	case SECTION_FULLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "DONE"); break; }
+	case SECTION_PARTIALLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "EXECUTED"); break; }
+	case SECTION_UNVISITED: { i += snprintf(&buffer[i], spaceLeft - i, "UNEXECUTED"); break; }
 	case SECTION_SIGNAL_DETECTED: { i += snprintf(&buffer[i], spaceLeft - i, "SIGNAL DETECTED"); break; }
 	default: {
 		fprintf(stderr, "invalid section status %d\n", ss);
@@ -162,7 +162,7 @@ bool isSectionSignalDetected(const Section* section) {
  *  the appropriate section_status_enum value
  */
 void markSectionAsExecuted(Section* section) {
-	section->status = SECTION_EXEC;
+	section->status = SECTION_PARTIALLY_VISITED;
 }
 
 /**
@@ -170,7 +170,7 @@ void markSectionAsExecuted(Section* section) {
  * appropriate section_status_enum value
  */
 void markSectionAsDone(Section * section) {
-	section->status = SECTION_DONE;
+	section->status = SECTION_FULLY_VISITED;
 }
 
 void markSectionAsSkippedByTag(Section* section) {
@@ -178,7 +178,7 @@ void markSectionAsSkippedByTag(Section* section) {
 }
 
 bool sectionStillNeedsExecution(Section * section) {
-	if (section->status == SECTION_UNEXEC || section->status == SECTION_EXEC) {
+	if (section->status == SECTION_UNVISITED || section->status == SECTION_PARTIALLY_VISITED) {
 		return true;
 	}
 	else {
