@@ -190,3 +190,7 @@ void ct_update_current_snapshot(ct_model_t* model, Section* section) {
 void ct_signal_callback_do_nothing(int signal, Section* signaled_section, Section* section, Section* target_section) {
 
 }
+
+void ct_set_crashc_teardown(ct_teardown_t f) {
+	ct_model->ct_teardown = f;
+}

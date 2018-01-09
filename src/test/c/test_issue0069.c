@@ -32,7 +32,7 @@ REGTESTS(11);
 REGTESTS(hello, world);
 //test a single registration with identifier
 REGTESTS(glhf);
-AFTER_TESTS(globalAssert);
+ct_set_crashc_teardown(globalAssert);
 TESTS_END
 
 TESTSUITE(3) {

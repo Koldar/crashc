@@ -45,6 +45,15 @@ typedef void (*ct_destructor_t)(const void* obj);
 typedef void (*test_pointer)(void);
 
 /**
+ * Function signature for a teardown function parameter
+ *
+ * The type of the function pointer of the global teardown function
+ *
+ * @see ct_model::ct_teardown
+ */
+typedef void (*ct_teardown_t)(void);
+
+/**
  * @addtogroup reportFunctionType Report Function Types
  * @brief function types used in ::ct_report_producer_t in order to build a test report human readable
  * @{

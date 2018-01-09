@@ -45,13 +45,13 @@ typedef struct ct_model {
 	/**
 	 * The pointer to the global teardown function
 	 *
-	 * This is NULL by default, and gets populated with a function pointer whenever the user uses the AFTER_TESTS macro.
+	 * This is @null by default, and gets populated with a function pointer whenever the user uses the AFTER_TESTS macro.
 	 *
 	 * @definition
 	 * The global teardown function is the last piece of code to execute before the ct_model_t model used by the framework is tore down.
 	 * It's basically the last place where you can put custom code
 	 */
-	void (*ct_teardown)();
+	ct_teardown_t ct_teardown;
 	/**
 	 * Variablee used to keep track of the @testsuite registered
 	 *

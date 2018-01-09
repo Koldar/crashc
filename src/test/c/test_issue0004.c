@@ -28,7 +28,7 @@ void check_result() {
 TESTS_START
 
 REG_SUITE(1);
-AFTER_TESTS(check_result);
+ct_set_crashc_teardown(check_result);
 
 TESTS_END
 
