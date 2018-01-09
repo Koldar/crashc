@@ -99,6 +99,7 @@ void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht
 		}
 		case 'h': {
 			ct_print_help(stdout);
+			//TODO create an exit macro like CORRECT_EXIT_MACRO
 			exit(0);
 			break;
 		}

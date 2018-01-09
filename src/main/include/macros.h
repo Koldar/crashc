@@ -21,6 +21,15 @@
 #endif
 
 /**
+ * The size of temporary buffers created, when needed, throughout the project
+ *
+ * Enlarge such buffer if you happen to have to deal with longer strings
+ */
+#ifndef CT_BUFFER_SIZE
+#	define CT_BUFFER_SIZE 300
+#endif
+
+/**
  * macro used to perform macro concatenation.
  *
  * @note

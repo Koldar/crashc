@@ -108,7 +108,7 @@ const char* computeNextTagInStr(const char* const str, char separator, char* cha
 }
 
 void populateTagsHT(tag_ht* output, const char* const tags, char separator) {
-	char token[100];
+	char token[CT_BUFFER_SIZE];
 	char* positionToWriteInBuffer = NULL;
 	int tokenId;
 

@@ -136,12 +136,14 @@ int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer)
 
 int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer) {
 	int i = 0;
+	//TODO renamed DONE, EXECUTED and UNEXECUTED to fit section status renaming
 	switch (ss) {
 	case SECTION_FULLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "DONE"); break; }
 	case SECTION_PARTIALLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "EXECUTED"); break; }
 	case SECTION_UNVISITED: { i += snprintf(&buffer[i], spaceLeft - i, "UNEXECUTED"); break; }
 	case SECTION_SIGNAL_DETECTED: { i += snprintf(&buffer[i], spaceLeft - i, "SIGNAL DETECTED"); break; }
 	default: {
+		//TODO create a new error type, like SWITCH_DEFAULT_ERROR_CALLBACK
 		fprintf(stderr, "invalid section status %d\n", ss);
 		exit(1);
 	}
@@ -206,29 +208,32 @@ bool isSectionFullyVisited(Section * section) {
 void drawSectionTree(const Section* section, const char* format, ...) {
 	//create image name
 	va_list ap;
-	char imageTemplate[300];
+	char imageTemplate[CT_BUFFER_SIZE];
 	va_start(ap, format);
-	vsnprintf(imageTemplate, 300, format, ap);
+	vsnprintf(imageTemplate, CT_BUFFER_SIZE, format, ap);
 	va_end(ap);
 
-	char dotFilename[300];
-	strcpy(dotFilename, imageTemplate);
+	char dotFilename[CT_BUFFER_SIZE];
+	strncpy(dotFilename, imageTemplate, CT_BUFFER_SIZE);
+	//TODO here we need to make sure ".dot" can be put within the buffer
 	strcat(dotFilename, ".dot");
 
 	FILE* dotFile = fopen(dotFilename, "w");
 	if (dotFile == NULL) {
 		fprintf(stderr, "Can't create dotFile %s! Exiting...", dotFilename);
+		//TODO create a new error like FILE_ERROR_CALLBACK
 		exit(1);
 	}
 	computeDotFileOfSectionTree(dotFile, section);
 	fclose(dotFile);
 
-	char pngFilename[300];
-	strcpy(pngFilename, imageTemplate);
+	char pngFilename[CT_BUFFER_SIZE];
+	strncpy(pngFilename, imageTemplate, CT_BUFFER_SIZE);
+	//TODO here we need to make sure ".dot" can be put within the buffer
 	strcat(pngFilename, ".png");
 
-	char command[300];
-	snprintf(command, 300, "dot -Tpng -o%s %s", pngFilename, dotFilename);
+	char command[CT_BUFFER_SIZE];
+	snprintf(command, CT_BUFFER_SIZE, "dot -Tpng -o%s %s", pngFilename, dotFilename);
 	system(command);
 	unlink(dotFilename);
 }
@@ -256,8 +261,8 @@ static void computeDotFileOfSectionTree(FILE* fout, const Section* section) {
  * @param[in] section the section where we start writing information from
  */
 static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section) {
-	char buffer[300];
-	populateBufferStringOfSectionStatus(section->status, 300, buffer);
+	char buffer[CT_BUFFER_SIZE];
+	populateBufferStringOfSectionStatus(section->status, CT_BUFFER_SIZE, buffer);
 	fprintf(fout, "\tSECTION%05d [label=\"%s\\nlevel=%d;\\nstatus=%s\", shape=\"box\"];\n", section->id, section->description, section->levelId, buffer);
 
 	if (section->firstChild == NULL) {
