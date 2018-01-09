@@ -12,8 +12,8 @@
 #include "errors.h"
 
 
-static HTCell* initHTCell(void* const data, unsigned long key);
-static void destroyHTCell(HTCell* htCell);
+static HTCell* initHTCell(const void* data, unsigned long key);
+static void destroyHTCell(const HTCell* htCell);
 
 HT* initHT() {
 	HT* retVal = malloc(sizeof(HT));
@@ -48,7 +48,7 @@ bool containsItemInHT(const HT* ht, unsigned long key) {
 	return (tmp != NULL);
 }
 
-bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data) {
+bool addOrUpdateItemInHT(HT* ht, unsigned long key, const void* data) {
 	HTCell* tmp;
 
 	HASH_FIND(hh, ht->head, &key, sizeof(unsigned long), tmp);
@@ -56,23 +56,23 @@ bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data) {
 		addItemInHTWithKey(ht, key, data);
 		return true;
 	} else {
-		tmp->data = data;
+		tmp->data = (void*)data;
 		return false;
 	}
 }
 
-bool updateItemInHT(HT* ht, unsigned long key, void* data) {
+bool updateItemInHT(HT* ht, unsigned long key, const void* data) {
 	HTCell* tmp;
 
 	HASH_FIND(hh, ht->head, &key, sizeof(unsigned long), tmp);
 	if (tmp == NULL) {
 		return false;
 	}
-	tmp->data = data;
+	tmp->data = (void*)data;
 	return true;
 }
 
-void addItemInHTWithKey(HT* ht, unsigned long key, void* data) {
+void addItemInHTWithKey(HT* ht, unsigned long key, const void* data) {
 	HTCell* add = initHTCell(data, key);
 	HASH_ADD(hh,ht->head,id, sizeof(unsigned long), add);
 }
@@ -99,14 +99,14 @@ void destroyHTWithElements(HT* ht, ct_destructor_t d) {
 }
 
 
-void deleteHTCell(HT* ht, HTCell* htCell) {
-	HASH_DEL(ht->head, htCell);
+void deleteHTCell(HT* ht, const HTCell* htCell) {
+	HASH_DEL(ht->head, (HTCell*)htCell);
 	destroyHTCell(htCell);
 }
 
-void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d) {
+void destroyHTCellWithElement(const HTCell* htCell, ct_destructor_t d) {
 	d(htCell->data);
-	free(htCell);
+	free((void*)htCell);
 }
 
 bool deleteItemInHT(HT* ht, unsigned long key) {
@@ -209,14 +209,14 @@ void clearHTWithElements(HT* ht, ct_destructor_t d) {
  * @param[in] f a function with one parameter <tt>void*</tt> returning the hash of the value, aka an int
  * @return a cell of an hash table. You still need to manually add it in the hash table though
  */
-static HTCell* initHTCell(void* const data, unsigned long key) {
+static HTCell* initHTCell(const void* data, unsigned long key) {
 	HTCell* retVal = malloc(sizeof(HTCell));
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
 	retVal->id = key;
-	retVal->data = data;
+	retVal->data = (void*)data;
 
 	return retVal;
 }
@@ -229,6 +229,6 @@ static HTCell* initHTCell(void* const data, unsigned long key) {
  *
  * @param[in] htCell the cell to remove from the memory
  */
-static void destroyHTCell(HTCell* htCell) {
-	free(htCell);
+static void destroyHTCell(const HTCell* htCell) {
+	free((void*)htCell);
 }

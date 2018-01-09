@@ -123,7 +123,7 @@ bool containsItemInHT(const HT* ht, unsigned long key);
  * 	\li @true if a new element is created;
  * 	\li @false if we overwrote the previous one
  */
-bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data);
+bool addOrUpdateItemInHT(HT* ht, unsigned long key, const void* data);
 
 /**
  * Updates the value indexed by \c key to a new value
@@ -138,7 +138,7 @@ bool addOrUpdateItemInHT(HT* ht, unsigned long key, void* data);
  * 	\li @true if we have update with success the data;
  * 	\li @false if we couldn't find any cell indexed with \c key;
  */
-bool updateItemInHT(HT* ht, unsigned long key, void* data);
+bool updateItemInHT(HT* ht, unsigned long key, const void* data);
 
 /**
  * Insert a new value within the hashtable
@@ -151,7 +151,7 @@ bool updateItemInHT(HT* ht, unsigned long key, void* data);
  * @param[in] key the key of \c data
  * @param[in] data the actual value to store in the hastable
  */
-void addItemInHTWithKey(HT* ht, unsigned long key, void* data);
+void addItemInHTWithKey(HT* ht, unsigned long key, const void* data);
 
 /**
  * Release the hashtable from the memory
@@ -181,7 +181,7 @@ void destroyHTWithElements(HT* ht, ct_destructor_t d);
  * @param[inout] ht the hash table to change
  * @param[in] htCell the cell to remove
  */
-void deleteHTCell(HT* ht, HTCell* htCell);
+void deleteHTCell(HT* ht, const HTCell* htCell);
 
 /**
  * like ::deleteHTCell but it delete from the memory also the element inside the cell
@@ -189,7 +189,7 @@ void deleteHTCell(HT* ht, HTCell* htCell);
  * @param[inout] htCell the cell to remove from the memory
  * @param[in] d the destructor to use to remove the data inside the \c htCell
  */
-void destroyHTCellWithElement(HTCell* htCell, ct_destructor_t d);
+void destroyHTCellWithElement(const HTCell* htCell, ct_destructor_t d);
 
 /**
  * Remove an element from the hashtable
