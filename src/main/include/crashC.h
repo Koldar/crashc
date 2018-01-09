@@ -486,7 +486,10 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
 				(model)->jump_source_testcase = (model)->current_section;																							\
 				bool UV(jump_occurred) = false;																														\
 				if (sigsetjmp((model)->jump_point, 1)) {                                                                          					        		\
-					/*we have caught a signal or an assertion failed: here current_section is the section where the signal was raised*/								\
+					/* We have caught a SIGNAL or an ASSERTION HAS FAILED: here current_section is the section where the signal was raised							\
+					 * If the code enters in this if remember that current_section still refer to the containablesection where the signal has happended				\
+					 * or the assertion have failed. If this is the case, you need to reset current_section to the containable section of the test case.			\
+					 * */																																			\
 					UV(jump_occurred) = true; 																														\
 					/*we reset the current_section to the test case*/																								\
 					ct_reset_section_after_jump((model), (model)->current_section, (model)->jump_source_testcase);													\
