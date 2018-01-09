@@ -46,10 +46,10 @@ HOW TO DEFINE THEM
 	}
 @endcode
 
-Optionally, you can change the separator between tags by compiling with a new definition of \c CC_TAGS_SEPARATOR macro, like this:
+Optionally, you can change the separator between tags by compiling with a new definition of ::CT_TAGS_SEPARATOR macro, like this:
 
 @code
-	gcc myProgram.c -Ipath/to/your/includes/containing/also/crashc/ -DCC_TAGS_SEPARATOR='#'
+	gcc myProgram.c -Ipath/to/your/includes/containing/also/crashc/ -DCT_TAGS_SEPARATOR='#'
 @endcode
 
 Then, you can do:

@@ -95,7 +95,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->parent = NULL;
 	retVal->tags = initHT();
 
-	populateTagsHT(retVal->tags, tags, CC_TAGS_SEPARATOR);
+	populateTagsHT(retVal->tags, tags, CT_TAGS_SEPARATOR);
 
 	return retVal;
 }

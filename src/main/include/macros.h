@@ -16,8 +16,8 @@
  * Setting this macro to '#' means that the tags are required to be defined as "hello#world".
  * See @ref tags for further information
  */
-#ifndef CC_TAGS_SEPARATOR
-#	define CC_TAGS_SEPARATOR ' '
+#ifndef CT_TAGS_SEPARATOR
+#	define CT_TAGS_SEPARATOR ' '
 #endif
 
 /**

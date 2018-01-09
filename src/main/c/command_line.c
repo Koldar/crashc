@@ -60,7 +60,7 @@ void ct_print_help(FILE* fout) {
 			fprintf(fout,
 					"Like \"i\", but allows to specify multiple tags. Tags are separated via \"%c\". "
 					"Can be defined multiple times.",
-					CC_TAGS_SEPARATOR
+					CT_TAGS_SEPARATOR
 			);
 			break;
 		}
@@ -68,7 +68,7 @@ void ct_print_help(FILE* fout) {
 			fprintf(fout,
 					"Like \"e\", but allows to specify multiple tags. Tags are separated via \"%c\". "
 					"Can be defined multiple times.",
-					CC_TAGS_SEPARATOR
+					CT_TAGS_SEPARATOR
 			);
 			break;
 		}
