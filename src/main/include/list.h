@@ -79,7 +79,7 @@ ct_list_t* ct_init_list();
  * @param[inout] l the list to handle
  * @see destroyListWithElement
  */
-void ct_destroy_list(ct_list_t* l);
+void ct_destroy_list(const ct_list_t* l);
 
 /**
  * like ::ct_destroy_list but it releases from the memory all the elements within the list as well
@@ -87,7 +87,7 @@ void ct_destroy_list(ct_list_t* l);
  * @param[inout] l the list to handle
  * @param[in] d a function used to dispose all values within the list from memory
  */
-void ct_destroy_list_with_elements(ct_list_t* l, ct_destructor_t d);
+void ct_destroy_list_with_elements(const ct_list_t* l, ct_destructor_t d);
 
 /**
  * Remove from the list all the payloads
@@ -105,7 +105,7 @@ void ct_clear_list(ct_list_t* l);
  * @param[inout] l the list we need to prepend a new item in
  * @param[in] el the item to prepend
  */
-void ct_add_head_in_list(ct_list_t* l, void* el);
+void ct_add_head_in_list(ct_list_t* l, const void* el);
 
 /**
  * Adds a new element at the end of the list
@@ -113,7 +113,7 @@ void ct_add_head_in_list(ct_list_t* l, void* el);
  * @param[inout] l the list we need to append a new item in
  * @param[in] el the item to append
  */
-void ct_add_tail_in_list(ct_list_t* l, void* el);
+void ct_add_tail_in_list(ct_list_t* l, const void* el);
 
 /**
  * the size of the list
@@ -220,7 +220,7 @@ void* ct_get_list_element(const ct_list_t* list, int index);
  * @param[in] cell_to_remove the cell you want to remove
  *
  */
-void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** restrict previous_cell, ct_list_cell_t* restrict cell_to_remove);
+void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** previous_cell, ct_list_cell_t* cell_to_remove);
 
 /**
  * Allows you to transparently iterate through a list
