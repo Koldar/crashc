@@ -73,7 +73,7 @@ struct ct_report_producer_t {
  * @param[in] status the status to compute the string representation of
  * @return a string representation of \c status
  */
-char * ct_snapshot_status_to_string(snapshot_status status);
+char* ct_snapshot_status_to_string(snapshot_status status);
 
 /**
  * Prints the string representation of a ::section_type
@@ -81,7 +81,7 @@ char * ct_snapshot_status_to_string(snapshot_status status);
  * @param[in] type the type to compute the string representation of
  * @return a string representation of \c type
  */
-char * ct_section_type_to_string(section_type type);
+char* ct_section_type_to_string(section_type type);
 
 //TODO in my opinion these functiosn should be placed in another header called like "default_report_producer.h"
 
@@ -99,7 +99,7 @@ char * ct_section_type_to_string(section_type type);
  *
  * @param[inout] model the model to handle
  */
-void ct_default_report(ct_model_t * model);
+void ct_default_report(ct_model_t* model);
 /**
  * Prints the tests summary in a default format
  *
@@ -108,7 +108,7 @@ void ct_default_report(ct_model_t * model);
  *
  * @param[inout] model the model to handle
  */
-void ct_default_report_summary(ct_model_t * model);
+void ct_default_report_summary(ct_model_t* model);
 
 /**
  * Prints a the report of a single test with a default format
@@ -119,7 +119,7 @@ void ct_default_report_summary(ct_model_t * model);
  * @param[inout] model the model to handle
  * @param[inout] report the test report to put in the file
  */
-void ct_default_test_report(ct_model_t * model, ct_test_report_t * report);
+void ct_default_test_report(ct_model_t* model, ct_test_report_t* report);
 
 /**
  * Prints a representation of a snapshot tree in a default format
@@ -131,7 +131,7 @@ void ct_default_test_report(ct_model_t * model, ct_test_report_t * report);
  * @param[inout] snapshot the snapshot to write into the file
  * @param[in] level the depth level \c snapshot is in the snapshot tree
  */
-void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level);
+void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapshot, int level);
 
 /**
  * Prints a default report for the assertions related to a specific snapshot
@@ -153,27 +153,27 @@ void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, 
  *
  * @return a structure containing the statistics data related to the tests
  */
-ct_test_statistics_t * initStatistics();
+ct_test_statistics_t* ct_init_stats();
 
 /**
  * Creates and initializes in memory a new default report producer structure
  *
  * @return a structure representing a naive report producer
  */
-ct_report_producer_t * initDefaultReportProducer();
+ct_report_producer_t* ct_init_default_report_producer();
 
 /**
  * Frees the memory occupied by a ct_test_statistics_t
  *
  * @param[inout] stats the structure to dispose from the memory
  */
-void destroyStatistics(ct_test_statistics_t * stats);
+void ct_destroy_stats(ct_test_statistics_t* stats);
 
 /**
  * Frees the memory allocated for the default report producer
  *
  * @param[inout] producer the structure to dispose from the mermory
  */
-void destroyDefaultReportProducer(ct_report_producer_t * producer);
+void ct_destroy_default_report_producer(ct_report_producer_t* producer);
 
 #endif /* REPORT_PRODUCER_H_ */
