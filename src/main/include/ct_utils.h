@@ -26,7 +26,7 @@
  * @param[in] filename the absolute filename returned by \c __FILE__
  * @return the basename of the absolute file
  */
-char* ct_file_basename(const char* filename);
+char* const ct_file_basename(char* const filename);
 
 
 #endif /* CT_UTILS_H_ */
