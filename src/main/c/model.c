@@ -6,8 +6,8 @@
  */
 
 #include <stdlib.h>
-#include <test_report.h>
 
+#include "test_report.h"
 #include "report_producer.h"
 #include "errors.h"
 #include "model.h"

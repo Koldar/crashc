@@ -13,8 +13,8 @@
 #define REPORT_PRODUCER_H_
 
 #include <stdio.h>
-#include <test_report.h>
 
+#include "test_report.h"
 #include "section.h"
 #include "list.h"
 #include "typedefs.h"

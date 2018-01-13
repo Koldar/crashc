@@ -7,8 +7,8 @@
  */
 
 #include <string.h>
-#include <test_report.h>
 
+#include "test_report.h"
 #include "list.h"
 #include "ct_assert.h"
 

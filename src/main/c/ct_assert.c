@@ -7,8 +7,8 @@
 
 #include <string.h>
 #include <setjmp.h>
-#include <test_report.h>
 
+#include "test_report.h"
 #include "ct_assert.h"
 #include "errors.h"
 #include "section.h"
