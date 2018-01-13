@@ -11,7 +11,7 @@
 #include "ct_assert.h"
 #include "errors.h"
 
-char * ct_snapshot_status_to_string(snapshot_status s) {
+char* ct_snapshot_status_to_string(snapshot_status s) {
 
 	switch (s) {
 		case SNAPSHOT_OK: return "OK";
@@ -23,7 +23,7 @@ char * ct_snapshot_status_to_string(snapshot_status s) {
 
 }
 
-char * ct_section_type_to_string(section_type t) {
+char* ct_section_type_to_string(section_type t) {
 
 	switch (t) {
 		case ST_WHEN: return "WHEN";
@@ -39,16 +39,16 @@ char * ct_section_type_to_string(section_type t) {
 
 
 //TODO: Check for errors due to FILE null pointer etc...
-void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level) {
+void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapshot, int level) {
 
-	FILE * file = model->output_file;
+	FILE* file = model->output_file;
 
-	char * type_str = ct_section_type_to_string(snapshot->type);
-	char * status_str = ct_snapshot_status_to_string(snapshot->status);
+	char* type_str = ct_section_type_to_string(snapshot->type);
+	char* status_str = ct_snapshot_status_to_string(snapshot->status);
 	fprintf(file, "%s : %s -> %s\n", type_str, snapshot->description, status_str);
 	ct_default_assertions_report(model, snapshot, level);
 
-	SectionSnapshot * child = snapshot->first_child;
+	SectionSnapshot* child = snapshot->first_child;
 	while (child != NULL) {
 		for (int i = 0; i < level; i++) {
 			putchar('\t');
@@ -59,9 +59,9 @@ void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snaps
 
 }
 
-void ct_default_test_report(ct_model_t * model, ct_test_report_t * report) {
+void ct_default_test_report(ct_model_t* model, ct_test_report_t* report) {
 
-	FILE * file = model->output_file;
+	FILE* file = model->output_file;
 
 	fprintf(file, " ---------- TEST REPORT ----------\n\n");
 	//fprintf(file, "File: %s\n\n", report->filename);
@@ -72,9 +72,9 @@ void ct_default_test_report(ct_model_t * model, ct_test_report_t * report) {
 
 }
 
-void ct_default_report_summary(ct_model_t * model) {
+void ct_default_report_summary(ct_model_t* model) {
 
-	FILE * file = model->output_file;
+	FILE* file = model->output_file;
 	ct_test_statistics_t * stats = model->statistics;
 
 	fprintf(file, "Total tests: %d\n", stats->total_tests);
@@ -104,12 +104,12 @@ void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, 
 
 }
 
-void ct_default_report(ct_model_t * model) {
+void ct_default_report(ct_model_t* model) {
 
-	ct_list_t * report_list = model->test_reports_list;
+	ct_list_t* report_list = model->test_reports_list;
 
 	//TODO: Move the stats-acquiring code away from the report producer
-	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
+	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t*) {
 		if (report->outcome == TEST_SUCCESS) {
 			model->statistics->successful_tests++;
 		}
@@ -124,9 +124,9 @@ void ct_default_report(ct_model_t * model) {
 
 }
 
-ct_test_statistics_t * initStatistics() {
+ct_test_statistics_t* ct_init_stats() {
 
-	ct_test_statistics_t * retVal = malloc(sizeof(ct_test_statistics_t));
+	ct_test_statistics_t* retVal = malloc(sizeof(ct_test_statistics_t));
 
 	if (retVal == NULL) {
 		MALLOCERRORCALLBACK();
@@ -139,9 +139,9 @@ ct_test_statistics_t * initStatistics() {
 	return retVal;
 }
 
-ct_report_producer_t * initDefaultReportProducer() {
+ct_report_producer_t* ct_init_default_report_producer() {
 
-	ct_report_producer_t * ret_val = malloc(sizeof(ct_report_producer_t));
+	ct_report_producer_t* ret_val = malloc(sizeof(ct_report_producer_t));
 
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
@@ -157,13 +157,13 @@ ct_report_producer_t * initDefaultReportProducer() {
 
 }
 
-void destroyStatistics(ct_test_statistics_t * stats) {
+void ct_destroy_stats(ct_test_statistics_t* stats) {
 
 	free(stats);
 
 }
 
-void destroyDefaultReportProducer(ct_report_producer_t * producer) {
+void ct_destroy_default_report_producer(ct_report_producer_t* producer) {
 
 	free(producer);
 

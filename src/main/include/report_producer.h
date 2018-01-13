@@ -61,31 +61,31 @@ struct ct_report_producer_t {
 /**
  * Prints the string representation of a snapshot status
  */
-char * ct_snapshot_status_to_string(snapshot_status status);
+char* ct_snapshot_status_to_string(snapshot_status status);
 
 /**
  * Prints the string representation of a section type
  */
-char * ct_section_type_to_string(section_type type);
+char* ct_section_type_to_string(section_type type);
 
 /**
  * Prints the report of the executed tests in a default format
  */
-void ct_default_report(ct_model_t * model);
+void ct_default_report(ct_model_t* model);
 /**
  * Prints the tests summary in a default format
  */
-void ct_default_report_summary(ct_model_t * model);
+void ct_default_report_summary(ct_model_t* model);
 
 /**
  * Prints a the report of a single test with a default format
  */
-void ct_default_test_report(ct_model_t * model, ct_test_report_t * report);
+void ct_default_test_report(ct_model_t* model, ct_test_report_t* report);
 
 /**
  * Prints a representation of a snapshot tree in a default format
  */
-void ct_default_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level);
+void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapshot, int level);
 
 /**
  * Prints a default report for the assertions related to a specific snapshot
@@ -95,21 +95,21 @@ void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, 
 /**
  * Initializes and return a structure containing the statistics data related to the tests
  */
-ct_test_statistics_t * initStatistics();
+ct_test_statistics_t* ct_init_stats();
 
 /**
  * Initializes the default report producer structure
  */
-ct_report_producer_t * initDefaultReportProducer();
+ct_report_producer_t* ct_init_default_report_producer();
 
 /**
  * Frees the memory occupied by a ct_test_statistics_t struct
  */
-void destroyStatistics(ct_test_statistics_t * stats);
+void ct_destroy_stats(ct_test_statistics_t* stats);
 
 /**
  * Frees the memory allocated for the default report producer
  */
-void destroyDefaultReportProducer(ct_report_producer_t * producer);
+void ct_destroy_default_report_producer(ct_report_producer_t* producer);
 
 #endif /* REPORT_PRODUCER_H_ */
