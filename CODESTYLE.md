@@ -1,14 +1,14 @@
-## CrashC Codestyle - Version 1.1 - January 2018
+## Codestyle
 
-In order to keep the CrashC project codebase as clean as possible  
-we follow a set of conventions in the way we name types, variables  
-and write code. Anyone willing to contribute to the framework **must**  
+In order to keep the CrashC project codebase as clean as possible
+we follow a set of conventions in the way we name types, variables
+and write code. Anyone willing to contribute to the framework **must**
 follow these rules.
 
 ### General codestyle
 
 1. Identifiers are written using snake case: e.g `this_is_an_identifier`. No uppercase letters are admitted
-2. Pointer types are declared with the asterisk on the **right** side of the **type**, with no spaces: e.g `int* pointer`
+2. Pointer types are declared with the asterisk on the **right** side of the **type**, with no spaces: e.g `int* pointer`  
 _SECTION UNDER CONSTRUCTION_
 
 ### Type definitions
@@ -24,10 +24,12 @@ On the other side, a well-thought use of typedef can also _greatly_ increase cod
 For this reason, we use them in 2 possible scenarios:
 * Function pointer types
 * Opaque types
-The reasons are simple: C's function pointers syntax is just too annoying to carry around the code, and opaque types must hide their implementation details.  
+The reasons are simple: C's function pointers syntax is just too annoying to be carried  
+ around the code, and opaque types **must** hide their implementation details.
+ 
 For these two cases we also use different suffixes in order to distinguish between them:
-* "\_c" for function pointers (the "c " stands for _callback_ )
-* "\_o" for opaque types
+* "`\_`c" for function pointers (the "c " stands for _callback_ )
+* "`\_o`" for opaque types
 
 ### Public identifiers conventions
 
