@@ -15,7 +15,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 
 	//TODO here we need  to replace the parameter runOnlyWithTags and excludeIfTags with a pointer of the global model
 	//check if the section we're dealing with is compliant with the context tags
-	if (!isHTEmpty(exclude_tags)) {
+	if (!ct_ht_is_empty(exclude_tags)) {
 		if (haveTagSetsIntersection(section->tags, exclude_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;
@@ -24,7 +24,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 		}
 	}
 
-	if (!isHTEmpty(run_tags)) {
+	if (!ct_ht_is_empty(run_tags)) {
 		if (!haveTagSetsIntersection(section->tags, run_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;

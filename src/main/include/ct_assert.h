@@ -181,7 +181,7 @@ ct_assert_report_t* ct_init_assert_report(bool is_mandatory, char* asserted_text
  *
  * @param[in] report the report to release from the memory
  */
-void ct_destroy_assert_report(ct_assert_report_t * report);
+void ct_destroy_assert_report(ct_assert_report_t* report);
 
 /**
  * @defgroup assertCallbacks Assert Outcome Callbacks
@@ -194,14 +194,14 @@ void ct_destroy_assert_report(ct_assert_report_t * report);
  *
  * @param[in] model the model to handle
  */
-void ct_assert_do_nothing(ct_model_t * model);
+void ct_assert_do_nothing(ct_model_t* model);
 
 /**
  * Function used by the general ASSERT macro to handle its failure
  *
  * @param[in] model the model to handle
  */
-void ct_general_assert_failed(ct_model_t * model);
+void ct_general_assert_failed(ct_model_t* model);
 
 ///@}
 
