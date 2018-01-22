@@ -68,7 +68,7 @@ typedef struct ct_model {
 	 * The payloads within the list are of type ::ct_test_report.
 	 * Each of them represent the outcome of the test of a run within a @testcase loop.
 	 */
-	ct_list_t* test_reports_list;
+	ct_list_o* test_reports_list;
 	/**
 	 * field representing the root of the section tree
 	 *

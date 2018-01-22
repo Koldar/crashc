@@ -16,36 +16,36 @@
 #include "errors.h"
 
 
-typedef struct list_cell {
+struct ct_list_entry {
 	///represents the payload inside this cell of the list
 	void* payload;
 	///a pointer to the next element of the list. Can be NULL
-	struct list_cell* next;
-} ct_list_cell_t;
+	struct ct_list_entry* next;
+};
 
-typedef struct list {
+struct ct_list {
 	///number of elements inside the list. Allows count operation to be O(1)
 	int size;
 	///pointer to the first element of the list. Can be NULL
-	ct_list_cell_t* head;
+	ct_list_entry_o* head;
 	///pointer to the last element of the list. Can be NULL
-	ct_list_cell_t* tail;
-} ct_list_t;
+	ct_list_entry_o* tail;
+};
 
-ct_list_cell_t* ct_next_list_cell(const ct_list_cell_t* cell) {
-	return cell->next;
+ct_list_entry_o* _ct_list_get_next_entry(const ct_list_entry_o* entry) {
+	return entry->next;
 }
 
-void* ct_list_cell_payload(const ct_list_cell_t* cell) {
-	return cell->payload;
+void* _ct_list_get_entry_payload(const ct_list_entry_o* entry) {
+	return entry->payload;
 }
 
-ct_list_cell_t* ct_list_head_cell(const ct_list_t* l) {
+ct_list_entry_o* _ct_list_head_entry(const ct_list_o* l) {
 	return l->head;
 }
 
-ct_list_t* ct_init_list() {
-	ct_list_t* ret_val = malloc(sizeof(ct_list_t));
+ct_list_o* ct_list_init() {
+	ct_list_o* ret_val = malloc(sizeof(ct_list_o));
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
@@ -57,73 +57,73 @@ ct_list_t* ct_init_list() {
 	return ret_val;
 }
 
-void ct_destroy_list(const ct_list_t* lst) {
-	ITERATE_ON_LIST(lst, cell, value, void*) {
-		free(cell);
+void ct_list_destroy(const ct_list_o* lst) {
+	ITERATE_ON_LIST(lst, entry, value, void*) {
+		free(entry);
 	}
-	free((void*)lst);
+	free((void*) lst);
 }
 
-void ct_destroy_list_with_elements(const ct_list_t* lst, ct_destructor_t d) {
-	ITERATE_ON_LIST(lst, cell, value, void*) {
-		d(cell->payload);
-		free(cell);
+void ct_list_destroy_with_elements(const ct_list_o* lst, ct_destructor_t d) {
+	ITERATE_ON_LIST(lst, entry, value, void*) {
+		d(entry->payload);
+		free(entry);
 	}
-	free((void*)lst);
+	free((void*) lst);
 }
 
-void ct_clear_list(ct_list_t* l) {
-	ITERATE_ON_LIST(l, cell, value, void*) {
-		free(cell);
+void ct_list_clear(ct_list_o* l) {
+	ITERATE_ON_LIST(l, entry, value, void*) {
+		free(entry);
 	}
 	l->head = NULL;
 	l->size = 0;
 	l->tail = NULL;
 }
 
-void ct_add_head_in_list(ct_list_t* l, const void* el) {
-	ct_list_cell_t* new_cell = malloc(sizeof(ct_list_cell_t));
-	if (new_cell == NULL) {
+void ct_list_add_head(ct_list_o* l, const void* el) {
+	ct_list_entry_o* new_entry = malloc(sizeof(ct_list_entry_o));
+	if (new_entry == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	new_cell->payload = (void*)el;
-	new_cell->next = l->head;
+	new_entry->payload = (void*)el;
+	new_entry->next = l->head;
 
 	l->size++;
-	l->head = new_cell;
+	l->head = new_entry;
 	if (l->tail == NULL) {
-		l->tail = new_cell;
+		l->tail = new_entry;
 	}
 }
 
-void ct_add_tail_in_list(ct_list_t* l, const void* el) {
-	ct_list_cell_t* new_cell = malloc(sizeof(ct_list_cell_t));
-	if (new_cell == NULL) {
+void ct_list_add_tail(ct_list_o* l, const void* el) {
+	ct_list_entry_o* new_entry = malloc(sizeof(ct_list_entry_o));
+	if (new_entry == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	new_cell->payload = (void*)el;
-	new_cell->next = NULL;
+	new_entry->payload = (void*)el;
+	new_entry->next = NULL;
 	if (l->tail != NULL) {
-		l->tail->next = new_cell;
+		l->tail->next = new_entry;
 	}
 
 	l->size++;
 	if (l->head == NULL) {
-		l->head = new_cell;
+		l->head = new_entry;
 	}
-	l->tail = new_cell;
+	l->tail = new_entry;
 
 }
 
-int ct_list_length(const ct_list_t* l) {
+int ct_list_size(const ct_list_o* l) {
 	return l->size;
 }
 
-void ct_move_list_contents(ct_list_t* restrict dst, ct_list_t* restrict src) {
+void ct_list_full_transfer(ct_list_o* restrict dst, ct_list_o* restrict src) {
 	//*********** DST **********
-	dst->size += ct_list_length(src);
+	dst->size += ct_list_size(src);
 	if (dst->head == NULL) {
 		dst->head = src->head;
 	} else {
@@ -137,50 +137,43 @@ void ct_move_list_contents(ct_list_t* restrict dst, ct_list_t* restrict src) {
 	src->tail = NULL;
 }
 
-void* ct_list_last_element(const ct_list_t* l) {
-	if (l->tail == NULL) {
-		return NULL;
-	}
-	return l->tail->payload;
-}
-
-bool ct_is_list_empty(const ct_list_t* l) {
+bool ct_list_is_empty(const ct_list_o* l) {
 	return l->size == 0;
 }
 
-void* ct_pop_from_list(ct_list_t* l) {
-	if (ct_is_list_empty(l)) {
+void* ct_list_pop(ct_list_o* l) {
+	if (ct_list_is_empty(l)) {
 		return NULL;
 	}
 
-	ct_list_cell_t* cell = l->head;
-	void* retVal = cell->payload;
+	ct_list_entry_o* cell = l->head;
+	void* ret_val = cell->payload;
 	l->head = l->head->next;
 	l->size--;
-	if (ct_is_list_empty(l)) {
+	if (ct_list_is_empty(l)) {
 		l->tail = NULL;
 	}
 
 	free(cell);
-	return retVal;
+	return ret_val;
 }
 
-void* ct_list_head(const ct_list_t* l) {
-	if (ct_is_list_empty(l)) {
+void* ct_list_head(const ct_list_o* l) {
+	if (ct_list_is_empty(l)) {
 		return NULL;
 	}
 	return l->head->payload;
 }
 
-void* ct_list_tail(const ct_list_t* l) {
-	if (ct_is_list_empty(l)) {
+void* ct_list_tail(const ct_list_o* l) {
+	if (ct_list_is_empty(l)) {
 		return NULL;
 	}
 	return l->tail->payload;
 }
 
-void* ct_get_list_element(const ct_list_t* l, int index) {
-	ITERATE_ON_LIST(l, cell, payload, void*) {
+void* ct_list_get(const ct_list_o* l, int index) {
+	ITERATE_ON_LIST(l, entry, payload, void*) {
 		if (index == 0) {
 			return payload;
 		}
@@ -189,25 +182,25 @@ void* ct_get_list_element(const ct_list_t* l, int index) {
 	return NULL;
 }
 
-void ct_remove_element_list_cell(ct_list_t* l, ct_list_cell_t** previous_cell, ct_list_cell_t* cell_to_remove) {
-	ct_list_t* lst = l;
-	ct_list_cell_t* previous = *previous_cell;
+void ct_list_remove_entry_dynamic(ct_list_o* l, ct_list_entry_o** previous_entry, ct_list_entry_o* entry_to_remove) {
+	ct_list_o* lst = l;
+	ct_list_entry_o* previous = *previous_entry;
 
 	if (previous == NULL) {
 		//we're removing the head
-		ct_pop_from_list(l);
-	} else if (cell_to_remove->next == NULL){
+		ct_list_pop(l);
+	} else if (entry_to_remove->next == NULL){
 		//we're removing the tail
 		previous->next = NULL;
 		lst->size--;
 		lst->tail = previous;
-		free(cell_to_remove);
+		free(entry_to_remove);
 	} else {
 		//we're removing an element inside the list
-		previous->next = cell_to_remove->next;
+		previous->next = entry_to_remove->next;
 		lst->size--;
-		free(cell_to_remove);
+		free(entry_to_remove);
 	}
 
-	*previous_cell = NULL;
+	*previous_entry = NULL;
 }

@@ -146,7 +146,7 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
  * @param[in] failed_callback function of type ct_assert_callback_t called if the assertion doesn't pass;
  */
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
-	ct_add_tail_in_list((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
+	ct_list_add_tail((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
 	if ((asserted) != true) {																												\
 		failed_callback((model));																											\
 	}																																		\

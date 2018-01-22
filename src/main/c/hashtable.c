@@ -5,13 +5,10 @@
  *      Author: koldar
  */
 
-#include <stdbool.h>
-
 #include "hashtable.h"
-#include "macros.h"
 #include "errors.h"
 
-
+// File-local functions declarations
 static ct_hashtable_entry_o* ht_init_entry(const void* data, unsigned long key);
 static void ht_destroy_entry(const ct_hashtable_entry_o* entry);
 
@@ -217,6 +214,18 @@ void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destructor_t d) {
 		ht_destroy_entry(s);
 	}
 	ht->head = NULL;
+}
+
+ct_hashtable_entry_o* _ct_ht_head_entry(ct_hashtable_o* ht) {
+	return ht->head;
+}
+
+void* _ct_ht_entry_next(ct_hashtable_entry_o* entry) {
+	return entry->hh.next;
+}
+
+void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry) {
+	return entry->data;
 }
 
 /**

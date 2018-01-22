@@ -30,6 +30,7 @@
 #define HASHTABLE_H_
 
 #include <stdbool.h>
+#include <stdlib.h> /* For NULL macro */
 
 #include "typedefs.h"
 #include "uthash.h"
@@ -235,23 +236,39 @@ void ct_ht_clear(ct_hashtable_o* ht);
  */
 void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destructor_t d);
 
-//Picked up from uthash HASH_ITER Definition
-#define ITERATE_ON_HT(_head,el)   \
-	ct_hashtable_entry_o* UV(head) = ((ct_hashtable_o*)(_head))->head;\
-	ct_hashtable_entry_o* el = NULL; \
-	ct_hashtable_entry_o* UV(tmp) = NULL;\
-	for(((el)=(UV(head))), ((*(char**)(&(UV(tmp))))=(char*)((UV(head)!=NULL)?(UV(head))->hh.next:NULL)); \
-  (el) != NULL; ((el)=(UV(tmp))), ((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?(UV(tmp))->hh.next:NULL)))
+/**
+ * Returns the head entry of the hashtable.
+ *
+ * @param[inout] ht The hashtable on which to operate
+ * @return The head entry of the hashtable
+ */
+ct_hashtable_entry_o* _ct_ht_head_entry(ct_hashtable_o* ht);
 
-#ifdef NO_DECLTYPE
-#define HASH_ITER(hh,head,el,tmp)                                                \
-for(((el)=(head)), ((*(char**)(&(tmp)))=(char*)((head!=NULL)?(head)->hh.next:NULL)); \
-  (el) != NULL; ((el)=(tmp)), ((*(char**)(&(tmp)))=(char*)((tmp!=NULL)?(tmp)->hh.next:NULL)))
-#else
-#define HASH_ITER(hh,head,el,tmp)                                                \
-for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));      \
-  (el) != NULL; ((el)=(tmp)), ((tmp)=DECLTYPE(el)((tmp!=NULL)?(tmp)->hh.next:NULL)))
-#endif
+/**
+ * Returns the value of the "next" field in the UT_hash_handle field of an entry.
+ * \note
+ * This function is purely instrumental towards hiding implementation details to the hashtable user
+ *
+ * @param[in] entry The hashtable entry on which the desired handle resides
+ * @return A pointer to the next value contained in the hashtable, considered by insertion order
+ */
+void* _ct_ht_entry_next(ct_hashtable_entry_o* entry);
+
+/**
+ * Returns the payload of a given hashtable entry
+ *
+ * @param[in] entry The entry which contains the desired payload
+ * @return The payload of the entry
+ */
+void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry);
+
+//Picked up from uthash HASH_ITER Definition
+#define ITERATE_ON_HT(ht,el)   																								\
+	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*) (ht));												\
+	ct_hashtable_entry_o* el = NULL; 																						\
+	ct_hashtable_entry_o* UV(tmp) = NULL;																					\
+	for(((el)=(UV(head))), ((*(char**)(&(UV(tmp))))=(char*)((UV(head)!=NULL)?_ct_ht_entry_next(UV(head)):NULL)); 			\
+  (el) != NULL; ((el)=(UV(tmp))), ((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL)))
 
 //TODO replace this code with the correct code in Cutils!!!!
 /**
@@ -266,27 +283,27 @@ for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));     
  * }
  * </code></pre>
  *
- * @param[in] _head double point to an hashtable to go through
+ * @param[in] ht Pointer to the hashtable on which to iterate
  * @param[in] _data the name of the variable that will contain a value in the iteration
  * @param[in] type the type of \c _data. So if you put \c int, data will have type <tt>int</tt>
  */
-#define ITERATE_VALUES_ON_HT(_head,_data,type) \
-	ct_hashtable_entry_o* UV(head) = ((ct_hashtable_o*)(_head))->head;\
-	ct_hashtable_entry_o* UV(el) = NULL; \
-	ct_hashtable_entry_o* UV(tmp) = NULL;\
-	type _data = NULL; \
-	if (UV(head) != NULL) { \
-		_data = UV(head)->data; \
-	} \
-	for(\
-		(UV(el)=(UV(head))), \
-		((*(char**)(&(UV(tmp))))=(char*)((UV(head) != NULL)?(UV(head))->hh.next:NULL)) \
-		; \
-		UV(el) != NULL \
-		; \
-		(UV(el)=(UV(tmp))), \
-		_data=(UV(el) != NULL) ? UV(el)->data : NULL,\
-		((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?(UV(tmp))->hh.next:NULL))\
+#define ITERATE_VALUES_ON_HT(ht,_data,type) 															\
+	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*)(ht));						\
+	ct_hashtable_entry_o* UV(el) = NULL; 															\
+	ct_hashtable_entry_o* UV(tmp) = NULL;															\
+	type _data = NULL; 																				\
+	if (UV(head) != NULL) { 																		\
+		_data = _ct_ht_entry_payload(UV(head)); 													\
+	} 																								\
+	for(																							\
+		(UV(el)=(UV(head))), 																		\
+		((*(char**)(&(UV(tmp))))=(char*)((UV(head) != NULL)?_ct_ht_entry_next(UV(head)):NULL)) 		\
+		; 																							\
+		UV(el) != NULL 																				\
+		; 																							\
+		(UV(el)=(UV(tmp))), 																		\
+		_data=(UV(el) != NULL) ? _ct_ht_entry_payload(UV(el)) : NULL,								\
+		((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL))			\
 	)
 
 

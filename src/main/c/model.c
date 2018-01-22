@@ -22,7 +22,7 @@ ct_model_t* ct_setup_default_model() {
 	ret_val->current_section = NULL;
 	ret_val->current_snapshot = NULL;
 	ret_val->ct_teardown = NULL;
-	ret_val->test_reports_list = ct_init_list();
+	ret_val->test_reports_list = ct_list_init();
 	ret_val->jump_source_testcase = NULL;
 	ret_val->suites_array_index = 0;
 	ret_val->run_only_if_tags = ct_ht_init();
@@ -40,7 +40,7 @@ void ct_teardown_default_model(ct_model_t* ccm) {
 	destroySection(ccm->root_section);
 	ct_ht_destroy_with_elements(ccm->exclude_tags, (ct_destructor_t)destroyTag);
 	ct_ht_destroy_with_elements(ccm->run_only_if_tags, (ct_destructor_t)destroyTag);
-	ct_destroy_list_with_elements(ccm->test_reports_list, (ct_destructor_t)ct_destroy_test_report);
+	ct_list_destroy_with_elements(ccm->test_reports_list, (ct_destructor_t)ct_destroy_test_report);
 	ct_destroy_stats(ccm->statistics);
 	ct_destroy_default_report_producer(ccm->report_producer_implementation);
 	fclose(ccm->output_file);

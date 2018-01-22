@@ -44,7 +44,7 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 	ret_val->type          = section->type;
 	ret_val->status        = SNAPSHOT_OK;
 	ret_val->elapsed_time  = 0;
-	ret_val->assertion_reports = ct_init_list();
+	ret_val->assertion_reports = ct_list_init();
 	ret_val->parent = NULL;
 	ret_val->next_sibling = NULL;
 	ret_val->first_child = NULL;
@@ -54,7 +54,7 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 
 void ct_destroy_snapshot_tree(SectionSnapshot* snapshot) {
 	free(snapshot->description);
-	ct_destroy_list_with_elements(snapshot->assertion_reports, (ct_destructor_t) ct_destroy_assert_report);
+	ct_list_destroy_with_elements(snapshot->assertion_reports, (ct_destructor_t) ct_destroy_assert_report);
 
 	SectionSnapshot* next_child = snapshot->first_child;
 	while (next_child != NULL) {

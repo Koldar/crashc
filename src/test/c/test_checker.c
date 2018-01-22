@@ -122,7 +122,7 @@ static void ct_testing_summary_producer(ct_model_t * model) {
 
 static void ct_testing_report(ct_model_t * model) {
 
-	ct_list_t * report_list = model->test_reports_list;
+	ct_list_o * report_list = model->test_reports_list;
 
 	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
 		ct_testing_test_report(model, report);
