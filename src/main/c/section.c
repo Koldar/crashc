@@ -93,7 +93,7 @@ Section* initSection(section_type type, SectionLevelId levelId, const char* desc
 	retVal->loop2 = false;
 	retVal->nextSibling = NULL;
 	retVal->parent = NULL;
-	retVal->tags = initHT();
+	retVal->tags = ct_ht_init();
 
 	populateTagsHT(retVal->tags, tags, CT_TAGS_SEPARATOR);
 
@@ -112,7 +112,7 @@ void destroySection(Section* section) {
 		return;
 	}
 
-	destroyHTWithElements(section->tags, (ct_destructor_t)(destroyTag));
+	ct_ht_destroy_with_elements(section->tags, (ct_destructor_t)(destroyTag));
 	//destroyListWithElement(section->sectionToRunList, destroySection);
 	free((void*)section->description);
 	free((void*)section);

@@ -146,7 +146,7 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
  * @param[in] failed_callback function of type ct_assert_callback_t called if the assertion doesn't pass;
  */
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
-	ct_add_tail_in_list((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
+	ct_list_add_tail((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
 	if ((asserted) != true) {																												\
 		failed_callback((model));																											\
 	}																																		\
@@ -181,7 +181,7 @@ ct_assert_report_t* ct_init_assert_report(bool is_mandatory, char* asserted_text
  *
  * @param[in] report the report to release from the memory
  */
-void ct_destroy_assert_report(ct_assert_report_t * report);
+void ct_destroy_assert_report(ct_assert_report_t* report);
 
 /**
  * @defgroup assertCallbacks Assert Outcome Callbacks
@@ -194,14 +194,14 @@ void ct_destroy_assert_report(ct_assert_report_t * report);
  *
  * @param[in] model the model to handle
  */
-void ct_assert_do_nothing(ct_model_t * model);
+void ct_assert_do_nothing(ct_model_t* model);
 
 /**
  * Function used by the general ASSERT macro to handle its failure
  *
  * @param[in] model the model to handle
  */
-void ct_general_assert_failed(ct_model_t * model);
+void ct_general_assert_failed(ct_model_t* model);
 
 ///@}
 

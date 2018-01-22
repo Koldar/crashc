@@ -53,7 +53,7 @@ bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2) {
 void addTagNameInTagHashTable(tag_ht* tagHashTable, const char* name) {
 	//TODO to improve performances you don't need to create a tag every time you see a name, There should be a tag pool containing
 	//all the tags in the project. In this way, tag with the same name are created only once
-	addItemInHTWithKey(tagHashTable, getHashOfString(name), initTag(name));
+	ct_ht_put(tagHashTable, getHashOfString(name), initTag(name));
 }
 
 int getHashOfString(const char* str) {
@@ -123,10 +123,10 @@ void populateTagsHT(tag_ht* output, const char* const tags, char separator) {
 
 		//add the fetched tag inside the section
 		tokenId = getHashOfString(token);
-		tag* tagWithTokenId = getItemInHT(output, tokenId);
+		tag* tagWithTokenId = ct_ht_get(output, tokenId);
 		if (tagWithTokenId == NULL) {
 			tagWithTokenId = initTag(token);
-			addItemInHTWithKey(output, tokenId, tagWithTokenId);
+			ct_ht_put(output, tokenId, tagWithTokenId);
 		}
 	}
 }

@@ -3,23 +3,23 @@
  *
  * Implements hashtables
  *
- * This module is just a front end to uthash
+ * This module is just a front-end to uthash
  *
- * Here's an example on how to use the hashtable. Of course you can exploit all macro available in \b ut_hash to find/loop and so on
+ * Here's an example on how to use the hashtable. Of course you can exploit all the macros available in \b ut_hash to find/loop and so on
  * even here. Those macros are explained <a href="https://troydhanson.github.io/uthash/userguide.html#_hash_operations">here</a>
  *
  * ```
- * HT* ht = initHT();
+ * ct_hashtable_o* ht = ct_ht_init();
  * double* d = NULL;
  *
  * d = malloc(sizeof(double)); *d = 5;
- * addItemInHTWithKey(&ht,1, d);
+ * ct_ht_put(&ht,1, d);
  * d = malloc(sizeof(double)); *d = 127;
- * addItemInHTWithKey(&ht,5, d);
+ * ct_ht_put(&ht,5, d);
  * d = malloc(sizeof(double)); *d = -4.5;
- * addItemInHTWithKey(&ht,7, d);
+ * ct_ht_put(&ht,7, d);
  *
- * destroyHTWithElements(&ht, free);
+ * ct_ht_destroy_with_elements(&ht, free);
  * ```
  *
  * @author koldar
@@ -30,60 +30,43 @@
 #define HASHTABLE_H_
 
 #include <stdbool.h>
+#include <stdlib.h> /* For NULL macro */
 
 #include "typedefs.h"
 #include "uthash.h"
 #include "macros.h"
 
 /**
- * A structure representing a cell of the hash table
+ * A structure representing an entry of the hash table
  *
  * see <a href="http://troydhanson.github.io/uthash/userguide.html">uthash</a> for further information
  */
-typedef struct HTCell {
-	/**
-	 * the key of a particular value
-	 */
-	unsigned long id;
-	/**
-	 * the value in the hashtable
-	 */
-	void* data;
-	/**
-	 * A field required by \c uthash project to correctly work
-	 */
-	UT_hash_handle hh;
-} HTCell;
+struct ct_hashtable_entry;
+typedef struct ct_hashtable_entry ct_hashtable_entry_o;
 
 /**
  * Structure representing the facet of the hashtable data structure
  */
-typedef struct HT {
-	/**
-	 * **head** of the hashtable
-	 *
-	 * \c uthash hashtables are retrieved by a particular ::HTCell called **head**. This field is exactly that
-	 */
-	HTCell* head;
-} HT;
+struct ct_hashtable;
+typedef struct ct_hashtable ct_hashtable_o;
 
 /**
  * Create a new hashtable in memory
  *
  * @return the new hashtable just created
  */
-HT* initHT();
+ct_hashtable_o* ct_ht_init();
 
 /**
  * number of item in the hashtable
  *
  * \note
- * This operation is a O(1)
+ * This operation is O(1)
  *
  * @param[in] ht the hash table involved
  * @return the number of elements inside the hash table
  */
-int getSizeOfHT(const HT* ht);
+int ct_ht_size(const ct_hashtable_o* ht);
 
 /**
  * get an element in the hashtable, given a certain key
@@ -94,7 +77,7 @@ int getSizeOfHT(const HT* ht);
  * 	\li the element whose key is \c key;
  * 	\li NULL if it isn't present in the hashtable;
  */
-void* getItemInHT(const HT* ht, unsigned long key);
+void* ct_ht_get(const ct_hashtable_o* ht, unsigned long key);
 
 /**
  * Check if a value in the hashtable has a particular key
@@ -105,7 +88,7 @@ void* getItemInHT(const HT* ht, unsigned long key);
  * 	\li @true if there is a value within the hashtable whose key is \c key;
  * 	\li @false otheriwse
  */
-bool containsItemInHT(const HT* ht, unsigned long key);
+bool ct_ht_contains(const ct_hashtable_o* ht, unsigned long key);
 
 /**
  * Insert or alter an element inside the hash table
@@ -115,7 +98,7 @@ bool containsItemInHT(const HT* ht, unsigned long key);
  *
  * \attention
  * After this operation the old data will be totally overwritten! Be sure to still have a backup reference
- * of the previous object, otherwise memory leak will likely to happen!
+ * of the previous object, otherwise memory leaks will likely happen!
  *
  * @param[inout] ht the hashtable to analyze
  * @param[in] key the key of the element to update
@@ -124,7 +107,7 @@ bool containsItemInHT(const HT* ht, unsigned long key);
  * 	\li @true if a new element is created;
  * 	\li @false if we overwrote the previous one
  */
-bool addOrUpdateItemInHT(HT* ht, unsigned long key, const void* data);
+bool ct_ht_put_or_update(ct_hashtable_o* ht, unsigned long key, const void* data);
 
 /**
  * Updates the value indexed by \c key to a new value
@@ -139,79 +122,60 @@ bool addOrUpdateItemInHT(HT* ht, unsigned long key, const void* data);
  * 	\li @true if we have update with success the data;
  * 	\li @false if we couldn't find any cell indexed with \c key;
  */
-bool updateItemInHT(HT* ht, unsigned long key, const void* data);
+bool ct_ht_update(ct_hashtable_o* ht, unsigned long key, const void* data);
 
 /**
  * Insert a new value within the hashtable
  *
  * \note
- * undefined behaviour if the key already exists in the hashtable
+ * Undefined behaviour if the key already exists in the hashtable
  *
  *
  * @param[inout] ht the hashtable to handle
  * @param[in] key the key of \c data
  * @param[in] data the actual value to store in the hastable
  */
-void addItemInHTWithKey(HT* ht, unsigned long key, const void* data);
+void ct_ht_put(ct_hashtable_o* ht, unsigned long key, const void* data);
 
 /**
  * Release the hashtable from the memory
  *
  * \note
- * if the values in the hastable are in the memory as well, they won't be freed at all
+ * If the values in the hastable are in memory as well, they won't be freed at all
  *
  * @param[inout] ht the hashtable to remove
- * @see destroyHTWithElements
+ * @see ct_ht_destroy_with_elements
  */
-void destroyHT(HT* ht);
+void ct_ht_destroy(ct_hashtable_o* ht);
 
 /**
- * like ::destroyHT but it destory the values in the hashtable from the memory as well
+ * Like ::ct_ht_destroy but it frees the items in the hashtable from memory as well
  *
  * @param[inout] ht the hashtable to remove
- * @param[in] d a function to use to dispose of the elements in the hashtable
+ * @param[in] d a function to use to free the elements in the hashtable from memory
  */
-void destroyHTWithElements(HT* ht, ct_destructor_t d);
-
-/**
- * Delete a cell inside the hashtable
- *
- * \post
- * 	\li don't use \c htCell after this call because it will cause an invalid read
- *
- * @param[inout] ht the hash table to change
- * @param[in] htCell the cell to remove
- */
-void deleteHTCell(HT* ht, const HTCell* htCell);
-
-/**
- * like ::deleteHTCell but it delete from the memory also the element inside the cell
- *
- * @param[inout] htCell the cell to remove from the memory
- * @param[in] d the destructor to use to remove the data inside the \c htCell
- */
-void destroyHTCellWithElement(const HTCell* htCell, ct_destructor_t d);
+void ct_ht_destroy_with_elements(ct_hashtable_o* ht, ct_destructor_t d);
 
 /**
  * Remove an element from the hashtable
  *
  * \note
- * the element won't be removed from the memory at all
+ * The element won't be removed from the memory at all
  *
  * @param[inout] ht the hashtable to handle
  * @param[in] key the key of the value to remove from the hashtable
- * @see deleteItemInHTWithElement
+ * @see ct_ht_remove_and_destroy
  */
-bool deleteItemInHT(HT* ht, unsigned long key);
+bool ct_ht_remove(ct_hashtable_o* ht, unsigned long key);
 
 /**
- * like ::deleteItemInHT but it removed the value from memory as well
+ * like ::ct_ht_remove but it frees the value from memory as well
  *
  * @param[inout] ht the hashtable to handle
  * @param[in] key the key of the value to remove from the hashtable
  * @param[in] d the function to use to dispose of the value removed from the hashtable
  */
-bool deleteItemInHTWithElement(HT* ht, unsigned long key, ct_destructor_t d);
+bool ct_ht_remove_and_destroy(ct_hashtable_o* ht, unsigned long key, ct_destructor_t d);
 
 /**
  * checks if the hashtable contains no values
@@ -219,19 +183,19 @@ bool deleteItemInHTWithElement(HT* ht, unsigned long key, ct_destructor_t d);
  * @param[in] ht the hashtable to handle
  * @return @true if the hashtable contains no values; @false otherwise;
  */
-bool isHTEmpty(const HT* ht);
+bool ct_ht_is_empty(const ct_hashtable_o* ht);
 
 /**
  * Fetch the first item the program can find within the hashtable.
  *
- * Nothing is said about what the softwar epicks up: **don't assume it was the first one you have added in the hashtable!**
+ * Nothing is said about what the software picks up: **don't assume it was the first one you have added in the hashtable!**
  *
- * @param[in] ht the hashtable invovled
+ * @param[in] ht the hashtable involved
  * @return
  * 	\li an item inside the \c ht;
  * 	\li @null if the \c ht is empty;
  */
-void* getFirstItemInHT(const HT* ht);
+void* ct_ht_get_first(const ct_hashtable_o* ht);
 
 /**
  * Swap the contents of the values indexed by \c key1 and \c keys
@@ -246,7 +210,7 @@ void* getFirstItemInHT(const HT* ht);
  * 	\li @true if a swap is performed;
  * 	\li @false if both keys are not present;
  */
-bool swapValuesInHT(HT* ht, unsigned long key1, unsigned long key2);
+bool ct_ht_swap(ct_hashtable_o* ht, unsigned long key1, unsigned long key2);
 
 /**
  * Clear all the elements inside the given hashtable.
@@ -256,12 +220,12 @@ bool swapValuesInHT(HT* ht, unsigned long key1, unsigned long key2);
  *
  * @param[inout] ht the hashtable to clear
  */
-void clearHT(HT* ht);
+void ct_ht_clear(ct_hashtable_o* ht);
 
 /**
  * Clear all the elements inside the given hashtable
  *
- * Contrarly to ::clearHT, this function will release the memory of the paylaod inside the hashtable as well!
+ * Contrary to ::ct_ht_clear, this function will release the memory of the payloads inside the hashtable as well!
  *
  * \post
  * 	\li hashtable empty;
@@ -270,25 +234,41 @@ void clearHT(HT* ht);
  * @param[inout] ht the hashtable to clear
  * @param[in] d the function to use to destroy the paylaod of the hashtable
  */
-void clearHTWithElements(HT* ht, ct_destructor_t d);
+void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destructor_t d);
+
+/**
+ * Returns the head entry of the hashtable.
+ *
+ * @param[inout] ht The hashtable on which to operate
+ * @return The head entry of the hashtable
+ */
+ct_hashtable_entry_o* _ct_ht_head_entry(ct_hashtable_o* ht);
+
+/**
+ * Returns the value of the "next" field in the UT_hash_handle field of an entry.
+ * \note
+ * This function is purely instrumental towards hiding implementation details to the hashtable user
+ *
+ * @param[in] entry The hashtable entry on which the desired handle resides
+ * @return A pointer to the next value contained in the hashtable, considered by insertion order
+ */
+void* _ct_ht_entry_next(ct_hashtable_entry_o* entry);
+
+/**
+ * Returns the payload of a given hashtable entry
+ *
+ * @param[in] entry The entry which contains the desired payload
+ * @return The payload of the entry
+ */
+void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry);
 
 //Picked up from uthash HASH_ITER Definition
-#define ITERATE_ON_HT(_head,el)   \
-	HTCell* UV(head) = ((HT*)(_head))->head;\
-	HTCell* el = NULL; \
-	HTCell* UV(tmp) = NULL;\
-	for(((el)=(UV(head))), ((*(char**)(&(UV(tmp))))=(char*)((UV(head)!=NULL)?(UV(head))->hh.next:NULL)); \
-  (el) != NULL; ((el)=(UV(tmp))), ((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?(UV(tmp))->hh.next:NULL)))
-
-#ifdef NO_DECLTYPE
-#define HASH_ITER(hh,head,el,tmp)                                                \
-for(((el)=(head)), ((*(char**)(&(tmp)))=(char*)((head!=NULL)?(head)->hh.next:NULL)); \
-  (el) != NULL; ((el)=(tmp)), ((*(char**)(&(tmp)))=(char*)((tmp!=NULL)?(tmp)->hh.next:NULL)))
-#else
-#define HASH_ITER(hh,head,el,tmp)                                                \
-for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));      \
-  (el) != NULL; ((el)=(tmp)), ((tmp)=DECLTYPE(el)((tmp!=NULL)?(tmp)->hh.next:NULL)))
-#endif
+#define ITERATE_ON_HT(ht,el)   																								\
+	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*) (ht));												\
+	ct_hashtable_entry_o* el = NULL; 																						\
+	ct_hashtable_entry_o* UV(tmp) = NULL;																					\
+	for(((el)=(UV(head))), ((*(char**)(&(UV(tmp))))=(char*)((UV(head)!=NULL)?_ct_ht_entry_next(UV(head)):NULL)); 			\
+  (el) != NULL; ((el)=(UV(tmp))), ((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL)))
 
 //TODO replace this code with the correct code in Cutils!!!!
 /**
@@ -297,33 +277,33 @@ for(((el)=(head)), ((tmp)=DECLTYPE(el)((head!=NULL)?(head)->hh.next:NULL));     
  * An example of usage might be:
  *
  * <pre><code>
- * HT* ht;
+ * ct_hashtable_o* ht;
  * ITERATE_VALUES_ON_HT(&ht, el, int) {
  * 	printf("value %d\n", *el);
  * }
  * </code></pre>
  *
- * @param[in] _head double point to an hashtable to go through
+ * @param[in] ht Pointer to the hashtable on which to iterate
  * @param[in] _data the name of the variable that will contain a value in the iteration
  * @param[in] type the type of \c _data. So if you put \c int, data will have type <tt>int</tt>
  */
-#define ITERATE_VALUES_ON_HT(_head,_data,type) \
-	HTCell* UV(head) = ((HT*)(_head))->head;\
-	HTCell* UV(el) = NULL; \
-	HTCell* UV(tmp) = NULL;\
-	type _data = NULL; \
-	if (UV(head) != NULL) { \
-		_data = UV(head)->data; \
-	} \
-	for(\
-		(UV(el)=(UV(head))), \
-		((*(char**)(&(UV(tmp))))=(char*)((UV(head) != NULL)?(UV(head))->hh.next:NULL)) \
-		; \
-		UV(el) != NULL \
-		; \
-		(UV(el)=(UV(tmp))), \
-		_data=(UV(el) != NULL) ? UV(el)->data : NULL,\
-		((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?(UV(tmp))->hh.next:NULL))\
+#define ITERATE_VALUES_ON_HT(ht,_data,type) 															\
+	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*)(ht));						\
+	ct_hashtable_entry_o* UV(el) = NULL; 															\
+	ct_hashtable_entry_o* UV(tmp) = NULL;															\
+	type _data = NULL; 																				\
+	if (UV(head) != NULL) { 																		\
+		_data = _ct_ht_entry_payload(UV(head)); 													\
+	} 																								\
+	for(																							\
+		(UV(el)=(UV(head))), 																		\
+		((*(char**)(&(UV(tmp))))=(char*)((UV(head) != NULL)?_ct_ht_entry_next(UV(head)):NULL)) 		\
+		; 																							\
+		UV(el) != NULL 																				\
+		; 																							\
+		(UV(el)=(UV(tmp))), 																		\
+		_data=(UV(el) != NULL) ? _ct_ht_entry_payload(UV(el)) : NULL,								\
+		((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL))			\
 	)
 
 

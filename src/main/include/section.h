@@ -163,7 +163,7 @@ struct SectionSnapshot {
 	 *
 	 * @notnull
 	 */
-	ct_list_t * assertion_reports;
+	ct_list_o * assertion_reports;
 	/**
 	 * The pointer to the parent snapshot in the snapshot tree.
 	 *

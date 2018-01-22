@@ -15,7 +15,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 
 	//TODO here we need  to replace the parameter runOnlyWithTags and excludeIfTags with a pointer of the global model
 	//check if the section we're dealing with is compliant with the context tags
-	if (!isHTEmpty(exclude_tags)) {
+	if (!ct_ht_is_empty(exclude_tags)) {
 		if (haveTagSetsIntersection(section->tags, exclude_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;
@@ -24,7 +24,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 		}
 	}
 
-	if (!isHTEmpty(run_tags)) {
+	if (!ct_ht_is_empty(run_tags)) {
 		if (!haveTagSetsIntersection(section->tags, run_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;
@@ -143,7 +143,7 @@ void ct_callback_do_nothing(ct_model_t* model, Section* section) {
 void ct_callback_entering_testcase(ct_model_t* model, Section* section) {
 	ct_update_current_snapshot(model, model->current_section);
 	ct_test_report_t* report = ct_init_test_report(model->current_snapshot);
-	ct_add_tail_in_list(model->test_reports_list, report);
+	ct_list_add_tail(model->test_reports_list, report);
 }
 
 void ct_callback_entering_then(ct_model_t* model, Section* section) {
@@ -157,7 +157,7 @@ void ct_callback_entering_when(ct_model_t* model, Section* section) {
 }
 
 void ct_exit_callback_access_granted_testcase(ct_model_t* model, Section** pointer_to_set_as_parent, Section* section) {
-	ct_test_report_t* report = ct_list_last_element(model->test_reports_list);
+	ct_test_report_t* report = ct_list_tail(model->test_reports_list);
 	SectionSnapshot* last_snapshot = model->current_snapshot;
 
 	ct_update_snapshot_status(section, model->current_snapshot);

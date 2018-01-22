@@ -30,7 +30,7 @@ typedef struct tag {
 /**
  * Alias to improve readability inside the code
  */
-typedef HT tag_ht;
+typedef ct_hashtable_o tag_ht;
 
 /**
  * Initialize a new tag
