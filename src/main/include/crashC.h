@@ -601,7 +601,7 @@ void ct_callback_entering_testcase(ct_model_t* model, Section* section);
  * Use this function to perform additional operations **just before** ct_model_t model is fully disposed.
  * Usually you can use this function to release from memory any additional resources you've created.
  *
- * @param[in] x a function of type <tt>void (*f)(void)</tt> to be executed before tearing down the whole model
+ * @param[in] f a function of type <tt>void (*f)(void)</tt> to be executed before tearing down the whole model
  * @see ct_model_t::ct_teardown
  */
 void ct_set_crashc_teardown(ct_teardown_t f);

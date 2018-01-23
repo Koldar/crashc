@@ -62,10 +62,10 @@ int ct_tag_compare(const struct ct_tag* tag1, const struct ct_tag* tag2);
 /**
  * Check if 2 tag sets have an intersection
  *
- * 2 tag hashtables have an intersection if at least one tag is present both in \c tagSet1 and in \c tagSet2
+ * 2 tag hashtables have an intersection if at least one tag is present both in \c tag_set1 and in \c tag_set2
  *
- * @param[in] tagSet1 the first tagset to compute
- * @param[in] tagSet2 the second tagset to compute
+ * @param[in] tag_set1 the first tagset to compute
+ * @param[in] tag_set2 the second tagset to compute
  * @return
  * 	\li @true if the 2 tagsets have something in common;
  * 	\li @false otherwise;
@@ -78,7 +78,7 @@ bool ct_have_tag_set_intersection(const ct_tag_hashtable_o* tag_set1, const ct_t
  * \post
  * 	\li after this operation, the hastable has increased its size by 1
  *
- * @param[inout] tagHashTable hashtable to populate
+ * @param[inout] tag_hashable hashtable to populate
  * @param[in] name name of the tag to add
  */
 void ct_tag_ht_put(ct_tag_hashtable_o* tag_hashable, const char* name);
