@@ -12,7 +12,7 @@
 #include "list.h"
 #include "ct_assert.h"
 
-ct_test_report_t* ct_init_test_report(SectionSnapshot* tc_snapshot) {
+ct_test_report_t* ct_init_test_report(struct ct_snapshot* tc_snapshot) {
 	ct_test_report_t* ret_val = malloc(sizeof(ct_test_report_t));
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
@@ -33,8 +33,8 @@ void ct_destroy_test_report(ct_test_report_t* report) {
 
 }
 
-SectionSnapshot* ct_init_section_snapshot(Section* section) {
-	SectionSnapshot* ret_val = malloc(sizeof(SectionSnapshot));
+struct ct_snapshot* ct_init_section_snapshot(struct ct_section* section) {
+	struct ct_snapshot* ret_val = malloc(sizeof(struct ct_snapshot));
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
@@ -42,7 +42,7 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 	ret_val->description   = strdup(section->description);
 	ret_val->tags          = section->tags;
 	ret_val->type          = section->type;
-	ret_val->status        = SNAPSHOT_OK;
+	ret_val->status        = CT_SNAPSHOT_OK;
 	ret_val->elapsed_time  = 0;
 	ret_val->assertion_reports = ct_list_init();
 	ret_val->parent = NULL;
@@ -52,13 +52,13 @@ SectionSnapshot* ct_init_section_snapshot(Section* section) {
 	return ret_val;
 }
 
-void ct_destroy_snapshot_tree(SectionSnapshot* snapshot) {
+void ct_destroy_snapshot_tree(struct ct_snapshot* snapshot) {
 	free(snapshot->description);
 	ct_list_destroy_with_elements(snapshot->assertion_reports, (ct_destructor_t) ct_destroy_assert_report);
 
-	SectionSnapshot* next_child = snapshot->first_child;
+	struct ct_snapshot* next_child = snapshot->first_child;
 	while (next_child != NULL) {
-		SectionSnapshot* tmp = next_child->next_sibling;
+		struct ct_snapshot* tmp = next_child->next_sibling;
 		ct_destroy_snapshot_tree(next_child);
 		next_child = tmp;
 	}
@@ -66,10 +66,10 @@ void ct_destroy_snapshot_tree(SectionSnapshot* snapshot) {
 	free(snapshot);
 }
 
-SectionSnapshot* ct_add_snapshot_to_tree(SectionSnapshot* to_add, SectionSnapshot* tree) {
+struct ct_snapshot* ct_add_snapshot_to_tree(struct ct_snapshot* to_add, struct ct_snapshot* tree) {
 	to_add->parent = tree;
 
-	SectionSnapshot* tmp = tree->first_child;
+	struct ct_snapshot* tmp = tree->first_child;
 	if (tmp == NULL) {
 			tree->first_child = to_add;
 			return to_add;
@@ -85,14 +85,14 @@ SectionSnapshot* ct_add_snapshot_to_tree(SectionSnapshot* to_add, SectionSnapsho
 	}
 }
 
-void ct_update_snapshot_status(Section* section, SectionSnapshot* snapshot) {
-	if (section->status == SECTION_SIGNAL_DETECTED) {
-		snapshot->status = SNAPSHOT_SIGNALED;
+void ct_update_snapshot_status(struct ct_section* section, struct ct_snapshot* snapshot) {
+	if (section->status == CT_SECTION_SIGNAL_DETECTED) {
+		snapshot->status = CT_SNAPSHOT_SIGNALED;
 	}
 }
 
-void ct_update_test_outcome(ct_test_report_t* report, SectionSnapshot* last_snapshot) {
-	if (last_snapshot->status != SNAPSHOT_OK) {
+void ct_update_test_outcome(ct_test_report_t* report, struct ct_snapshot* last_snapshot) {
+	if (last_snapshot->status != CT_SNAPSHOT_OK) {
 		report->testcase_snapshot->status = last_snapshot->status;
 		report->outcome = TEST_FAILURE;
 	}

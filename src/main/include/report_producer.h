@@ -68,20 +68,20 @@ struct ct_report_producer_t {
 };
 
 /**
- * Prints the string representation of a ::snapshot_status
+ * Prints the string representation of a ::enum ct_snapshot_status
  *
  * @param[in] status the status to compute the string representation of
  * @return a string representation of \c status
  */
-char* ct_snapshot_status_to_string(snapshot_status status);
+char* ct_snapshot_status_to_string(enum ct_snapshot_status status);
 
 /**
- * Prints the string representation of a ::section_type
+ * Prints the string representation of a ::enum ct_section_type
  *
  * @param[in] type the type to compute the string representation of
  * @return a string representation of \c type
  */
-char* ct_section_type_to_string(section_type type);
+char* ct_section_type_to_string(enum ct_section_type type);
 
 //TODO in my opinion these functiosn should be placed in another header called like "default_report_producer.h"
 
@@ -131,7 +131,7 @@ void ct_default_test_report(ct_model_t* model, ct_test_report_t* report);
  * @param[inout] snapshot the snapshot to write into the file
  * @param[in] level the depth level \c snapshot is in the snapshot tree
  */
-void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapshot, int level);
+void ct_default_snapshot_tree_report(ct_model_t* model, struct ct_snapshot* snapshot, int level);
 
 /**
  * Prints a default report for the assertions related to a specific snapshot
@@ -144,7 +144,7 @@ void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapsho
  * @param[in] level the depth level \c snapshot is in the snapshot tree
  *
  */
-void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, int level);
+void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapshot, int level);
 
 ///@}
 

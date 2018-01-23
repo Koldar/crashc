@@ -68,7 +68,7 @@ typedef enum {
  *
  * These are what @crashc considers to be tests.
  * This implies that the informations stored in the ct_test_report_t struct are related to the flow of execution, not to a given section.
- * This is the reason why the ct_test_report_t struct needs an auxiliary struct, ::SectionSnapshot, to hold the information on the status of
+ * This is the reason why the ct_test_report_t struct needs an auxiliary struct, ::struct ct_snapshot, to hold the information on the status of
  * the sections involved in the test at the moment they were executed.
  */
 struct ct_test_report {
@@ -86,7 +86,7 @@ struct ct_test_report {
 	 * @notnull
 	 */
 	 //TODO is this field always not null? Ask lorenzo
-	 SectionSnapshot * testcase_snapshot;
+	 struct ct_snapshot * testcase_snapshot;
 	 /**
 	  * The outcome of the test.
 	  */
@@ -110,7 +110,7 @@ struct ct_test_report {
  * @param[in] tc_snapshot the snapshot tree associated to the test report
  * @return the test report desired;
  */
-ct_test_report_t* ct_init_test_report(struct SectionSnapshot* tc_snapshot);
+ct_test_report_t* ct_init_test_report(struct ct_snapshot* tc_snapshot);
 /**
  * release from the memory a ct_test_report_t
  *
@@ -122,16 +122,16 @@ void ct_destroy_test_report(ct_test_report_t* report);
 /**
  * Initialize in the heap a new section snapshot
  *
- * @param[in] section the section represented by the ::SectionSnapshot you want to build
- * @return the requested ::SectionSnapshot
+ * @param[in] section the section represented by the ::struct ct_snapshot you want to build
+ * @return the requested ::struct ct_snapshot
  */
-SectionSnapshot* ct_init_section_snapshot(Section* section);
+struct ct_snapshot* ct_init_section_snapshot(struct ct_section* section);
 /**
  * Release from memory a section snapshot
  *
  * @param[inout] snapshot the snapshot to remove from the memory
  */
-void ct_destroy_snapshot_tree(SectionSnapshot* snapshot);
+void ct_destroy_snapshot_tree(struct ct_snapshot* snapshot);
 
 /**
  * Adds the given section to the section tree
@@ -143,19 +143,19 @@ void ct_destroy_snapshot_tree(SectionSnapshot* snapshot);
  * @param[inout] tree root of the snapshot tree to rearrange
  * @return \c to_add value
  */
-SectionSnapshot* ct_add_snapshot_to_tree(SectionSnapshot* to_add, SectionSnapshot* tree);
+struct ct_snapshot* ct_add_snapshot_to_tree(struct ct_snapshot* to_add, struct ct_snapshot* tree);
 
 /**
  * Checks the status of the section associated to a given snapshot in order to change coherently the status of the snapshot.
  *
  * This is needed due to the fact
  * that every snapshot is created when entering at the beginning of the section and by default
- * is set as ::SNAPSHOT_OK, so it discovers if any error occourred only at the end, by checking the section status.
+ * is set as ::CT_SNAPSHOT_OK, so it discovers if any error occourred only at the end, by checking the section status.
  *
  * @param[in] section to status to check
  * @param[inout] snapshot whose status we need to alter
  */
-void ct_update_snapshot_status(Section* section, SectionSnapshot* snapshot);
+void ct_update_snapshot_status(struct ct_section* section, struct ct_snapshot* snapshot);
 
 /**
  * Checks the status of the last executed snapshot in the test tree and sets the status of the test as needed
@@ -163,6 +163,6 @@ void ct_update_snapshot_status(Section* section, SectionSnapshot* snapshot);
  * @param[inout] report the report to update
  * @param[in] last_snapshot the snapshot whose result we need to integrate to \c report
  */
-void ct_update_test_outcome(ct_test_report_t* report, SectionSnapshot* last_snapshot);
+void ct_update_test_outcome(ct_test_report_t* report, struct ct_snapshot* last_snapshot);
 
 #endif /* TEST_REPORT_H_ */

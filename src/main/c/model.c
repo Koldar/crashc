@@ -28,7 +28,7 @@ ct_model_t* ct_setup_default_model() {
 	ret_val->run_only_if_tags = ct_ht_init();
 	ret_val->exclude_tags = ct_ht_init();
 	ret_val->_crashc_sigaction = (struct sigaction) { 0 };
-	ret_val->root_section = initSection(ST_ROOT, 0, "root", "");
+	ret_val->root_section = ct_section_init(CT_ROOT_SECTION, "root", "");
 	ret_val->statistics = ct_init_stats();
 	ret_val->report_producer_implementation = ct_init_default_report_producer();
 	ret_val->output_file = stdout;
@@ -37,7 +37,7 @@ ct_model_t* ct_setup_default_model() {
 }
 
 void ct_teardown_default_model(ct_model_t* ccm) {
-	destroySection(ccm->root_section);
+	ct_section_destroy(ccm->root_section);
 	ct_ht_destroy_with_elements(ccm->exclude_tags, (ct_destructor_t)ct_tag_destroy);
 	ct_ht_destroy_with_elements(ccm->run_only_if_tags, (ct_destructor_t)ct_tag_destroy);
 	ct_list_destroy_with_elements(ccm->test_reports_list, (ct_destructor_t)ct_destroy_test_report);

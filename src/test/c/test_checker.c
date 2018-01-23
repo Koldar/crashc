@@ -17,13 +17,13 @@
 static char __TEST_CHECKER_BUFFER[1000];
 static int nextPosition;
 static char split = ' ';
-static void ct_testing_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level);
+static void ct_testing_snapshot_tree_report(ct_model_t * model, struct ct_snapshot * snapshot, int level);
 static void ct_testing_summary_producer(ct_model_t * model);
 static void ct_testing_report(ct_model_t * model);
 static void ct_testing_test_report(ct_model_t * model, ct_test_report_t* report);
 static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome);
-static char * ct_testing_section_type_to_c(section_type type);
-static char * ct_testing_snapshot_status_to_s(snapshot_status status);
+static char * ct_testing_section_type_to_c(enum ct_section_type type);
+static char * ct_testing_snapshot_status_to_s(enum ct_snapshot_status status);
 
 void clearTestChecker() {
 	nextPosition = 0;
@@ -79,27 +79,27 @@ static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome) {
 	}
 }
 
-static char * ct_testing_section_type_to_s(section_type type) {
+static char * ct_testing_section_type_to_s(enum ct_section_type type) {
 	switch (type) {
-		case ST_ROOT: return "ROOT";
-		case ST_SUITECASE: return "SUITE";
-		case ST_TESTCASE: return "TESTCASE";
-		case ST_WHEN: return "WHEN";
-		case ST_THEN: return "THEN";
+		case CT_ROOT_SECTION: return "ROOT";
+		case CT_TESTSUITE_SECTION: return "SUITE";
+		case CT_TESTCASE_SECTION: return "TESTCASE";
+		case CT_WHEN_SECTION: return "WHEN";
+		case CT_THEN_SECTION: return "THEN";
 		default: return "???";
 	}
 }
 
-static char * ct_testing_snapshot_status_to_s(snapshot_status status) {
+static char * ct_testing_snapshot_status_to_s(enum ct_snapshot_status status) {
 	switch (status) {
-		case SNAPSHOT_OK: return "OK";
-		case SNAPSHOT_SIGNALED: return "SIG";
-		case SNAPSHOT_FAILED: return "FAIL";
+		case CT_SNAPSHOT_OK: return "OK";
+		case CT_SNAPSHOT_SIGNALED: return "SIG";
+		case CT_SNAPSHOT_FAILED: return "FAIL";
 		default: return "???";
 	}
 }
 
-static void ct_testing_snapshot_tree_report(ct_model_t * model, SectionSnapshot * snapshot, int level) {
+static void ct_testing_snapshot_tree_report(ct_model_t * model, struct ct_snapshot * snapshot, int level) {
 	char level_str[12];
 	sprintf(level_str, "%d", level);
 	addString(level_str, false);
@@ -109,7 +109,7 @@ static void ct_testing_snapshot_tree_report(ct_model_t * model, SectionSnapshot 
 	addString(ct_testing_snapshot_status_to_s(snapshot->status), false);
 	addCharacter('_');
 
-	SectionSnapshot * child = snapshot->first_child;
+	struct ct_snapshot * child = snapshot->first_child;
 	while (child != NULL) {
 		ct_testing_snapshot_tree_report(model, child, level + 1);
 		child = child->next_sibling;

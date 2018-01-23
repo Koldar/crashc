@@ -46,7 +46,7 @@ void ct_assert_do_nothing(ct_model_t* model) {
 
 void ct_general_assert_failed(ct_model_t* model) {
 
-	SectionSnapshot* snapshot = model->current_snapshot;
+	struct ct_snapshot* snapshot = model->current_snapshot;
 	ct_assert_report_t* report = ct_list_tail(snapshot->assertion_reports);
 	ct_test_report_t* test_report = ct_list_tail(model->test_reports_list);
 
@@ -56,7 +56,7 @@ void ct_general_assert_failed(ct_model_t* model) {
 	report->actual_str = "false";
 
 	//Update the status of the snapshot which contained this assertion and of the test
-	snapshot->status = SNAPSHOT_FAILED;
+	snapshot->status = CT_SNAPSHOT_FAILED;
 	ct_update_test_outcome(test_report, snapshot);
 
 	//We then need to reset the current snapshot to start a new snapshot tree

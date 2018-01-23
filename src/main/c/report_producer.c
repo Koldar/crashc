@@ -11,26 +11,26 @@
 #include "ct_assert.h"
 #include "errors.h"
 
-char* ct_snapshot_status_to_string(snapshot_status s) {
+char* ct_snapshot_status_to_string(enum ct_snapshot_status s) {
 
 	switch (s) {
-		case SNAPSHOT_OK: return "OK";
-		case SNAPSHOT_SIGNALED: return "SIGNALED";
-		case SNAPSHOT_FAILED: return "FAILED";
+		case CT_SNAPSHOT_OK: return "OK";
+		case CT_SNAPSHOT_SIGNALED: return "SIGNALED";
+		case CT_SNAPSHOT_FAILED: return "FAILED";
 		default: 	printf("\nERROR: Unrecognized snapshot status, exiting.\n");
 					exit(1); //TODO: Fix error exit
 	}
 
 }
 
-char* ct_section_type_to_string(section_type t) {
+char* ct_section_type_to_string(enum ct_section_type t) {
 
 	switch (t) {
-		case ST_WHEN: return "WHEN";
-		case ST_THEN: return "THEN";
-		case ST_TESTCASE: return "TESTCASE";
-		case ST_ROOT: return "ROOT";
-		case ST_SUITECASE: return "SUITE";
+		case CT_WHEN_SECTION: return "WHEN";
+		case CT_THEN_SECTION: return "THEN";
+		case CT_TESTCASE_SECTION: return "TESTCASE";
+		case CT_ROOT_SECTION: return "ROOT";
+		case CT_TESTSUITE_SECTION: return "SUITE";
 		default: 	printf("\nERROR: Unrecognized section type, exiting.\n");
 					exit(1); //TODO: Fix error exit
 	}
@@ -39,7 +39,7 @@ char* ct_section_type_to_string(section_type t) {
 
 
 //TODO: Check for errors due to FILE null pointer etc...
-void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapshot, int level) {
+void ct_default_snapshot_tree_report(ct_model_t* model, struct ct_snapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
 
@@ -48,7 +48,7 @@ void ct_default_snapshot_tree_report(ct_model_t* model, SectionSnapshot* snapsho
 	fprintf(file, "%s : %s -> %s\n", type_str, snapshot->description, status_str);
 	ct_default_assertions_report(model, snapshot, level);
 
-	SectionSnapshot* child = snapshot->first_child;
+	struct ct_snapshot* child = snapshot->first_child;
 	while (child != NULL) {
 		for (int i = 0; i < level; i++) {
 			putchar('\t');
@@ -84,7 +84,7 @@ void ct_default_report_summary(ct_model_t* model) {
 
 }
 
-void ct_default_assertions_report(ct_model_t* model, SectionSnapshot* snapshot, int level) {
+void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
 	ct_list_o* assertion_reports = snapshot->assertion_reports;

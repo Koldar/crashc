@@ -13,135 +13,199 @@
 #include "macros.h"
 
 /**
- * The id the next section created with ::initSection will have.
+ * The id the next section created with ::ct_section_init will have.
  *
- * It goes from 1 and not from0 because 0 is **manually** set to the root section, created **statically**.
+ * It starts from 1 and not from 0 because 0 is **manually** set to the root section, created **statically**.
  * See ::rootSection
  */
-static int nextSectionId = 1;
+static int next_section_id = 1;
 
-static void printSectionData(const Section* section, bool recursive);
-static void computeDotFileOfSectionTree(FILE* fout, const Section* section);
-static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section);
-static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section* section);
+static int populate_section_status_buffer_string(const int ss, int space_left, char* buffer);
+static void compute_section_tree_dot_file(FILE* fout, const struct ct_section* section);
+static void update_section_tree_dot_file_with_section_info(FILE* fout, const struct ct_section* section);
+static void update_section_tree_dot_file_with_section_edges(FILE* fout, const struct ct_section* section);
 
-//TODO remove this documentation!
+struct ct_section* ct_section_add_child(struct ct_section* restrict to_add, struct ct_section* restrict parent) {
+	struct ct_section* list = NULL;
 
-/** Adds the given section as a children to the specified parent section.
- *  The function also automatically reorganize the internal sections tree
- *  by properly updating the involved nodes pointers.
- *  Returns a pointer to the added section.
- */
-Section* addSectionToParent(Section* restrict toAdd, Section* restrict parent) {
-	Section* list = NULL;
+	to_add->parent = parent;
 
-	toAdd->parent = parent;
-
-	list = parent->firstChild;
+	list = parent->first_child;
 	if (list == NULL) {
-		parent->firstChild = toAdd;
-		return toAdd;
+		parent->first_child = to_add;
+		return to_add;
 	}
 	while (true) {
-		if (list->nextSibling != NULL) {
-			list = list->nextSibling;
+		if (list->next_sibling != NULL) {
+			list = list->next_sibling;
 		} else {
-			list->nextSibling = toAdd;
-			return toAdd;
+			list->next_sibling = to_add;
+			return to_add;
 		}
 	}
 }
 
-/** Returns the n-th child of the given section or NULL if it has none.
- */
-Section* getNSection(const Section* parent, int nChild) {
-	Section* list = parent->firstChild;
+struct ct_section* ct_section_get_child(const struct ct_section* parent, int n) {
+	struct ct_section* list = parent->first_child;
 	while(true) {
-		if ((nChild == 0) || (list == NULL)) {
+		if ((n == 0) || (list == NULL)) {
 			return list;
 		} else {
-			list = list->nextSibling;
-			nChild--;
+			list = list->next_sibling;
+			n--;
 		}
 	}
 }
 
-/** Initializes a new Section struct given its levelId, description and tags.
- *  Other values are initialized to their default.
- *  Returns a pointes to the newly created Section.
- */
-Section* initSection(section_type type, SectionLevelId levelId, const char* description, const char* tags) {
-	Section* retVal = malloc(sizeof(Section));
-	if (retVal == NULL) {
+struct ct_section* ct_section_init(enum ct_section_type type, const char* description, const char* tags) {
+	struct ct_section* ret_val = malloc(sizeof(struct ct_section));
+	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->id = nextSectionId;
-	nextSectionId += 1;
-	retVal->accessGranted = false;
-	retVal->alreadyFoundWhen = false;
-	retVal->childrenNumber = 0;
-	retVal->childrenNumberComputed = false;
-	retVal->status = SECTION_UNVISITED;
-	retVal->currentChild = 0;
-	retVal->description = strdup(description);
-	retVal->firstChild = NULL;
-	retVal->type = type;
-	retVal->levelId = levelId;
-	retVal->loopId = 0;
-	retVal->loop1 = false;
-	retVal->loop2 = false;
-	retVal->nextSibling = NULL;
-	retVal->parent = NULL;
-	retVal->tags = ct_ht_init();
+	ret_val->id = next_section_id;
+	next_section_id += 1;
+	ret_val->access_granted = false;
+	ret_val->already_found_when = false;
+	ret_val->children_number = 0;
+	ret_val->children_number_known = false;
+	ret_val->status = CT_SECTION_UNVISITED;
+	ret_val->current_child = 0;
+	ret_val->description = strdup(description);
+	ret_val->first_child = NULL;
+	ret_val->type = type;
+	ret_val->times_encountered = 0;
+	ret_val->loop1 = false;
+	ret_val->loop2 = false;
+	ret_val->next_sibling = NULL;
+	ret_val->parent = NULL;
+	ret_val->tags = ct_ht_init();
 
-	ct_tag_ht_populate(retVal->tags, tags, CT_TAGS_SEPARATOR);
+	ct_tag_ht_populate(ret_val->tags, tags, CT_TAGS_SEPARATOR);
 
-	return retVal;
+	return ret_val;
 }
 
-void destroySection(Section* section) {
-	if (section->firstChild != NULL) {
-		destroySection(section->firstChild);
+void ct_section_destroy(struct ct_section* section) {
+	if (section->first_child != NULL) {
+		ct_section_destroy(section->first_child);
 	}
-	if (section->nextSibling != NULL) {
-		destroySection(section->nextSibling);
+	if (section->next_sibling != NULL) {
+		ct_section_destroy(section->next_sibling);
 	}
-	if (section->levelId <= 0) {
+	if (section->parent == NULL) {
 		//root section shouldn't be removed at all
 		return;
 	}
 
 	ct_ht_destroy_with_elements(section->tags, (ct_destructor_t)(ct_tag_destroy));
-	//destroyListWithElement(section->sectionToRunList, destroySection);
-	free((void*)section->description);
-	free((void*)section);
+	free((void*) section->description);
+	free((void*) section);
 }
 
-/** Checks whether we are still computing the number of a section's children and returns
- *  true in this case, false otherwise.
- */
-bool areWeComputingChildren(const Section* section) {
-	return !section->childrenNumberComputed;
+bool ct_section_still_discovering_children(const struct ct_section* section) {
+	return !section->children_number_known;
 }
 
-int populateBufferStringOfSection(const Section* s, int spaceLeft, char* buffer) {
-	int i = 0;
-	i += snprintf(&buffer[i], spaceLeft - i, "[%d: %s; status:", s->levelId, s->description);
-	i += populateBufferStringOfSectionStatus(s->status, spaceLeft - i, &buffer[i]);
-	i += snprintf(&buffer[i], spaceLeft - i, "; when found: %s", s->alreadyFoundWhen ? "yes" : "no");
-	i += snprintf(&buffer[i], spaceLeft - i, "]");
-	return i;
+void ct_section_set_signaled(struct ct_section* section) {
+	section->status = CT_SECTION_SIGNAL_DETECTED;
 }
 
-int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffer) {
+bool ct_section_is_signaled(const struct ct_section* section) {
+	return section->status == CT_SECTION_SIGNAL_DETECTED;
+}
+
+void ct_section_set_executed(struct ct_section* section) {
+	section->status = CT_SECTION_PARTIALLY_VISITED;
+}
+
+void ct_section_set_done(struct ct_section* section) {
+	section->status = CT_SECTION_FULLY_VISITED;
+}
+
+void ct_section_set_skipped(struct ct_section* section) {
+	section->status = CT_SECTION_SKIPPED_BY_TAG;
+}
+
+bool ct_section_still_needs_execution(struct ct_section* section) {
+	if (section->status == CT_SECTION_UNVISITED || section->status == CT_SECTION_PARTIALLY_VISITED) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+int ct_section_get_level(const struct ct_section* section) {
+	int level = 0;
+	const struct ct_section* tmp = section;
+
+	while (tmp->parent != NULL) {
+		level++;
+		tmp = tmp->parent;
+	}
+
+	return level;
+}
+
+bool ct_section_is_fully_visited(struct ct_section* section) {
+	if (section->children_number == 0) {
+		return true;
+	}
+	else {
+		struct ct_section* next_child = section->first_child;
+
+		while (next_child != NULL) {
+			if (ct_section_still_needs_execution(next_child)) {
+				return false;
+			}
+			next_child = next_child->next_sibling;
+		}
+		return true;
+	}
+}
+
+void ct_section_draw_tree(const struct ct_section* section, const char* format, ...) {
+	//create image name
+	va_list ap;
+	char image_template[CT_BUFFER_SIZE];
+	va_start(ap, format);
+	vsnprintf(image_template, CT_BUFFER_SIZE, format, ap);
+	va_end(ap);
+
+	char dot_filename[CT_BUFFER_SIZE];
+	strncpy(dot_filename, image_template, CT_BUFFER_SIZE);
+	//TODO here we need to make sure ".dot" can be put within the buffer
+	strcat(dot_filename, ".dot");
+
+	FILE* dot_file = fopen(dot_filename, "w");
+	if (dot_file == NULL) {
+		fprintf(stderr, "Can't create dot_file %s! Exiting...", dot_filename);
+		//TODO create a new error like FILE_ERROR_CALLBACK
+		exit(1);
+	}
+	compute_section_tree_dot_file(dot_file, section);
+	fclose(dot_file);
+
+	char png_filename[CT_BUFFER_SIZE];
+	strncpy(png_filename, image_template, CT_BUFFER_SIZE);
+	//TODO here we need to make sure ".dot" can be put within the buffer
+	strcat(png_filename, ".png");
+
+	char command[CT_BUFFER_SIZE];
+	snprintf(command, CT_BUFFER_SIZE, "dot -Tpng -o%s %s", png_filename, dot_filename);
+	system(command);
+	unlink(dot_filename);
+}
+
+static int populate_section_status_buffer_string(const int ss, int space_left, char* buffer) {
 	int i = 0;
 	//TODO renamed DONE, EXECUTED and UNEXECUTED to fit section status renaming
 	switch (ss) {
-	case SECTION_FULLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "DONE"); break; }
-	case SECTION_PARTIALLY_VISITED: { i += snprintf(&buffer[i], spaceLeft - i, "EXECUTED"); break; }
-	case SECTION_UNVISITED: { i += snprintf(&buffer[i], spaceLeft - i, "UNEXECUTED"); break; }
-	case SECTION_SIGNAL_DETECTED: { i += snprintf(&buffer[i], spaceLeft - i, "SIGNAL DETECTED"); break; }
+	case CT_SECTION_FULLY_VISITED: { i += snprintf(&buffer[i], space_left - i, "DONE"); break; }
+	case CT_SECTION_PARTIALLY_VISITED: { i += snprintf(&buffer[i], space_left - i, "EXECUTED"); break; }
+	case CT_SECTION_UNVISITED: { i += snprintf(&buffer[i], space_left - i, "UNEXECUTED"); break; }
+	case CT_SECTION_SIGNAL_DETECTED: { i += snprintf(&buffer[i], space_left - i, "SIGNAL DETECTED"); break; }
 	default: {
 		//TODO create a new error type, like SWITCH_DEFAULT_ERROR_CALLBACK
 		fprintf(stderr, "invalid section status %d\n", ss);
@@ -152,99 +216,13 @@ int populateBufferStringOfSectionStatus(const int ss, int spaceLeft, char* buffe
 	return i;
 }
 
-void markSectionAsSignalDetected(Section* section) {
-	section->status = SECTION_SIGNAL_DETECTED;
-}
-
-bool isSectionSignalDetected(const Section* section) {
-	return section->status == SECTION_SIGNAL_DETECTED;
-}
-
-/** Marks the given section as already executed once by setting
- *  the appropriate section_status_enum value
- */
-void markSectionAsExecuted(Section* section) {
-	section->status = SECTION_PARTIALLY_VISITED;
-}
-
-/**
- * Marks the given section as fully visited by setting the
- * appropriate section_status_enum value
- */
-void markSectionAsDone(Section * section) {
-	section->status = SECTION_FULLY_VISITED;
-}
-
-void markSectionAsSkippedByTag(Section* section) {
-	section->status = SECTION_SKIPPED_BY_TAG;
-}
-
-bool sectionStillNeedsExecution(Section * section) {
-	if (section->status == SECTION_UNVISITED || section->status == SECTION_PARTIALLY_VISITED) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-bool isSectionFullyVisited(Section * section) {
-	if (section->childrenNumber == 0) {
-		return true;
-	}
-	else {
-		Section * next_child = section->firstChild;
-
-		while (next_child != NULL) {
-			if (sectionStillNeedsExecution(next_child)) {
-				return false;
-			}
-			next_child = next_child->nextSibling;
-		}
-		return true;
-	}
-}
-
-void drawSectionTree(const Section* section, const char* format, ...) {
-	//create image name
-	va_list ap;
-	char imageTemplate[CT_BUFFER_SIZE];
-	va_start(ap, format);
-	vsnprintf(imageTemplate, CT_BUFFER_SIZE, format, ap);
-	va_end(ap);
-
-	char dotFilename[CT_BUFFER_SIZE];
-	strncpy(dotFilename, imageTemplate, CT_BUFFER_SIZE);
-	//TODO here we need to make sure ".dot" can be put within the buffer
-	strcat(dotFilename, ".dot");
-
-	FILE* dotFile = fopen(dotFilename, "w");
-	if (dotFile == NULL) {
-		fprintf(stderr, "Can't create dotFile %s! Exiting...", dotFilename);
-		//TODO create a new error like FILE_ERROR_CALLBACK
-		exit(1);
-	}
-	computeDotFileOfSectionTree(dotFile, section);
-	fclose(dotFile);
-
-	char pngFilename[CT_BUFFER_SIZE];
-	strncpy(pngFilename, imageTemplate, CT_BUFFER_SIZE);
-	//TODO here we need to make sure ".dot" can be put within the buffer
-	strcat(pngFilename, ".png");
-
-	char command[CT_BUFFER_SIZE];
-	snprintf(command, CT_BUFFER_SIZE, "dot -Tpng -o%s %s", pngFilename, dotFilename);
-	system(command);
-	unlink(dotFilename);
-}
-
-static void computeDotFileOfSectionTree(FILE* fout, const Section* section) {
+static void compute_section_tree_dot_file(FILE* fout, const struct ct_section* section) {
 	fprintf(fout, "digraph {\n");
 
 	// ******************* define nodes **********************
-	updateDotFileOfSectionTreeWithSectionInfo(fout, section);
+	update_section_tree_dot_file_with_section_info(fout, section);
 	// ******************* create edges **********************
-	updateDotFileOfSectionTreeWithSectionEdges(fout, section);
+	update_section_tree_dot_file_with_section_edges(fout, section);
 
 	fprintf(fout, "}\n");
 }
@@ -260,21 +238,21 @@ static void computeDotFileOfSectionTree(FILE* fout, const Section* section) {
  * @param[inout] fout the file to write on
  * @param[in] section the section where we start writing information from
  */
-static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section* section) {
+static void update_section_tree_dot_file_with_section_info(FILE* fout, const struct ct_section* section) {
 	char buffer[CT_BUFFER_SIZE];
-	populateBufferStringOfSectionStatus(section->status, CT_BUFFER_SIZE, buffer);
-	fprintf(fout, "\tSECTION%05d [label=\"%s\\nlevel=%d;\\nstatus=%s\", shape=\"box\"];\n", section->id, section->description, section->levelId, buffer);
+	populate_section_status_buffer_string(section->status, CT_BUFFER_SIZE, buffer);
+	fprintf(fout, "\tSECTION%05d [label=\"%s\\nlevel=%d;\\nstatus=%s\", shape=\"box\"];\n", section->id, section->description, ct_section_get_level(section), buffer);
 
-	if (section->firstChild == NULL) {
+	if (section->first_child == NULL) {
 		return;
 	}
 
-	updateDotFileOfSectionTreeWithSectionInfo(fout, section->firstChild);
+	update_section_tree_dot_file_with_section_info(fout, section->first_child);
 
-	Section* tmp = section->firstChild->nextSibling;
+	struct ct_section* tmp = section->first_child->next_sibling;
 	while (tmp != NULL) {
-		updateDotFileOfSectionTreeWithSectionInfo(fout, tmp);
-		tmp = tmp->nextSibling;
+		update_section_tree_dot_file_with_section_info(fout, tmp);
+		tmp = tmp->next_sibling;
 	}
 
 }
@@ -284,25 +262,25 @@ static void updateDotFileOfSectionTreeWithSectionInfo(FILE* fout, const Section*
  *
  * \pre
  * 	\li \c fout open in "w" mode;
- * 	\li ::updateDotFileOfSectionTreeWithSectionInfo called;
+ * 	\li ::update_section_tree_dot_file_with_section_info called;
  * \post
  * 	\li \c fout contains all the edges;
  *
  * @param[inout] fout the file to write on
  * @param[in] section the section where we need to start adding edges from
  */
-static void updateDotFileOfSectionTreeWithSectionEdges(FILE* fout, const Section* section) {
-	if (section->firstChild == NULL) {
+static void update_section_tree_dot_file_with_section_edges(FILE* fout, const struct ct_section* section) {
+	if (section->first_child == NULL) {
 		return;
 	}
 
-	updateDotFileOfSectionTreeWithSectionEdges(fout, section->firstChild);
+	update_section_tree_dot_file_with_section_edges(fout, section->first_child);
 
-	fprintf(fout, "\tSECTION%05d -> SECTION%05d;\n", section->id, section->firstChild->id);
-	Section* tmp = section->firstChild->nextSibling;
+	fprintf(fout, "\tSECTION%05d -> SECTION%05d;\n", section->id, section->first_child->id);
+	struct ct_section* tmp = section->first_child->next_sibling;
 	while (tmp != NULL) {
 		fprintf(fout, "SECTION%05d -> SECTION%05d;\n", section->id, tmp->id);
-		tmp = tmp->nextSibling;
+		tmp = tmp->next_sibling;
 	}
 
 }

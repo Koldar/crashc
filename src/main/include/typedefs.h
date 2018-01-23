@@ -11,25 +11,16 @@
 #define TYPEDEFS_H_
 
 struct ct_model;
-struct Section;
+struct ct_section;
 struct ct_test_report;
-struct SectionSnapshot;
+struct ct_snapshot;
 struct ct_test_statistics_t;
 struct ct_report_producer_t;
 
-
-typedef struct Section Section;
-typedef struct SectionSnapshot SectionSnapshot;
 typedef struct ct_model ct_model_t;
 typedef struct ct_test_report ct_test_report_t;
 typedef struct ct_test_statistics_t ct_test_statistics_t;
 typedef struct ct_report_producer_t ct_report_producer_t;
-
-
-/**
- * Represents the type ::Section::levelId has
- */
-typedef int SectionLevelId;
 
 /**
  * Represents the signature of a function which release a structure from the memory
@@ -73,10 +64,10 @@ typedef void (*ct_test_reporter_t)(ct_model_t * model, ct_test_report_t * test_r
  * This type defines the function pointer to the function used to produce the report of a snapshot tree
  *
  * @param[inout] model the model under analysis
- * @param[in] snapshot the ::SectionSnapshot we need to create a human readable representation of
+ * @param[in] snapshot the ::struct ct_snapshot we need to create a human readable representation of
  * @param[in] level the depth (in the snapshot tree) of the \c snapshot
  */
-typedef void (*ct_snapshot_tree_reporter_t)(ct_model_t * model, SectionSnapshot * snapshot, int level);
+typedef void (*ct_snapshot_tree_reporter_t)(ct_model_t * model, struct ct_snapshot * snapshot, int level);
 
 /**
  * This type defines the function pointer to the function used to produce the tests summary.
@@ -92,10 +83,10 @@ typedef void (*ct_summary_reporter_t)(ct_model_t * model);
  * This type defines the function pointer to the function used to produce the reports for the assertions executed during a specific snapshot.
  *
  * @param[inout] model the model under analysis
- * @param[in] snapshot the ::SectionSnapshot containing the relevant asseritons. This argument **can be used** to get the list of ct_assert_report_t.
+ * @param[in] snapshot the ::struct ct_snapshot containing the relevant asseritons. This argument **can be used** to get the list of ct_assert_report_t.
  * @param[in] level the depth (in the snapshot tree) of the \c snapshot
  */
-typedef void (*ct_assert_reporter_t)(ct_model_t* model, SectionSnapshot* snapshot, int level);
+typedef void (*ct_assert_reporter_t)(ct_model_t* model, struct ct_snapshot* snapshot, int level);
 
 /**
  * function pointer type used to create the whole report by calling the other \ref reportFunctionType.
