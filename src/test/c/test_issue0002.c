@@ -15,8 +15,8 @@
 TESTS_START
 
 //add the tags we want to use
-addTagNameInTagHashTable(ct_model->run_only_if_tags, "RUN");
-addTagNameInTagHashTable(ct_model->exclude_tags, "NORUN");
+ct_tag_ht_put(ct_model->run_only_if_tags, "RUN");
+ct_tag_ht_put(ct_model->exclude_tags, "NORUN");
 
 REG_SUITE(1);
 REG_SUITE(2);

@@ -80,7 +80,7 @@ void ct_print_help(FILE* fout) {
 	}
 }
 
-void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht* run_tags, tag_ht* exclude_tags) {
+void ct_parse_args(const int argc, char* const* args, char tag_separator, ct_tag_hashtable_o* run_tags, ct_tag_hashtable_o* exclude_tags) {
 
 	while (true) {
 		/* getopt_long stores the option index here. */
@@ -104,19 +104,19 @@ void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht
 			break;
 		}
 		case 'i': {
-			addTagNameInTagHashTable(run_tags, optarg);
+			ct_tag_ht_put(run_tags, optarg);
 			break;
 		}
 		case 'e': {
-			addTagNameInTagHashTable(exclude_tags, optarg);
+			ct_tag_ht_put(exclude_tags, optarg);
 			break;
 		}
 		case 'I': {
-			populateTagsHT(run_tags, optarg, tag_separator);
+			ct_tag_ht_populate(run_tags, optarg, tag_separator);
 			break;
 		}
 		case 'E': {
-			populateTagsHT(exclude_tags, optarg, tag_separator);
+			ct_tag_ht_populate(exclude_tags, optarg, tag_separator);
 			break;
 		}
 		case '?': {
@@ -130,10 +130,10 @@ void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht
 	}
 
 //  ACTIVATE IF YOU WANT TO SEE WHAT TAGS HAVE BEEN STORED
-//	ITERATE_VALUES_ON_HT(runIfTags, t, tag*) {
+//	ITERATE_VALUES_ON_HT(runIfTags, t, struct ct_tag*) {
 //		printf("run if tag: %s\n", t->name);
 //	}
-//	ITERATE_VALUES_ON_HT(excludeTags, t2, tag*) {
+//	ITERATE_VALUES_ON_HT(excludeTags, t2, struct ct_tag*) {
 //		printf("exclude tag: %s\n", t2->name);
 //	}
 

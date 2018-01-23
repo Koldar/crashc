@@ -8,7 +8,7 @@ void ct_update_test_array(ct_model_t* model, test_pointer func) {
 	model->suites_array_index++;
 }
 
-bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const tag_ht* restrict run_tags, const tag_ht* restrict exclude_tags) {
+bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags) {
 	if (!section->loop2) {
 		return false;
 	}
@@ -16,7 +16,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 	//TODO here we need  to replace the parameter runOnlyWithTags and excludeIfTags with a pointer of the global model
 	//check if the section we're dealing with is compliant with the context tags
 	if (!ct_ht_is_empty(exclude_tags)) {
-		if (haveTagSetsIntersection(section->tags, exclude_tags)) {
+		if (ct_have_tag_set_intersection(section->tags, exclude_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;
 			markSectionAsSkippedByTag(section);
@@ -25,7 +25,7 @@ bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_cal
 	}
 
 	if (!ct_ht_is_empty(run_tags)) {
-		if (!haveTagSetsIntersection(section->tags, run_tags)) {
+		if (!ct_have_tag_set_intersection(section->tags, run_tags)) {
 			section->accessTagGranted = false;
 			section->accessGranted = false;
 			markSectionAsSkippedByTag(section);

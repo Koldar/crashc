@@ -119,7 +119,7 @@ typedef struct ct_model {
 	 *
 	 * @see ct_model_t::excludeTags
 	 */
-	tag_ht* run_only_if_tags;
+	ct_tag_hashtable_o* run_only_if_tags;
 	/**
 	 * Represents the tags the user has specified as the ones that excludes tests
 	 *
@@ -130,7 +130,7 @@ typedef struct ct_model {
 	 *
 	 * @see ct_model_t::run_only_if_tags
 	 */
-	tag_ht* exclude_tags;
+	ct_tag_hashtable_o* exclude_tags;
 	/**
 	 * Used to store the execution state to be restored thanks to setjmp and longjmp when needed during faulty test execution.
 	 *

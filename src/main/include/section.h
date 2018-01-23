@@ -139,7 +139,7 @@ struct SectionSnapshot {
 	 *
 	 * @notnull
 	 */
-	tag_ht *  tags;
+	ct_tag_hashtable_o *  tags;
 	/**
 	 * The type of the ::Section represented by the struct
 	 */
@@ -238,7 +238,7 @@ struct Section {
 	 *
 	 * @notnull
 	 */
-	tag_ht* tags;
+	ct_tag_hashtable_o* tags;
 
 	/**
 	 * determine if ::Section::childrenNumber has a meaning
@@ -503,7 +503,7 @@ bool isSectionFullyVisited(Section * section);
  * 	\li @true if the 2 sets has at least one element in common;
  * 	\li @false otherwise
  */
-bool haveTagSetsIntersection(const tag_ht* tagSet1, const tag_ht* tagSet2);
+bool ct_have_tag_set_intersection(const ct_tag_hashtable_o* tagSet1, const ct_tag_hashtable_o* tagSet2);
 
 /**
  * Populated a buffer containing a string representation of the section
