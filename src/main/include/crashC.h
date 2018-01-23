@@ -138,7 +138,7 @@ void ct_update_test_array(ct_model_t* model, test_pointer func);
  * 	\li @true if the section has to be visited;
  * 	\li @false otherwise;
  */
-bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const tag_ht* restrict run_tags, const tag_ht* restrict exclude_tags);
+bool ct_run_once_check_access(ct_model_t* model, Section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags);
 /**
  * Function supposed to run in the **parent switcher** cycle
  *

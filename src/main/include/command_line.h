@@ -24,7 +24,7 @@
  * @param[inout] run_tags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
  * @param[inout] exclude_tags hashtable from crashc model. Hashtable must be already initialized. The table will be populated at the end of the function
  */
-void ct_parse_args(const int argc, char* const* args, char tag_separator, tag_ht* run_tags, tag_ht* exclude_tags);
+void ct_parse_args(const int argc, char* const* args, char tag_separator, ct_tag_hashtable_o* run_tags, ct_tag_hashtable_o* exclude_tags);
 
 /**
  * Print the help of the command line

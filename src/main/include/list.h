@@ -26,8 +26,6 @@
 #include <stdbool.h>
 
 #include "typedefs.h"
-#include "macros.h"
-#include "errors.h"
 
 struct ct_list;
 typedef struct ct_list ct_list_o;
