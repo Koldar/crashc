@@ -93,7 +93,7 @@ typedef struct ct_model {
 	 * This means you need something that points which @containablesection you're actually in. This variable is that pointer.
 	 *
 	 * When you're in "when 2" this variable is set to the node in the tree representing "when 2". When you enter inside the code of "then1",
-	 * this variable is reset to point "then 1" ::struct ct_section. Then, when you return to "when 2" to execute the code between "then 1" and "then 2", this variable
+	 * this variable is reset to point "then 1" ::ct_section. Then, when you return to "when 2" to execute the code between "then 1" and "then 2", this variable
 	 * is set again in a way to point "when2".
 	 */
 	struct ct_section* current_section;

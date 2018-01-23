@@ -68,7 +68,7 @@ struct ct_report_producer_t {
 };
 
 /**
- * Prints the string representation of a ::enum ct_snapshot_status
+ * Prints the string representation of a ::ct_snapshot_status
  *
  * @param[in] status the status to compute the string representation of
  * @return a string representation of \c status
@@ -76,7 +76,7 @@ struct ct_report_producer_t {
 char* ct_snapshot_status_to_string(enum ct_snapshot_status status);
 
 /**
- * Prints the string representation of a ::enum ct_section_type
+ * Prints the string representation of a ::ct_section_type
  *
  * @param[in] type the type to compute the string representation of
  * @return a string representation of \c type

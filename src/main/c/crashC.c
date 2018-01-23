@@ -73,7 +73,7 @@ bool ct_run_once_final_work(ct_model_t* model, struct ct_section* section, struc
  *  Else, the function returns a pointer to the current_child of the given section.
  *
  *  @param[in] type the kind of section we're getting.
- *  @see ::enum ct_section_type
+ *  @see ::ct_section_type
  */
 struct ct_section* ct_fetch_section(struct ct_section* parent, enum ct_section_type type, const char* description, const char* tags) {
 	if (ct_section_still_discovering_children(parent)) {

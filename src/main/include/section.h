@@ -18,7 +18,7 @@
 #include "list.h"
 
 /**
- * Represents the type of a ::struct ct_section
+ * Represents the type of a ::ct_section
  *
  * section type is used to uniquely determine the behaviour of the section itself.
  */
@@ -46,10 +46,10 @@ enum ct_section_type {
 };
 
 /**
- * Represents each state a ::struct ct_section can have
+ * Represents each state a ::ct_section can have
  *
- * ::struct ct_section state is used to check whether or not @crashc runtime should access to the related @containablesection code
- * or not. This answer greatly depends on the type of the given ::struct ct_section as well.
+ * ::ct_section state is used to check whether or not @crashc runtime should access to the related @containablesection code
+ * or not. This answer greatly depends on the type of the given ::ct_section as well.
  */
 enum ct_section_status {
 	/**
@@ -120,36 +120,36 @@ enum ct_snapshot_status {
 };
 
 /**
- * Contains relevant test results information contained in a ::struct ct_section at a precise moment of the program execution
+ * Contains relevant test results information contained in a ::ct_section at a precise moment of the program execution
  *
  * @definition struct ct_section Snapshot
- * Represents the in-test information a given ::struct ct_section has. Note that one ::struct ct_section may actually have several, different, section shapshot, since
- * a @containablesection represented by a ::struct ct_section can be run multiple times in a @testcase. A section snapshot is tree because it is a run
+ * Represents the in-test information a given ::ct_section has. Note that one ::ct_section may actually have several, different, section shapshot, since
+ * a @containablesection represented by a ::ct_section can be run multiple times in a @testcase. A section snapshot is tree because it is a run
  * of a single cycle of a ::LOOPER, like @testcase: in it, the section are organized as a **tree**, not just as a list. For example a @then may have multiple
  * but different subsection @then.
  *
  * Such information are then used by the test reports to yield to the user a more detailed set of informations about a given test.
- * Note that this structure contains only the fields of a ::struct ct_section which are subject to changes during the execution
+ * Note that this structure contains only the fields of a ::ct_section which are subject to changes during the execution
  * of the tests. Furthermore, note that this structure represents an implicit tree, used by @crashc to track the relationships between the
  * sections involved in a precise test
  */
 struct ct_snapshot {
 	/**
-	 * The description of the ::struct ct_section represented by the struct
+	 * The description of the ::ct_section represented by the struct
 	 *
 	 * @notnull
 	 */
 	char* description;
 
 	/**
-	 * The tags associated to the ::struct ct_section represented by the struct
+	 * The tags associated to the ::ct_section represented by the struct
 	 *
 	 * @notnull
 	 */
 	ct_tag_hashtable_o*  tags;
 
 	/**
-	 * The type of the ::struct ct_section represented by the struct
+	 * The type of the ::ct_section represented by the struct
 	 */
 	enum ct_section_type type;
 
@@ -164,12 +164,12 @@ struct ct_snapshot {
 	/**
 	 * The amount of time, in microseconds, the section ran during one specific test.
 	 *
-	 * This field has no meaning until the associated ::struct ct_section has been completely exeuted during the specific test
+	 * This field has no meaning until the associated ::ct_section has been completely exeuted during the specific test
 	 */
 	long elapsed_time;
 
 	/**
-	 * The list of reports of the assertions executed in the ::struct ct_section represented.
+	 * The list of reports of the assertions executed in the ::ct_section represented.
 	 *
 	 * @notnull
 	 */
@@ -202,7 +202,7 @@ struct ct_snapshot {
  *
  * @definition section
  * It's data structure representing, in @crashc framework, a given @containablesection.
- * ::struct ct_section is one of the most important data structure in @crashc. section are hierarchuically organized in a tree, called **section tree**
+ * ::ct_section is one of the most important data structure in @crashc. section are hierarchuically organized in a tree, called **section tree**
  *
  * Examples of sections may be @testcase, @when, @then and so on. Whilst this structure **does not contain**
  * any of the code inside the section, it represents the metadata of such code. An example of metadata is the number of
@@ -249,7 +249,7 @@ struct ct_section {
 	ct_tag_hashtable_o* tags;
 
 	/**
-	 * determine if ::struct ct_section::children_number has a meaning
+	 * determine if ::ct_section::children_number has a meaning
 	 *
 	 * The field is @true if we have already scanned the section content at least once. This means
 	 * that we explore the associated @containablesection from the beginning till the end. This has 2 effects:
@@ -263,7 +263,7 @@ struct ct_section {
 	/**
 	 * the number of subsection this section has
 	 *
-	 * This field has only a meaning when ::struct ct_section::children_number_known is set to @true.
+	 * This field has only a meaning when ::ct_section::children_number_known is set to @true.
 	 * For example, given the code:
 	 *
 	 * @include exampleOfTestCase.dox
@@ -316,7 +316,7 @@ struct ct_section {
 	bool loop1;
 
 	/**
-	 * like ::struct ct_section::loop1, but for the access cycle inside ::CONTAINABLESECTION
+	 * like ::ct_section::loop1, but for the access cycle inside ::CONTAINABLESECTION
 	 */
 	bool loop2;
 
@@ -333,7 +333,7 @@ struct ct_section {
 	 * \li the condition of the section is not satisfied;
 	 *
 	 *
-	 * The first check is computed before the second one. Together with  ::struct ct_section::access_granted, this field
+	 * The first check is computed before the second one. Together with  ::ct_section::access_granted, this field
 	 * allow you to understand why a particular section has been denied. In particular this field is @true
 	 * if the section tags are compatible with the tag context; @false otherwise
 	 */
@@ -353,7 +353,7 @@ struct ct_section {
 	/**
 	 * The signal detected when running this section
 	 *
-	 * The value is meaningful only when ::struct ct_section::status is set to ::CT_SECTION_SIGNAL_DETECTED
+	 * The value is meaningful only when ::ct_section::status is set to ::CT_SECTION_SIGNAL_DETECTED
 	 */
 	int signal_detected;
 
@@ -368,7 +368,7 @@ struct ct_section {
 };
 
 /**
- * Adds a ::struct ct_section inside the children list of a parent section
+ * Adds a ::ct_section inside the children list of a parent section
  *
  * @param[in] to_add the new child \c parent has;
  * @param[inout] parent the parent \c toAdd have from this point on;
@@ -376,7 +376,7 @@ struct ct_section {
  */
 struct ct_section* ct_section_add_child(struct ct_section* restrict to_add, struct ct_section* restrict parent);
 /**
- * get the n-th child of a given ::struct ct_section
+ * get the n-th child of a given ::ct_section
  *
  * @param[in] parent the parent involved
  * @param[in] n the number of the child we want to fetch
@@ -403,18 +403,18 @@ int ct_section_get_level(const struct ct_section* section);
  * @param[in] type the type of this section
  * @param[in] description a text describing briefly the section
  * @param[in] tags a single string containing all the tags associated to the section. See \ref tags
- * @return the new ::struct ct_section instance just created
+ * @return the new ::ct_section instance just created
  */
 struct ct_section* ct_section_init(enum ct_section_type type, const char* description, const char* tags);
 /**
- * Destroy a ::struct ct_section inside the heap
+ * Destroy a ::ct_section inside the heap
  *
  * \note
  * The function will destory all the sections which have parent (directly or indirectly) \c section.
  * Formally, the function will free from the memory the subtree generate by \c section (\c section included).
  *
- * There is only a ::struct ct_section that won't be freed by this function: all the sections with struct ct_section::levelId set to 0 won't be touched.
- * Normally this isn't a problem because there is only one ::struct ct_section with such an id: struct ct_section::rootSection. The rationale is that such variable is global one
+ * There is only a ::ct_section that won't be freed by this function: all the sections with struct ct_section::levelId set to 0 won't be touched.
+ * Normally this isn't a problem because there is only one ::ct_section with such an id: struct ct_section::rootSection. The rationale is that such variable is global one
  * allocated in the \b stack, so freeing such a variable is illegal.
  *
  * @param[inout] section the section to free

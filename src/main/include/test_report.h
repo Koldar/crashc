@@ -68,7 +68,7 @@ typedef enum {
  *
  * These are what @crashc considers to be tests.
  * This implies that the informations stored in the ct_test_report_t struct are related to the flow of execution, not to a given section.
- * This is the reason why the ct_test_report_t struct needs an auxiliary struct, ::struct ct_snapshot, to hold the information on the status of
+ * This is the reason why the ct_test_report_t struct needs an auxiliary struct, ::ct_snapshot, to hold the information on the status of
  * the sections involved in the test at the moment they were executed.
  */
 struct ct_test_report {
@@ -122,8 +122,8 @@ void ct_destroy_test_report(ct_test_report_t* report);
 /**
  * Initialize in the heap a new section snapshot
  *
- * @param[in] section the section represented by the ::struct ct_snapshot you want to build
- * @return the requested ::struct ct_snapshot
+ * @param[in] section the section represented by the ::ct_snapshot you want to build
+ * @return the requested ::ct_snapshot
  */
 struct ct_snapshot* ct_init_section_snapshot(struct ct_section* section);
 /**
