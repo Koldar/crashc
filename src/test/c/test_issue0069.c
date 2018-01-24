@@ -8,7 +8,7 @@
 #ifdef TEST_0069
 
 #include <stdio.h>
-#include "crashC.h"
+#include "crashc.h"
 
 static int sum = 0;
 

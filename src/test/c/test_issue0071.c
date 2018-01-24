@@ -8,7 +8,7 @@
 #ifdef TEST_0071
 
 #include <stdio.h>
-#include "crashC.h"
+#include "crashc.h"
 
 TESTS_START
 REG_SUITE(0);

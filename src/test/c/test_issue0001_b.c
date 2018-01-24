@@ -1,6 +1,6 @@
 #ifdef TEST_0001
 
-#include "crashC.h"
+#include "crashc.h"
 #include "test_checker.h"
 
 TESTSUITE(1) {

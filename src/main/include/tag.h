@@ -84,7 +84,7 @@ bool ct_have_tag_set_intersection(const ct_tag_hashtable_o* tag_set1, const ct_t
 void ct_tag_ht_put(ct_tag_hashtable_o* tag_hashable, const char* name);
 
 
-//TODO maybe we should put this function in ct_utils.h
+//TODO maybe we should put this function in utils.h
 /**
  * the hash of a string
  *

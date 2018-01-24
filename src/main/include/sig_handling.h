@@ -13,7 +13,7 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#include "crashC.h"
+#include "crashc.h"
 #include "section.h"
 
 /**

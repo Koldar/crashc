@@ -10,7 +10,7 @@
 
 #include "test_report.h"
 #include "list.h"
-#include "ct_assert.h"
+#include "assertions.h"
 
 ct_test_report_t* ct_init_test_report(struct ct_snapshot* tc_snapshot) {
 	ct_test_report_t* ret_val = malloc(sizeof(ct_test_report_t));

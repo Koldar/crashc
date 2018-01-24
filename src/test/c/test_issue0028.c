@@ -7,7 +7,7 @@
 
 #ifdef TEST_0028
 
-#include "crashC.all.in.one.h"
+#include "crashc.h"
 #include "test_checker.h"
 
 TESTS_START

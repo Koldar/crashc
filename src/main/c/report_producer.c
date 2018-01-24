@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "report_producer.h"
-#include "ct_assert.h"
+#include "assertions.h"
 #include "errors.h"
 
 char* ct_snapshot_status_to_string(enum ct_snapshot_status s) {

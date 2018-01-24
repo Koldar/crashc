@@ -57,7 +57,7 @@
 #include "test_report.h"
 #include "main_model.h"
 #include "report_producer.h"
-#include "ct_assert.h"
+#include "assertions.h"
 
 /**
  * Callback type of a function representing a general condition that determine if we can access to a particular @containablesection source code

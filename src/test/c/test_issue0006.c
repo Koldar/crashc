@@ -1,6 +1,6 @@
 #ifdef TEST_0006
 
-#include "crashC.h"
+#include "crashc.h"
 #include "test_checker.h"
 
 TESTS_START

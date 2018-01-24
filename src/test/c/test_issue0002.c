@@ -7,7 +7,7 @@
 
 #ifdef TEST_0002
 
-#include "crashC.h"
+#include "crashc.h"
 #include "test_checker.h"
 #include "tag.h"
 #include <stdio.h>

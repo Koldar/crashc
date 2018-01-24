@@ -9,7 +9,7 @@
 #include <setjmp.h>
 
 #include "test_report.h"
-#include "ct_assert.h"
+#include "assertions.h"
 #include "errors.h"
 #include "section.h"
 
