@@ -10,6 +10,8 @@
 #ifndef CT_UTILS_H_
 #define CT_UTILS_H_
 
+#include <time.h>
+
 //TODO: Maybe improve this function
 /**
  * Returns the basename of a file, given its absolute path.
@@ -27,6 +29,28 @@
  * @return the basename of the absolute file
  */
 char* const ct_file_basename(char* const filename);
+
+/**
+ * Get the time *now*
+ *
+ * @return struct holding information about the time when this function has been called
+ */
+struct timespec ct_get_time();
+/**
+ * Get a time interval
+ *
+ * @param[in] start the start of the time interval
+ * @param[in] end the end of the time interval
+ * @param[in] format_str either one of the following options:
+ * 	\li "s" if you want to the time interval in seconds;
+ *  \li "m" if you want to the time interval in milliseconds;
+ *  \li "u" if you want to the time interval in microseconds;
+ *  \li "n" if you want to the time interval in nanoseconds;
+ * @return the time elapsed between \c start and \c end
+ * @see ct_get_time
+ */
+long ct_compute_time_gap(struct timespec start, struct timespec end, const char* format_str);
+
 
 
 #endif /* CT_UTILS_H_ */
