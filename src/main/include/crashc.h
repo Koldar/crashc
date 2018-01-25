@@ -62,18 +62,18 @@
 /**
  * Callback type of a function representing a general condition that determine if we can access to a particular @containablesection source code
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you want to access
  * @return
  * 	\li @true whenever the testing framework decided that the code can enter in the @containablesection source code;
  * 	\li @false otherwise.
  */
-typedef bool (*ct_access_callback_t)(ct_model_t* model, struct ct_section*);
+typedef bool (*ct_access_c)(struct ct_model* model, struct ct_section*);
 
 /**
  * Callback signature representing a callback to execute as soon as you **exit** from the @containablesection source code
  *
- * For example, suppose the following. Suppose you have exited from \c WHEN. The ct_model_t::current_section variable needs to be
+ * For example, suppose the following. Suppose you have exited from \c WHEN. The struct ct_model::current_section variable needs to be
  * reset from \c WHEN to its parent, namely \c TESTCASE. The function prototype allows you to code that
  *
  * @code
@@ -83,11 +83,11 @@ typedef bool (*ct_access_callback_t)(ct_model_t* model, struct ct_section*);
  * 	}
  * @endcode
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] parent_position a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] child the section representing the @containablesection you'have just exit from.
  */
-typedef void (*ct_exit_callback_t)(ct_model_t* model, struct ct_section** parent_position, struct ct_section* child);
+typedef void (*ct_exit_c)(struct ct_model* model, struct ct_section** parent_position, struct ct_section* child);
 
 /**
  * Callback prototype for any function executing addtional code before entering in a @containablesection
@@ -101,10 +101,10 @@ typedef void (*ct_exit_callback_t)(ct_model_t* model, struct ct_section** parent
  * 	}
  * @endcode
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access (hence the child).
  */
-typedef void (*ct_enter_callback_t)(ct_model_t* model, struct ct_section* section);
+typedef void (*ct_enter_c)(struct ct_model* model, struct ct_section* section);
 
 /**
  * Register a new @testsuite in the @crashc ecosystem
@@ -123,7 +123,7 @@ typedef void (*ct_enter_callback_t)(ct_model_t* model, struct ct_section* sectio
  * @param[inout] model the model where we operate on
  * @param[in] func the function to register
  */
-void ct_update_test_array(ct_model_t* model, test_pointer func);
+void ct_update_test_array(struct ct_model* model, ct_test_c func);
 
 /**
  * Function to concretely perform the **access cycle**
@@ -138,7 +138,7 @@ void ct_update_test_array(ct_model_t* model, test_pointer func);
  * 	\li @true if the section has to be visited;
  * 	\li @false otherwise;
  */
-bool ct_run_once_check_access(ct_model_t* model, struct ct_section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags);
+bool ct_run_once_check_access(struct ct_model* model, struct ct_section* section, ct_access_c cs, ct_enter_c callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags);
 /**
  * Function supposed to run in the **parent switcher** cycle
  *
@@ -152,7 +152,7 @@ bool ct_run_once_check_access(ct_model_t* model, struct ct_section* section, ct_
  *	\li @true if this is the first iteration of the **parent switcher** cycle.
  *	\li @false if this si the second iteration of the  **parent switcher cycle.
  */
-bool ct_run_once_final_work(ct_model_t* model, struct ct_section* section, struct ct_section** pointer_to_set_as_parent, ct_exit_callback_t callback, ct_exit_callback_t access_granted_callback, ct_exit_callback_t access_denied_callback);
+bool ct_run_once_final_work(struct ct_model* model, struct ct_section* section, struct ct_section** pointer_to_set_as_parent, ct_exit_c callback, ct_exit_c access_granted_callback, ct_exit_c access_denied_callback);
 
 /**
  * Fetches the section representing a particular @containablesection. If not present, it creates it.
@@ -183,26 +183,26 @@ bool ct_run_once_final_work(ct_model_t* model, struct ct_section* section, struc
 struct ct_section* ct_fetch_section(struct ct_section* parent, enum ct_section_type type, const char* description, const char* tags);
 
 /**
- * Reset the ct_model_t::current_section global variable to the given one after we have detected a signal
+ * Reset the struct ct_model::current_section global variable to the given one after we have detected a signal
  *
- * Sometimes it happens that we need to abruptly break the flow of ct_model_t::current_section.
+ * Sometimes it happens that we need to abruptly break the flow of struct ct_model::current_section.
  * For example when we detect an unhandled signal in one of the sections, we don't need to return to the parent of the section involved,
  * but we need to immediately go to the @testcase.
  *
  * This function allows you to set all the metadata to ensure that such "unorthodox" flow is valid.
  *
  * \post
- * 	\li ct_model_t::current_section is valid and refers to \c testcase_section
+ * 	\li struct ct_model::current_section is valid and refers to \c testcase_section
  *
  * @param[inout] model the model containing all the data representing the automatic testing
  * @param[in] jump_source_section the section where a signal has been raised
- * @param[in] testcase_section the section representing a test case we need to reset the ct_model_t:current_section to
+ * @param[in] testcase_section the section representing a test case we need to reset the struct ct_model:current_section to
  */
-void ct_reset_section_after_jump(ct_model_t* model, struct ct_section* const jump_source_section, struct ct_section* const testcase_section);
+void ct_reset_section_after_jump(struct ct_model* model, struct ct_section* const jump_source_section, struct ct_section* const testcase_section);
 
 ///@defgroup accessConditions Access Condition Functions
-///@brief Functions that can be used as ::ct_access_callback_t concrete values.
-///Use these functions to develop new @containablesection. These group of functions defines the pool of ::ct_access_callback_t you can use
+///@brief Functions that can be used as ::ct_access_c concrete values.
+///Use these functions to develop new @containablesection. These group of functions defines the pool of ::ct_access_c you can use
 ///to create new @containablesection s.
 ///@{
 
@@ -236,7 +236,7 @@ void ct_reset_section_after_jump(ct_model_t* model, struct ct_section* const jum
  * 	\li \true if we can access to section \c section;
  * 	\li \false otherwise
  */
-bool ct_get_access_when(ct_model_t* model, struct ct_section* section);
+bool ct_get_access_when(struct ct_model* model, struct ct_section* section);
 
 /**
  * Grants always access
@@ -249,14 +249,14 @@ bool ct_get_access_when(ct_model_t* model, struct ct_section* section);
  * 	\li true if we can access to section \c section;
  * 	\li false otherwise
  */
-bool ct_always_enter(ct_model_t* model, struct ct_section* section);
+bool ct_always_enter(struct ct_model* model, struct ct_section* section);
 
 
 ///@}
 
 ///@defgroup beforeEntering Before Entering Containable struct ct_section Functions
-///@brief Functions that can be used as ::ct_enter_callback_t concrete values.
-///Use these functions to develop new @containablesection. These group of functions defines the pool of ::ct_enter_callback_t you can use
+///@brief Functions that can be used as ::ct_enter_c concrete values.
+///Use these functions to develop new @containablesection. These group of functions defines the pool of ::ct_enter_c you can use
 ///to create new @containablesection s.
 ///@{
 
@@ -264,13 +264,13 @@ bool ct_always_enter(ct_model_t* model, struct ct_section* section);
  * Perform setup operations before entering in a @when
  *
  * This callback should be executed when we get access granted to a WHEN section, before executing its code.
- * It sets ::ct_section::already_found_when of ct_model_t::current_section and takes a snapshot of the WHEN section for the test report
+ * It sets ::ct_section::already_found_when of struct ct_model::current_section and takes a snapshot of the WHEN section for the test report
  * and adds it to the test report snapshots tree.
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access.
  */
-void ct_callback_entering_when(ct_model_t* model, struct ct_section* section);
+void ct_callback_entering_when(struct ct_model* model, struct ct_section* section);
 
 /**
  * Perform setup operations before entering in a @then
@@ -278,10 +278,10 @@ void ct_callback_entering_when(ct_model_t* model, struct ct_section* section);
  * This callback should be executed when we get access granted to a THEN section, before executing its code.
  * It takes a snapshot of the section and adds it to the current_section's test report snapshots tree.
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access.
  */
-void ct_callback_entering_then(ct_model_t* model, struct ct_section* section);
+void ct_callback_entering_then(struct ct_model* model, struct ct_section* section);
 
 ///@}
 
@@ -289,70 +289,70 @@ void ct_callback_entering_then(ct_model_t* model, struct ct_section* section);
  * Updates the current_snapshot, creating a new one if we started a new test
  * or adding a snapshot to the current test snapshots tree
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access.
  */
-void ct_update_current_snapshot(ct_model_t* model, struct ct_section* section);
+void ct_update_current_snapshot(struct ct_model* model, struct ct_section* section);
 
 ///@defgroup afterEntering After Entering Containable struct ct_section Functions
 ///@brief Callbacks that can be used in ::ct_run_once_final_work as callbacks. Set of candidate callbacks to be called after a struct ct_section **access cycle**, **regardless** of its outcome.
-///These callbacks have the main task to repair ct_model_t::current_section in order to ensure that the @containablesection
+///These callbacks have the main task to repair struct ct_model::current_section in order to ensure that the @containablesection
 ///we're actually in when the code is executing is the same pointed by the section tree.
 ///Furthermore, these callbacks fetches new data useful for other @crashc task (i.e. test reports).
 ///@{
 
 /**
- * updates ct_model_t::current_section and increases the children of the parent by 1
+ * updates struct ct_model::current_section and increases the children of the parent by 1
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] pointer_to_set_as_parent a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void ct_exit_callback_next_sibling(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
+void ct_exit_callback_next_sibling(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
 /**
  * Update section tree metadata whenever you have successfully entered in a child @containablesection
  *
  * If you have just exited from a @containablesection, this means you know the number of **direct** children it contains.
  * This function then performs the following operations:
  *  \li Mark the \c section as "now we know the exact number of children you have";
- *  \li Updates ct_model_t::current_snapshot;
+ *  \li Updates struct ct_model::current_snapshot;
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] pointer_to_set_as_parent a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void ct_exit_callback_children_number_computed(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
+void ct_exit_callback_children_number_computed(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
 
 //TODO find a new name. It's quite similar to ct_exit_callback_children_number_computed, so maybe we should have 2 similar names?
 /**
- * like ::ct_exit_callback_children_number_computed but it doesn't update the ct_model_t::current_snapshot
+ * like ::ct_exit_callback_children_number_computed but it doesn't update the struct ct_model::current_snapshot
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] pointer_to_set_as_parent a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void ct_exit_callback_reset_container(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
+void ct_exit_callback_reset_container(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
 
 /**
  * Do nothing
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] pointer_to_set_as_parent a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] child the section representing the @containablesection you have just exit from (hence it's the child section).
  */
-void ct_exit_callback_do_nothing(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
+void ct_exit_callback_do_nothing(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child);
 
 /**
  * Finalize operations when a @testcase is finished.
  *
  * it simply updates the test report outcome depending on the status of the last snapshot of the test tree
- * and resets the ct_model_t::current_snapshot pointer back to NULL to indicate that the current test is over
+ * and resets the struct ct_model::current_snapshot pointer back to NULL to indicate that the current test is over
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[inout] pointer_to_set_as_parent a pointer **you** need to set to the parent of the section representing the @containablesection
  * @param[in] section the section representing the @containablesection you'have just exit from.
  */
-void ct_exit_callback_access_granted_testcase(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section);
+void ct_exit_callback_access_granted_testcase(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section);
 
 ///@}
 
@@ -364,10 +364,10 @@ void ct_exit_callback_access_granted_testcase(ct_model_t* model, struct ct_secti
 /**
  * Does nothing
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access (hence the child).
  */
-void ct_callback_do_nothing(ct_model_t* model, struct ct_section* section);
+void ct_callback_do_nothing(struct ct_model* model, struct ct_section* section);
 
 /**
  * Setup function for @testcase sections
@@ -375,10 +375,10 @@ void ct_callback_do_nothing(ct_model_t* model, struct ct_section* section);
  * It initializes the test report associated to the particular looper iteration,
  * adds it to the test reports list and takes the snapshot of the testcase.
  *
- * @param[inout] model the global ct_model_t crashC model you manage
+ * @param[inout] model the global struct ct_model crashC model you manage
  * @param[in] section the section representing the @containablesection you're going to access (hence the child).
  */
-void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section);
+void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* section);
 
 ///@}
 
@@ -399,8 +399,8 @@ void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section
  * @definition
  * ::CONTAINABLESECTION is 2 nested for...loop cycles. The outermost is the **parent switcher**, allowing you to keep synchronized the
  * @containablesection the code is actually in with the metadata representing @containablesection, namely the tree formed by ::ct_section.
- * This syncronization is a two-pass system: first it change the ct_model_t::current_section from the parent @containablesection to the child one,
- * **regardless** if you have the access to the child. After fully execute the **access cycle**, it repairs ct_model_t::current_section by updating
+ * This syncronization is a two-pass system: first it change the struct ct_model::current_section from the parent @containablesection to the child one,
+ * **regardless** if you have the access to the child. After fully execute the **access cycle**, it repairs struct ct_model::current_section by updating
  * it from the child to the parent. Code-wise, just like ::ct_run_once_check_access, we model the if with a for loop. Since the for loop condition is run twice, we need to ensure the
  * cycle condition is in the first call @true whilst in the second one @false (this ensure the "if" behaviour"). Moreover we want to perform additional
  * code. Such operation is done by ::ct_run_once_final_work.
@@ -413,17 +413,17 @@ void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section
  * the condition check of the for loop and ensures the loop behaves like an \c if: this is necessary because for loops condition has to be checked twice: one
  * to check if we can access to the section and one (if we have entered inside the loop) to exit from the loop itself
  *
- * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[inout] model variable of type pointer of struct ct_model containing all the data to manage
  * @param[in] parent the ::ct_section this @containablesection is contained
  * @param[in] section_type (whose type is ::ct_section_type) the type of the ::ct_section representing this @containablesection
  * @param[in] description (whose type is <tt>char*</tt>) a brief description of this @containablesection
  * @param[in] tags a value (whose type is <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
- * @param[in] condition the condition (whose type is ::ct_access_callback_t)you need to clear in order to gain access to the internal test code of the @containablesection
- * @param[in] access_granted_callback a callback (whose type is ::ct_enter_callback_t) representing a set of instructions to execute if you gain access to the internal test code. This function will be execute before executing the actual test code
- * @param[in] back_to_parent_callback a callback (whose type is ::ct_exit_callback_t) executed when you're surpassing this @containablesection. Note that this function will be called regardless if you actually enter inside the code or not.
- * @param[in] exit_access_granted_callback a callback (whose type is ::ct_exit_callback_t)to execute if you entered inside the test code of the @containablesection. Called after \c back_to_parent_callback;
- * @param[in] exit_access_denied_callback a callback (whose type is ::ct_exit_callback_t)to execute if you didnt' enter inside the test code of the @containablesection. Called after \c back_to_parent_callback;
- * @param[in] setup_code a piece of C code to paste in the source code before starting all the reasoning for the @containablesection. ct_model_t::current_section for this @containablesection is already populated though.
+ * @param[in] condition the condition (whose type is ::ct_access_c)you need to clear in order to gain access to the internal test code of the @containablesection
+ * @param[in] access_granted_callback a callback (whose type is ::ct_enter_c) representing a set of instructions to execute if you gain access to the internal test code. This function will be execute before executing the actual test code
+ * @param[in] back_to_parent_callback a callback (whose type is ::ct_exit_c) executed when you're surpassing this @containablesection. Note that this function will be called regardless if you actually enter inside the code or not.
+ * @param[in] exit_access_granted_callback a callback (whose type is ::ct_exit_c)to execute if you entered inside the test code of the @containablesection. Called after \c back_to_parent_callback;
+ * @param[in] exit_access_denied_callback a callback (whose type is ::ct_exit_c)to execute if you didnt' enter inside the test code of the @containablesection. Called after \c back_to_parent_callback;
+ * @param[in] setup_code a piece of C code to paste in the source code before starting all the reasoning for the @containablesection. struct ct_model::current_section for this @containablesection is already populated though.
  */
 #define CONTAINABLESECTION(model, parent, section_type, description, tags, condition, access_granted_callback, back_to_parent_callback, exit_access_granted_callback, exit_access_denied_callback, setup_code)	\
 		/**
@@ -520,7 +520,7 @@ void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section
 /**
  * A @containablesection where you always gain access to
  *
- * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[inout] model variable of type pointer of struct ct_model containing all the data to manage
  * @param[in] section_type (whose type is ::ct_section_type) the type of the ::ct_section representing this @containablesection
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
@@ -537,7 +537,7 @@ void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section
  * A @containablesection where you gain access to only if has
  * not been fully visited and you didn't access to a similar section yet in the same parent.
  *
- * @param[inout] model variable of type pointer of ct_model_t containing all the data to manage
+ * @param[inout] model variable of type pointer of struct ct_model containing all the data to manage
  * @param[in] section_type (whose type is ::ct_section_type) the type of the ::ct_section representing this @containablesection
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
@@ -598,13 +598,13 @@ void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section
 /**
  * Used to register a teardown function
  *
- * Use this function to perform additional operations **just before** ct_model_t model is fully disposed.
+ * Use this function to perform additional operations **just before** struct ct_model model is fully disposed.
  * Usually you can use this function to release from memory any additional resources you've created.
  *
  * @param[in] f a function of type <tt>void (*f)(void)</tt> to be executed before tearing down the whole model
- * @see ct_model_t::ct_teardown
+ * @see struct ct_model::ct_teardown
  */
-void ct_set_crashc_teardown(ct_teardown_t f);
+void ct_set_crashc_teardown(ct_teardown_c f);
 
 ///@}
 

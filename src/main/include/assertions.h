@@ -31,7 +31,7 @@
 /**
  * This struct contains the informations related to a specific assertion
  */
-typedef struct {
+struct ct_assert_report{
 
 	/**
 	 *  The outcome of the assertion. True if succeded
@@ -85,7 +85,7 @@ typedef struct {
 	 */
 	unsigned int line_number;
 
-} ct_assert_report_t;
+};
 
 /**
  * function prototype for function comparing elements
@@ -101,7 +101,7 @@ typedef struct {
  *
  * UNUSED AT THE MOMENT
  */
-//typedef int (*ct_comparator_t)(void* elem1, void* elem2);
+//typedef int (*ct_comparator_c)(void* elem1, void* elem2);
 
 /**
  * function prototype for functions computing string representation of elements
@@ -116,7 +116,7 @@ typedef struct {
  * UNUSED AT THE MOMENT
  */
 //TODO I think the best prototype for this function pointer would be int(void* element, int buffer size, char* buffer) where the return value is the number of byte you used in the buffer.
-//typedef void (*ct_stringer_t)(void* elem);
+//typedef void (*ct_stringer_c)(void* elem);
 
 /**
  * Represents the function pointers used as callbacks to handle the behaviour of an assertion implementation.
@@ -129,7 +129,7 @@ typedef struct {
  * - asserted: pointer to the asserted variable/value
  * - stringer: the stringer to be used to convert raw bytes into a string
  */
-typedef void (*ct_assert_callback_t)(ct_model_t* model);
+typedef void (*ct_assert_c)(struct ct_model* model);
 
 
 /**
@@ -138,12 +138,12 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
  * This macro is not used directly, but it is masked by other macros which actually implement
  * a specific assertion type.
  *
- * @param[in] model a pointer to ct_crashc_t model used
+ * @param[in] model a pointer to struct ct_model used
  * @param[in] is_mandatory @true if the assertion needs to be surpassed; @false if the assertion is actually optional
  * @param[in] asserted C code representing the whole content of the assertion. This is likely to be something like <tt>someStuff == someOtherStuff</tt>.
  * 	The code is **required** to be a boolean expression.
- * @param[in] passed_callback function of type ct_assert_callback_t called if the assertion passes;
- * @param[in] failed_callback function of type ct_assert_callback_t called if the assertion doesn't pass;
+ * @param[in] passed_callback function of type ct_assert_c called if the assertion passes;
+ * @param[in] failed_callback function of type ct_assert_c called if the assertion doesn't pass;
  */
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
 	ct_list_add_tail((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
@@ -174,14 +174,14 @@ typedef void (*ct_assert_callback_t)(ct_model_t* model);
  * @param[in] line the line number where the assertion is located in the file \c file
  * @return a structure representing the performance of a given assertion
  */
-ct_assert_report_t* ct_init_assert_report(bool is_mandatory, char* asserted_text, char* file, unsigned int line);
+struct ct_assert_report* ct_init_assert_report(bool is_mandatory, char* asserted_text, char* file, unsigned int line);
 
 /**
  * Frees the memory allocated for a particular assertion report
  *
  * @param[in] report the report to release from the memory
  */
-void ct_destroy_assert_report(ct_assert_report_t* report);
+void ct_destroy_assert_report(struct ct_assert_report* report);
 
 /**
  * @defgroup assertCallbacks Assert Outcome Callbacks
@@ -194,14 +194,14 @@ void ct_destroy_assert_report(ct_assert_report_t* report);
  *
  * @param[in] model the model to handle
  */
-void ct_assert_do_nothing(ct_model_t* model);
+void ct_assert_do_nothing(struct ct_model* model);
 
 /**
  * Function used by the general ASSERT macro to handle its failure
  *
  * @param[in] model the model to handle
  */
-void ct_general_assert_failed(ct_model_t* model);
+void ct_general_assert_failed(struct ct_model* model);
 
 ///@}
 

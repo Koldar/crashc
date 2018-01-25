@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * Provides struct ct_section struct, which is used to represents @containablesection
+ * Provides struct ct_section, which is used to represents @containablesection
  *
  * @author koldar
  * @date Feb 16, 2017
@@ -256,7 +256,7 @@ struct ct_section {
 	 * 	\li we know whether there are subsections inside the @containablesection or not;
 	 *	\li we know the actual number of children the section has;
 	 *
-	 * The second effects allows us to safely use struct ct_section::children_number and  struct ct_section::first_child
+	 * The second effects allows us to safely use ct_section::children_number and ct_section::first_child
 	 */
 	bool children_number_known;
 

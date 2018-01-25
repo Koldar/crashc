@@ -12,8 +12,8 @@
 #include "errors.h"
 #include "model.h"
 
-ct_model_t* ct_setup_default_model() {
-	ct_model_t* ret_val = malloc(sizeof(ct_model_t));
+struct ct_model* ct_setup_default_model() {
+	struct ct_model* ret_val = malloc(sizeof(struct ct_model));
 
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
@@ -36,11 +36,11 @@ ct_model_t* ct_setup_default_model() {
 	return ret_val;
 }
 
-void ct_teardown_default_model(ct_model_t* ccm) {
+void ct_teardown_default_model(struct ct_model* ccm) {
 	ct_section_destroy(ccm->root_section);
-	ct_ht_destroy_with_elements(ccm->exclude_tags, (ct_destructor_t)ct_tag_destroy);
-	ct_ht_destroy_with_elements(ccm->run_only_if_tags, (ct_destructor_t)ct_tag_destroy);
-	ct_list_destroy_with_elements(ccm->test_reports_list, (ct_destructor_t)ct_destroy_test_report);
+	ct_ht_destroy_with_elements(ccm->exclude_tags, (ct_destroyer_c)ct_tag_destroy);
+	ct_ht_destroy_with_elements(ccm->run_only_if_tags, (ct_destroyer_c)ct_tag_destroy);
+	ct_list_destroy_with_elements(ccm->test_reports_list, (ct_destroyer_c)ct_destroy_test_report);
 	ct_destroy_stats(ccm->statistics);
 	ct_destroy_default_report_producer(ccm->report_producer_implementation);
 	fclose(ccm->output_file);

@@ -12,21 +12,21 @@
 #include "list.h"
 #include "assertions.h"
 
-ct_test_report_t* ct_init_test_report(struct ct_snapshot* tc_snapshot) {
-	ct_test_report_t* ret_val = malloc(sizeof(ct_test_report_t));
+struct ct_test_report* ct_init_test_report(struct ct_snapshot* tc_snapshot) {
+	struct ct_test_report* ret_val = malloc(sizeof(struct ct_test_report));
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
 	ret_val->filename = NULL;
 	ret_val->execution_time = 0;
-	ret_val->outcome = TEST_SUCCESS;
+	ret_val->outcome = CT_TEST_SUCCESS;
 	ret_val->testcase_snapshot = tc_snapshot;
 
 	return ret_val;
 }
 
-void ct_destroy_test_report(ct_test_report_t* report) {
+void ct_destroy_test_report(struct ct_test_report* report) {
 	free(report->filename);
 	ct_destroy_snapshot_tree(report->testcase_snapshot);
 	free(report);
@@ -54,7 +54,7 @@ struct ct_snapshot* ct_init_section_snapshot(struct ct_section* section) {
 
 void ct_destroy_snapshot_tree(struct ct_snapshot* snapshot) {
 	free(snapshot->description);
-	ct_list_destroy_with_elements(snapshot->assertion_reports, (ct_destructor_t) ct_destroy_assert_report);
+	ct_list_destroy_with_elements(snapshot->assertion_reports, (ct_destroyer_c) ct_destroy_assert_report);
 
 	struct ct_snapshot* next_child = snapshot->first_child;
 	while (next_child != NULL) {
@@ -91,10 +91,10 @@ void ct_update_snapshot_status(struct ct_section* section, struct ct_snapshot* s
 	}
 }
 
-void ct_update_test_outcome(ct_test_report_t* report, struct ct_snapshot* last_snapshot) {
+void ct_update_test_outcome(struct ct_test_report* report, struct ct_snapshot* last_snapshot) {
 	if (last_snapshot->status != CT_SNAPSHOT_OK) {
 		report->testcase_snapshot->status = last_snapshot->status;
-		report->outcome = TEST_FAILURE;
+		report->outcome = CT_TEST_FAILURE;
 	}
 }
 

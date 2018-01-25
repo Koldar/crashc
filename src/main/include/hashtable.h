@@ -154,7 +154,7 @@ void ct_ht_destroy(ct_hashtable_o* ht);
  * @param[inout] ht the hashtable to remove
  * @param[in] d a function to use to free the elements in the hashtable from memory
  */
-void ct_ht_destroy_with_elements(ct_hashtable_o* ht, ct_destructor_t d);
+void ct_ht_destroy_with_elements(ct_hashtable_o* ht, ct_destroyer_c d);
 
 /**
  * Remove an element from the hashtable
@@ -175,7 +175,7 @@ bool ct_ht_remove(ct_hashtable_o* ht, unsigned long key);
  * @param[in] key the key of the value to remove from the hashtable
  * @param[in] d the function to use to dispose of the value removed from the hashtable
  */
-bool ct_ht_remove_and_destroy(ct_hashtable_o* ht, unsigned long key, ct_destructor_t d);
+bool ct_ht_remove_and_destroy(ct_hashtable_o* ht, unsigned long key, ct_destroyer_c d);
 
 /**
  * checks if the hashtable contains no values
@@ -234,7 +234,7 @@ void ct_ht_clear(ct_hashtable_o* ht);
  * @param[inout] ht the hashtable to clear
  * @param[in] d the function to use to destroy the paylaod of the hashtable
  */
-void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destructor_t d);
+void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destroyer_c d);
 
 /**
  * Returns the head entry of the hashtable.

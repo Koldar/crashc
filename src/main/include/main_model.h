@@ -23,10 +23,10 @@
 /**
  * A structure containing the whole model of application
  *
- * This global variable represents the ct_model_t the framework use to store all its data.
+ * This global variable represents the struct ct_model the framework use to store all its data.
  *
  */
-extern ct_model_t* ct_model;
+extern struct ct_model* ct_model;
 
 ///@}
 

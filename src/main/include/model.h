@@ -5,7 +5,7 @@
  *
  * All the data needed by a **single instance of the framework** should be defined in the model.
  * With this design, one can potentially run several, different, instances of @crashc within the same process,
- * since they would use different ct_model_t instances.
+ * since they would use different struct ct_model instances.
  *
  * @author koldar
  * @date Oct 11, 2017
@@ -37,27 +37,27 @@
  * @definition @crashc model
  * It's a collection of all the needed variables a single thread of @crashc needs
  */
-typedef struct ct_model {
+struct ct_model {
 	/**
 	 * Array containing the pointers to the testsuites functions
 	 */
-	test_pointer tests_array[MAX_TESTS];
+	ct_test_c tests_array[MAX_TESTS];
 	/**
 	 * The pointer to the global teardown function
 	 *
 	 * This is @null by default, and gets populated with a function pointer whenever the user uses the AFTER_TESTS macro.
 	 *
 	 * @definition
-	 * The global teardown function is the last piece of code to execute before the ct_model_t model used by the framework is tore down.
+	 * The global teardown function is the last piece of code to execute before the struct ct_model model used by the framework is tore down.
 	 * It's basically the last place where you can put custom code
 	 */
-	ct_teardown_t ct_teardown;
+	ct_teardown_c ct_teardown;
 	/**
 	 * Variablee used to keep track of the @testsuite registered
 	 *
 	 * Whilst registering @testsuite, the field represents the number of @testsuite you've registered so far.
 	 * After registered all the @testsuite, the field represents the numbr of @testsuite registered in the run:
-	 * you can use the values to understand where the field ct_crash_t::tests_array ends to have meanings
+	 * you can use the values to understand where the field ct_model::tests_array ends to have meanings
 	 *
 	 * @see REGISTER_SUITE
 	 */
@@ -113,22 +113,22 @@ typedef struct ct_model {
 	 * Represents the tags the user has specified as the only ones that should be consider
 	 *
 	 * A test is run only if it declares at least one tag inside this container.
-	 * If the test is in conflict with ct_model_t::excludeTags , ct_model_t::excludeTags has the precedence.
+	 * If the test is in conflict with ct_model::excludeTags , ct_model::excludeTags has the precedence.
 	 *
 	 * If this hashtable is empty, then we consider as if the check does't need to happen
 	 *
-	 * @see ct_model_t::excludeTags
+	 * @see struct ct_model::excludeTags
 	 */
 	ct_tag_hashtable_o* run_only_if_tags;
 	/**
 	 * Represents the tags the user has specified as the ones that excludes tests
 	 *
 	 * A test is skipped if it declares at least one tag inside this container.
-	 * If the test is in conflict with ct_model_t::run_only_if_tags, ct_model_t::excludeTags has the precedence
+	 * If the test is in conflict with ct_model::run_only_if_tags, ct_model::excludeTags has the precedence
 	 *
 	 * If this hashtable is empty, then we consider as if the check does't need to happen
 	 *
-	 * @see ct_model_t::run_only_if_tags
+	 * @see struct ct_model::run_only_if_tags
 	 */
 	ct_tag_hashtable_o* exclude_tags;
 	/**
@@ -142,7 +142,7 @@ typedef struct ct_model {
 	/**
 	 * Represents the sigaction flag required for intercepting signals
 	 *
-	 * @see ct_model_t::jump_point
+	 * @see struct ct_model::jump_point
 	 */
 	struct sigaction _crashc_sigaction;
 	/**
@@ -153,31 +153,31 @@ typedef struct ct_model {
 	 * 	\li the number of failed tests;
 	 * 	\li and so on...;
 	 */
-	ct_test_statistics_t* statistics;
+	struct ct_test_stats* statistics;
 	/**
 	 * The implementation of the report producer used by the model.
 	 *
 	 * This contains the functions used to create test reports for the user to overview
 	 */
-	ct_report_producer_t* report_producer_implementation;
+	struct ct_report_producer* report_producer_implementation;
 	/**
 	 * The file where to write the report on
 	 */
 	FILE* output_file;
-} ct_model_t;
+};
 
 /**
  * Create a model correctly initialized
  *
  * @return a setupped model
  */
-ct_model_t* ct_setup_default_model();
+struct ct_model* ct_setup_default_model();
 
 /**
  * Destroy every memory allocated by the model
  *
  * @param[in] ccm the model to destroy
  */
-void ct_teardown_default_model(ct_model_t* ccm);
+void ct_teardown_default_model(struct ct_model* ccm);
 
 #endif /* MODEL_H_ */

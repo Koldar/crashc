@@ -67,6 +67,6 @@ void assertTestCheckerAndReset(const char* expected);
 /**
  * Updates the model in order to use the testing version of the report producer
  */
-void ct_setup_testing_producer(ct_model_t * model);
+void ct_setup_testing_producer(struct ct_model * model);
 
 #endif /* TEST_CHECKER_H_ */

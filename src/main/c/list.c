@@ -61,7 +61,7 @@ void ct_list_destroy(const ct_list_o* lst) {
 	free((void*) lst);
 }
 
-void ct_list_destroy_with_elements(const ct_list_o* lst, ct_destructor_t d) {
+void ct_list_destroy_with_elements(const ct_list_o* lst, ct_destroyer_c d) {
 	ITERATE_ON_LIST(lst, entry, value, void*) {
 		d(entry->payload);
 		free(entry);

@@ -59,7 +59,7 @@ void ct_list_destroy(const ct_list_o* l);
  * @param[inout] l the list to handle
  * @param[in] d a function used to dispose all values within the list from memory
  */
-void ct_list_destroy_with_elements(const ct_list_o* l, ct_destructor_t d);
+void ct_list_destroy_with_elements(const ct_list_o* l, ct_destroyer_c d);
 
 /**
  * Remove all the payloads from the list

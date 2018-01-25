@@ -98,7 +98,7 @@ void ct_section_destroy(struct ct_section* section) {
 		return;
 	}
 
-	ct_ht_destroy_with_elements(section->tags, (ct_destructor_t)(ct_tag_destroy));
+	ct_ht_destroy_with_elements(section->tags, (ct_destroyer_c)(ct_tag_destroy));
 	free((void*) section->description);
 	free((void*) section);
 }

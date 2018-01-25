@@ -3,12 +3,12 @@
 #include "main_model.h"
 #include "list.h"
 
-void ct_update_test_array(ct_model_t* model, test_pointer func) {
+void ct_update_test_array(struct ct_model* model, ct_test_c func) {
 	model->tests_array[model->suites_array_index] = func;
 	model->suites_array_index++;
 }
 
-bool ct_run_once_check_access(ct_model_t* model, struct ct_section* section, ct_access_callback_t cs, ct_enter_callback_t callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags) {
+bool ct_run_once_check_access(struct ct_model* model, struct ct_section* section, ct_access_c cs, ct_enter_c callback, const ct_tag_hashtable_o* restrict run_tags, const ct_tag_hashtable_o* restrict exclude_tags) {
 	if (!section->loop2) {
 		return false;
 	}
@@ -41,7 +41,7 @@ bool ct_run_once_check_access(ct_model_t* model, struct ct_section* section, ct_
 	return section->access_granted;
 }
 
-bool ct_run_once_final_work(ct_model_t* model, struct ct_section* section, struct ct_section** pointer_to_set_as_parent, ct_exit_callback_t callback, ct_exit_callback_t access_granted_callback, ct_exit_callback_t access_denied_callback) {
+bool ct_run_once_final_work(struct ct_model* model, struct ct_section* section, struct ct_section** pointer_to_set_as_parent, ct_exit_c callback, ct_exit_c access_granted_callback, ct_exit_c access_denied_callback) {
 	if (section->loop1) {
 		return true;
 	}
@@ -83,22 +83,22 @@ struct ct_section* ct_fetch_section(struct ct_section* parent, enum ct_section_t
 	return ct_section_get_child(parent, parent->current_child);
 }
 
-void ct_reset_section_after_jump(ct_model_t* model, struct ct_section* const jump_source_section, struct ct_section* const testcase_section) {
+void ct_reset_section_after_jump(struct ct_model* model, struct ct_section* const jump_source_section, struct ct_section* const testcase_section) {
 	model->current_section = testcase_section;
 }
 
-bool ct_always_enter(ct_model_t* model, struct ct_section* section) {
+bool ct_always_enter(struct ct_model* model, struct ct_section* section) {
 	return true;
 }
 
-void ct_exit_callback_next_sibling(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
+void ct_exit_callback_next_sibling(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
 	//we finish a section. we return to the parent
 	*pointer_to_set_as_parent = section->parent;
 	//we go to the next sibling of child
 	(*pointer_to_set_as_parent)->current_child += 1;
 }
 
-void ct_exit_callback_children_number_computed(ct_model_t* model, struct ct_section** pointerToSetAsParent, struct ct_section* section) {
+void ct_exit_callback_children_number_computed(struct ct_model* model, struct ct_section** pointerToSetAsParent, struct ct_section* section) {
 	//we executed the section. Hence we can safely say we know the child number of such section
 	if (!section->children_number_known) {
 		section->children_number_known = true;
@@ -110,17 +110,17 @@ void ct_exit_callback_children_number_computed(ct_model_t* model, struct ct_sect
 	model->current_snapshot = model->current_snapshot->parent;
 }
 
-void ct_exit_callback_reset_container(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child) {
+void ct_exit_callback_reset_container(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* child) {
 	//we finished a section. Hence now we know the number of children that section have
 	child->children_number_known = true;
 	child->current_child = 0;
 }
 
-void ct_exit_callback_do_nothing(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
+void ct_exit_callback_do_nothing(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
 
 }
 
-bool ct_get_access_when(ct_model_t* model, struct ct_section* section) {
+bool ct_get_access_when(struct ct_model* model, struct ct_section* section) {
 	//section is the WHEN we're considering right now
 
 	//we don't enter in this WHEN if we have already entered in another WHEN of the parent
@@ -136,28 +136,28 @@ bool ct_get_access_when(ct_model_t* model, struct ct_section* section) {
 	return true;
 }
 
-void ct_callback_do_nothing(ct_model_t* model, struct ct_section* section) {
+void ct_callback_do_nothing(struct ct_model* model, struct ct_section* section) {
 
 }
 
-void ct_callback_entering_testcase(ct_model_t* model, struct ct_section* section) {
+void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* section) {
 	ct_update_current_snapshot(model, model->current_section);
-	ct_test_report_t* report = ct_init_test_report(model->current_snapshot);
+	struct ct_test_report* report = ct_init_test_report(model->current_snapshot);
 	ct_list_add_tail(model->test_reports_list, report);
 }
 
-void ct_callback_entering_then(ct_model_t* model, struct ct_section* section) {
+void ct_callback_entering_then(struct ct_model* model, struct ct_section* section) {
 	ct_update_current_snapshot(model, section);
 }
 
-void ct_callback_entering_when(ct_model_t* model, struct ct_section* section) {
+void ct_callback_entering_when(struct ct_model* model, struct ct_section* section) {
 	section->parent->already_found_when = true;
 
 	ct_update_current_snapshot(model, section);
 }
 
-void ct_exit_callback_access_granted_testcase(ct_model_t* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
-	ct_test_report_t* report = ct_list_tail(model->test_reports_list);
+void ct_exit_callback_access_granted_testcase(struct ct_model* model, struct ct_section** pointer_to_set_as_parent, struct ct_section* section) {
+	struct ct_test_report* report = ct_list_tail(model->test_reports_list);
 	struct ct_snapshot* last_snapshot = model->current_snapshot;
 
 	ct_update_snapshot_status(section, model->current_snapshot);
@@ -174,7 +174,7 @@ void ct_exit_callback_access_granted_testcase(ct_model_t* model, struct ct_secti
  *  - if current_snapshot is not NULL it means we are not in a new test, so we take a snapshot and adds it to the test report tree
  */
 
-void ct_update_current_snapshot(ct_model_t* model, struct ct_section* section) {
+void ct_update_current_snapshot(struct ct_model* model, struct ct_section* section) {
 	struct ct_snapshot* snapshot = ct_init_section_snapshot(section);
 
 	if (model->current_snapshot == NULL) {
@@ -190,6 +190,6 @@ void ct_signal_callback_do_nothing(int signal, struct ct_section* signaled_secti
 
 }
 
-void ct_set_crashc_teardown(ct_teardown_t f) {
+void ct_set_crashc_teardown(ct_teardown_c f) {
 	ct_model->ct_teardown = f;
 }

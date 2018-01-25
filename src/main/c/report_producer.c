@@ -39,7 +39,7 @@ char* ct_section_type_to_string(enum ct_section_type t) {
 
 
 //TODO: Check for errors due to FILE null pointer etc...
-void ct_default_snapshot_tree_report(ct_model_t* model, struct ct_snapshot* snapshot, int level) {
+void ct_default_snapshot_tree_report(struct ct_model* model, struct ct_snapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
 
@@ -59,23 +59,23 @@ void ct_default_snapshot_tree_report(ct_model_t* model, struct ct_snapshot* snap
 
 }
 
-void ct_default_test_report(ct_model_t* model, ct_test_report_t* report) {
+void ct_default_test_report(struct ct_model* model, struct ct_test_report* report) {
 
 	FILE* file = model->output_file;
 
 	fprintf(file, " ---------- TEST REPORT ----------\n\n");
 	//fprintf(file, "File: %s\n\n", report->filename);
 	ct_default_snapshot_tree_report(model, report->testcase_snapshot, 1);
-	fprintf(file, "\nOutcome: %s\n", (report->outcome == TEST_SUCCESS) ? "SUCCESS" : "FAILURE");
+	fprintf(file, "\nOutcome: %s\n", (report->outcome == CT_TEST_SUCCESS) ? "SUCCESS" : "FAILURE");
 	fprintf(file, "\n --------------------------------\n");
 	fprintf(file, "\n\n");
 
 }
 
-void ct_default_report_summary(ct_model_t* model) {
+void ct_default_report_summary(struct ct_model* model) {
 
 	FILE* file = model->output_file;
-	ct_test_statistics_t * stats = model->statistics;
+	struct ct_test_stats * stats = model->statistics;
 
 	fprintf(file, "Total tests: %d\n", stats->total_tests);
 	fprintf(file, "Successful tests: %d\n", stats->successful_tests);
@@ -84,12 +84,12 @@ void ct_default_report_summary(ct_model_t* model) {
 
 }
 
-void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapshot, int level) {
+void ct_default_assertions_report(struct ct_model* model, struct ct_snapshot* snapshot, int level) {
 
 	FILE* file = model->output_file;
 	ct_list_o* assertion_reports = snapshot->assertion_reports;
 
-	ITERATE_ON_LIST(assertion_reports, report_cell, report, ct_assert_report_t*) {
+	ITERATE_ON_LIST(assertion_reports, report_cell, report, struct ct_assert_report*) {
 		for (int i = 0; i < level; i++) {
 			putchar('\t');
 		}
@@ -104,13 +104,13 @@ void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapsho
 
 }
 
-void ct_default_report(ct_model_t* model) {
+void ct_default_report(struct ct_model* model) {
 
 	ct_list_o* report_list = model->test_reports_list;
 
 	//TODO: Move the stats-acquiring code away from the report producer
-	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t*) {
-		if (report->outcome == TEST_SUCCESS) {
+	ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report*) {
+		if (report->outcome == CT_TEST_SUCCESS) {
 			model->statistics->successful_tests++;
 		}
 		else {
@@ -124,24 +124,24 @@ void ct_default_report(ct_model_t* model) {
 
 }
 
-ct_test_statistics_t* ct_init_stats() {
+struct ct_test_stats* ct_init_stats() {
 
-	ct_test_statistics_t* retVal = malloc(sizeof(ct_test_statistics_t));
+	struct ct_test_stats* ret_val = malloc(sizeof(struct ct_test_stats));
 
-	if (retVal == NULL) {
+	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
 	}
 
-	retVal->total_tests = 0;
-	retVal->successful_tests = 0;
-	retVal->failed_tests = 0;
+	ret_val->total_tests = 0;
+	ret_val->successful_tests = 0;
+	ret_val->failed_tests = 0;
 
-	return retVal;
+	return ret_val;
 }
 
-ct_report_producer_t* ct_init_default_report_producer() {
+struct ct_report_producer* ct_init_default_report_producer() {
 
-	ct_report_producer_t* ret_val = malloc(sizeof(ct_report_producer_t));
+	struct ct_report_producer* ret_val = malloc(sizeof(struct ct_report_producer));
 
 	if (ret_val == NULL) {
 		MALLOCERRORCALLBACK();
@@ -157,13 +157,13 @@ ct_report_producer_t* ct_init_default_report_producer() {
 
 }
 
-void ct_destroy_stats(ct_test_statistics_t* stats) {
+void ct_destroy_stats(struct ct_test_stats* stats) {
 
 	free(stats);
 
 }
 
-void ct_destroy_default_report_producer(ct_report_producer_t* producer) {
+void ct_destroy_default_report_producer(struct ct_report_producer* producer) {
 
 	free(producer);
 

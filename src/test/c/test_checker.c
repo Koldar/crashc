@@ -1,7 +1,7 @@
 /*
  * \file test_checker.c
  *
- * A naive module us
+ * A naive module used for internal automated testing
  *
  *  Created on: Sep 28, 2017
  *      Author: koldar
@@ -17,11 +17,11 @@
 static char __TEST_CHECKER_BUFFER[1000];
 static int nextPosition;
 static char split = ' ';
-static void ct_testing_snapshot_tree_report(ct_model_t * model, struct ct_snapshot * snapshot, int level);
-static void ct_testing_summary_producer(ct_model_t * model);
-static void ct_testing_report(ct_model_t * model);
-static void ct_testing_test_report(ct_model_t * model, ct_test_report_t* report);
-static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome);
+static void ct_testing_snapshot_tree_report(struct ct_model * model, struct ct_snapshot * snapshot, int level);
+static void ct_testing_summary_producer(struct ct_model * model);
+static void ct_testing_report(struct ct_model * model);
+static void ct_testing_test_report(struct ct_model * model, struct ct_test_report* report);
+static char * ct_testing_outcome_to_s(enum ct_test_outcome outcome);
 static char * ct_testing_section_type_to_c(enum ct_section_type type);
 static char * ct_testing_snapshot_status_to_s(enum ct_snapshot_status status);
 
@@ -54,9 +54,9 @@ bool checkTestChecker(const char* expected) {
 }
 
 bool checkTestCheckerAndReset(const char* expected) {
-	bool retVal = (strcmp(__TEST_CHECKER_BUFFER, expected) == 0);
+	bool ret_val = (strcmp(__TEST_CHECKER_BUFFER, expected) == 0);
 	clearTestChecker();
-	return retVal;
+	return ret_val;
 }
 
 void assertTestCheckerAndReset(const char* expected) {
@@ -70,8 +70,8 @@ void assertTestCheckerAndReset(const char* expected) {
 	clearTestChecker();
 }
 
-static char * ct_testing_outcome_to_s(ct_test_outcome_t outcome) {
-	if (outcome == TEST_SUCCESS) {
+static char * ct_testing_outcome_to_s(enum ct_test_outcome outcome) {
+	if (outcome == CT_TEST_SUCCESS) {
 		return "OK";
 	}
 	else {
@@ -99,7 +99,7 @@ static char * ct_testing_snapshot_status_to_s(enum ct_snapshot_status status) {
 	}
 }
 
-static void ct_testing_snapshot_tree_report(ct_model_t * model, struct ct_snapshot * snapshot, int level) {
+static void ct_testing_snapshot_tree_report(struct ct_model * model, struct ct_snapshot * snapshot, int level) {
 	char level_str[12];
 	sprintf(level_str, "%d", level);
 	addString(level_str, false);
@@ -116,29 +116,29 @@ static void ct_testing_snapshot_tree_report(ct_model_t * model, struct ct_snapsh
 	}
 }
 
-static void ct_testing_summary_producer(ct_model_t * model) {
+static void ct_testing_summary_producer(struct ct_model * model) {
 	
 }
 
-static void ct_testing_report(ct_model_t * model) {
+static void ct_testing_report(struct ct_model * model) {
 
 	ct_list_o * report_list = model->test_reports_list;
 
-	ITERATE_ON_LIST(report_list, report_cell, report, ct_test_report_t *) {
+	ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report *) {
 		ct_testing_test_report(model, report);
 	}
 	
 }
 
-static void ct_testing_test_report(ct_model_t * model, ct_test_report_t * report) {
+static void ct_testing_test_report(struct ct_model * model, struct ct_test_report * report) {
 	addString(ct_testing_outcome_to_s(report->outcome), false);
 	addCharacter('-');
 	ct_testing_snapshot_tree_report(model, report->testcase_snapshot, 1);
 	addCharacter(split);
 }
 
-void ct_setup_testing_producer(ct_model_t * model) {
-	ct_report_producer_t * old_producer = model->report_producer_implementation;
+void ct_setup_testing_producer(struct ct_model * model) {
+	struct ct_report_producer * old_producer = model->report_producer_implementation;
 
 	old_producer->snapshot_tree_reporter = ct_testing_snapshot_tree_report;
 	old_producer->test_reporter			 = ct_testing_test_report;

@@ -8,4 +8,4 @@
 
 #include "main_model.h"
 
-ct_model_t* ct_model;
+struct ct_model* ct_model;

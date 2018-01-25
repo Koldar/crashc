@@ -109,7 +109,7 @@ void ct_ht_destroy(ct_hashtable_o* ht) {
 	}
 }
 
-void ct_ht_destroy_with_elements(ct_hashtable_o* ht, ct_destructor_t d) {
+void ct_ht_destroy_with_elements(ct_hashtable_o* ht, ct_destroyer_c d) {
 	ct_hashtable_entry_o* s;
 	ct_hashtable_entry_o* tmp;
 
@@ -132,7 +132,7 @@ bool ct_ht_remove(ct_hashtable_o* ht, unsigned long key) {
 	return true;
 }
 
-bool ct_ht_remove_and_destroy(ct_hashtable_o* ht, unsigned long key, ct_destructor_t d) {
+bool ct_ht_remove_and_destroy(ct_hashtable_o* ht, unsigned long key, ct_destroyer_c d) {
 	ct_hashtable_entry_o* tmp;
 
 	HASH_FIND(hh, ht->head, &key, sizeof(unsigned long), tmp);
@@ -204,7 +204,7 @@ void ct_ht_clear(ct_hashtable_o* ht) {
 	ht->head = NULL;
 }
 
-void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destructor_t d) {
+void ct_ht_clear_and_destroy_elements(ct_hashtable_o* ht, ct_destroyer_c d) {
 	ct_hashtable_entry_o* s;
 	ct_hashtable_entry_o* tmp;
 

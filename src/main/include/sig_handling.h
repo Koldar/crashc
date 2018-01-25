@@ -21,7 +21,7 @@
  */
 #define SIGNAL_JUMP_CODE 1
 /**
- * Used by ct_model_t::_crashc_sigaction to indicate an empty bitmask
+ * Used by struct ct_model::_crashc_sigaction to indicate an empty bitmask
  */
 #define NO_FLAGS 0
 
@@ -29,7 +29,7 @@
  * Registers all the signal @crashc test framework wants to handle
  *
  * \post
- * 	\li ct_model_t::_crashc_sigaction manages all signals
+ * 	\li struct ct_model::_crashc_sigaction manages all signals
  */
 void ct_register_signal_handlers();
 

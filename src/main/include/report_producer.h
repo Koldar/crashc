@@ -23,7 +23,7 @@
 /**
  * Struct used to contain the statistics used by @crashc to give the user additional info on the run tests
  */
-struct ct_test_statistics_t {
+struct ct_test_stats {
 	/**
 	 * The number of total tests @crashc have detected
 	 *
@@ -53,17 +53,17 @@ struct ct_test_statistics_t {
  * This allows for easy customization and high code maintainability. Use this struct to generate your custom test reporter.
  * For example, one may want to create a test reporter which save its data ina mysqlite database.
  */
-struct ct_report_producer_t {
+struct ct_report_producer {
 
-	ct_test_reporter_t test_reporter;
+	ct_test_reporter_c test_reporter;
 
-	ct_snapshot_tree_reporter_t snapshot_tree_reporter;
+	ct_snapshot_tree_reporter_c snapshot_tree_reporter;
 
-	ct_summary_reporter_t summary_producer;
+	ct_summary_reporter_c summary_producer;
 
-	ct_assert_reporter_t assert_reporter;
+	ct_assert_reporter_c assert_reporter;
 
-	ct_reporter_t report_producer;
+	ct_reporter_c report_producer;
 
 };
 
@@ -87,7 +87,7 @@ char* ct_section_type_to_string(enum ct_section_type type);
 
 /**
  * @addtogroup defaultReportProducer Default Report Producer
- * @brief a ct_report_producer_t which print the summary of @crashc test outcomes in a file by writing the test correctly indented
+ * @brief a struct ct_report_producer which print the summary of @crashc test outcomes in a file by writing the test correctly indented
  * @{
  */
 
@@ -95,56 +95,56 @@ char* ct_section_type_to_string(enum ct_section_type type);
  * Prints the report of the executed tests in a default format
  *
  * \note
- * The report will be printed in the file specified by ct_model_t::output_file
+ * The report will be printed in the file specified by struct ct_model::output_file
  *
  * @param[inout] model the model to handle
  */
-void ct_default_report(ct_model_t* model);
+void ct_default_report(struct ct_model* model);
 /**
  * Prints the tests summary in a default format
  *
  * \note
- * The report will be printed in the file specified by ct_model_t::output_file
+ * The report will be printed in the file specified by struct ct_model::output_file
  *
  * @param[inout] model the model to handle
  */
-void ct_default_report_summary(ct_model_t* model);
+void ct_default_report_summary(struct ct_model* model);
 
 /**
  * Prints a the report of a single test with a default format
  *
  * \note
- * The report will be printed in the file specified by ct_model_t::output_file
+ * The report will be printed in the file specified by struct ct_model::output_file
  *
  * @param[inout] model the model to handle
  * @param[inout] report the test report to put in the file
  */
-void ct_default_test_report(ct_model_t* model, ct_test_report_t* report);
+void ct_default_test_report(struct ct_model* model, struct ct_test_report* report);
 
 /**
  * Prints a representation of a snapshot tree in a default format
  *
  * \note
- * The report will be printed in the file specified by ct_model_t::output_file
+ * The report will be printed in the file specified by struct ct_model::output_file
  *
  * @param[inout] model the model to manage
  * @param[inout] snapshot the snapshot to write into the file
  * @param[in] level the depth level \c snapshot is in the snapshot tree
  */
-void ct_default_snapshot_tree_report(ct_model_t* model, struct ct_snapshot* snapshot, int level);
+void ct_default_snapshot_tree_report(struct ct_model* model, struct ct_snapshot* snapshot, int level);
 
 /**
  * Prints a default report for the assertions related to a specific snapshot
  *
  * \note
- * The report will be printed in the file specified by ct_model_t::output_file
+ * The report will be printed in the file specified by struct ct_model::output_file
  *
  * @param[inout] model the model to manage
  * @param[inout] snapshot the snapshot to write into the file
  * @param[in] level the depth level \c snapshot is in the snapshot tree
  *
  */
-void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapshot, int level);
+void ct_default_assertions_report(struct ct_model* model, struct ct_snapshot* snapshot, int level);
 
 ///@}
 
@@ -153,27 +153,27 @@ void ct_default_assertions_report(ct_model_t* model, struct ct_snapshot* snapsho
  *
  * @return a structure containing the statistics data related to the tests
  */
-ct_test_statistics_t* ct_init_stats();
+struct ct_test_stats* ct_init_stats();
 
 /**
  * Creates and initializes in memory a new default report producer structure
  *
  * @return a structure representing a naive report producer
  */
-ct_report_producer_t* ct_init_default_report_producer();
+struct ct_report_producer* ct_init_default_report_producer();
 
 /**
- * Frees the memory occupied by a ct_test_statistics_t
+ * Frees the memory occupied by a struct ct_test_stats
  *
  * @param[inout] stats the structure to dispose from the memory
  */
-void ct_destroy_stats(ct_test_statistics_t* stats);
+void ct_destroy_stats(struct ct_test_stats* stats);
 
 /**
  * Frees the memory allocated for the default report producer
  *
  * @param[inout] producer the structure to dispose from the mermory
  */
-void ct_destroy_default_report_producer(ct_report_producer_t* producer);
+void ct_destroy_default_report_producer(struct ct_report_producer* producer);
 
 #endif /* REPORT_PRODUCER_H_ */

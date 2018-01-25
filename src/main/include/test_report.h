@@ -22,22 +22,22 @@
 /**
  * Represents the possible outcomes of a single test:
  */
-typedef enum {
+enum ct_test_outcome {
 	/**
 	 * A test passed
 	 *
 	 * @definition Passed Test
 	 * It's a **test** containing no failed assertions
 	 */
-	TEST_SUCCESS,
+	CT_TEST_SUCCESS,
 	/**
 	 * A test didn't pass
 	 *
 	 * @definition Failed Test
 	 * It's a **test** which is not a **passed test**.
 	 */
-	TEST_FAILURE
-} ct_test_outcome_t;
+	CT_TEST_FAILURE,
+};
 
 /**
  * Represents the actual test report.
@@ -67,8 +67,8 @@ typedef enum {
  * -# inner when 2 -> then
  *
  * These are what @crashc considers to be tests.
- * This implies that the informations stored in the ct_test_report_t struct are related to the flow of execution, not to a given section.
- * This is the reason why the ct_test_report_t struct needs an auxiliary struct, ::ct_snapshot, to hold the information on the status of
+ * This implies that the informations stored in the ct_test_report struct are related to the flow of execution, not to a given section.
+ * This is the reason why the ct_test_report struct needs an auxiliary struct, ::ct_snapshot, to hold the information on the status of
  * the sections involved in the test at the moment they were executed.
  */
 struct ct_test_report {
@@ -77,7 +77,7 @@ struct ct_test_report {
 	 *
 	 * @notnull
 	 */
-	char * filename;
+	char* filename;
 	/**
 	 * The snapshot of the testcase that contained this test.
 	 * This is actually the root of a tree which contains the section path followed by the test
@@ -86,11 +86,11 @@ struct ct_test_report {
 	 * @notnull
 	 */
 	 //TODO is this field always not null? Ask lorenzo
-	 struct ct_snapshot * testcase_snapshot;
+	 struct ct_snapshot* testcase_snapshot;
 	 /**
 	  * The outcome of the test.
 	  */
-	 ct_test_outcome_t outcome;
+	 enum ct_test_outcome outcome;
 	/**
 	 * The time that it took to complete the test
 	 *
@@ -105,18 +105,18 @@ struct ct_test_report {
  * create in memory a new test report
  *
  * \note
- * the test report created is assumed to have state ::TEST_SUCCESS
+ * the test report created is assumed to have state ::CT_TEST_SUCCESS
  *
  * @param[in] tc_snapshot the snapshot tree associated to the test report
  * @return the test report desired;
  */
-ct_test_report_t* ct_init_test_report(struct ct_snapshot* tc_snapshot);
+struct ct_test_report* ct_init_test_report(struct ct_snapshot* tc_snapshot);
 /**
- * release from the memory a ct_test_report_t
+ * release from the memory a struct ct_test_report
  *
  * @param[inout] report the report to dispose of. @notnull
  */
-void ct_destroy_test_report(ct_test_report_t* report);
+void ct_destroy_test_report(struct ct_test_report* report);
 
 //TODO why the init section snapshot is defined here while the struct is defined in section.h?
 /**
@@ -163,6 +163,6 @@ void ct_update_snapshot_status(struct ct_section* section, struct ct_snapshot* s
  * @param[inout] report the report to update
  * @param[in] last_snapshot the snapshot whose result we need to integrate to \c report
  */
-void ct_update_test_outcome(ct_test_report_t* report, struct ct_snapshot* last_snapshot);
+void ct_update_test_outcome(struct ct_test_report* report, struct ct_snapshot* last_snapshot);
 
 #endif /* TEST_REPORT_H_ */
