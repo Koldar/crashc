@@ -4,41 +4,41 @@
 #include "test_checker.h"
 
 TESTSUITE(1) {
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("testcase1", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("test", "") {
-			addCharacter('b');
+			add_char('b');
 			WHEN("inner when", "") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("inner when 2", "") {
-				addCharacter('e');
+				add_char('e');
 			}
-			addCharacter('f');
+			add_char('f');
 			THEN("inner then", "") {
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 		}
-		addCharacter('i');
+		add_char('i');
 		THEN("test", "") {
-			addCharacter('j');
+			add_char('j');
 		}
-		addCharacter('k');
+		add_char('k');
 		WHEN("test2", "") {
-			addCharacter('l');
+			add_char('l');
 		}
-		addCharacter('m');
+		add_char('m');
 		THEN("test2", "") {
-			addCharacter('n');
+			add_char('n');
 		}
-		addCharacter('o');
-		addCharacter(' ');
+		add_char('o');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdfghijkmno abdefghijkmno aijklmno ");
+	assert_and_reset_test_checker("abcdfghijkmno abdefghijkmno aijklmno ");
 }
 
 #endif

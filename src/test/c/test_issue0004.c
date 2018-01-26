@@ -17,7 +17,7 @@
  */
 void check_result() {
 	//Here we check that the reports are what we expect
-	assertTestCheckerAndReset(											   	\
+	assert_and_reset_test_checker(											   	\
 		"OK-1|TC1|OK_2|OW|OK_3|IW1|OK_3|IT1|OK_2|OT|OK_3|IW2|OK_3|IT2|OK_ " \
 		"OK-1|TC2|OK_2|W1|OK_2|T|OK_ "										\
 		"NO-1|TC2|SIG_2|W2|SIG_ "											\
@@ -35,7 +35,7 @@ TESTS_END
 TESTSUITE(1) {
 
 	//Here we set up the special report producer used for testing
-	ct_setup_testing_producer(ct_model);
+	setup_testing_producer(ct_model);
 
 	//Now we have the usual test code
 

@@ -41,722 +41,722 @@ TESTS_END
 
 TESTSUITE(1) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("1", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdefghlm abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdefghlm abcdhijklm amnopqrst ");
 }
 
 // ************************ TESTS WITH RUN/NORUN *****************************
 
 TESTSUITE(2) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("2", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "NORUN") { //no run!
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdeghlm abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdeghlm abcdhijklm amnopqrst ");
 }
 
 TESTSUITE(3) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("3", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "NORUN") { //no run!
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdhijklm amnopqrst ");
 }
 
 TESTSUITE(4) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("4", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "NORUN") { //no run!
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abdefghlm abdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abdefghlm abdhijklm amnopqrst ");
 }
 
 TESTSUITE(5) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("5", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "NORUN") { //no run!
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdefghlm abcdhijklm amnopqst ");
+	assert_and_reset_test_checker("abcdefghlm abcdhijklm amnopqst ");
 }
 
 TESTSUITE(6) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("6", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "NORUN") { //NORUN!
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdefghlm abcdhijklm ");
+	assert_and_reset_test_checker("abcdefghlm abcdhijklm ");
 }
 
 TESTSUITE(7) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("7", "NORUN") { //NORUN!
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("");
+	assert_and_reset_test_checker("");
 }
 
 // ************************ TESTS WITH RUN *****************************
 
 TESTSUITE(102) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("102", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "") { //no run!
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdeghlm abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdeghlm abcdhijklm amnopqrst ");
 }
 
 TESTSUITE(103) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("103", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "") { //no run!
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdhijklm amnopqrst ");
 }
 
 TESTSUITE(104) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("104", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "") { //no run!
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abdefghlm abdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abdefghlm abdhijklm amnopqrst ");
 }
 
 TESTSUITE(105) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("105", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "") { //no run!
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdefghlm abcdhijklm amnopqst ");
+	assert_and_reset_test_checker("abcdefghlm abcdhijklm amnopqst ");
 }
 
 TESTSUITE(106) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("106", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "") { //NORUN!
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdefghlm abcdhijklm ");
+	assert_and_reset_test_checker("abcdefghlm abcdhijklm ");
 }
 
 TESTSUITE(107) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("107", "") { //NORUN!
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("");
+	assert_and_reset_test_checker("");
 }
 
 // ************************** CONFLICT BETWEEN EXCLUDE AND INCLUDE *****************************
 
 TESTSUITE(201) {
 
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("201", "RUN") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "RUN") {
-			addCharacter('b');
+			add_char('b');
 			THEN("", "RUN") {
-				addCharacter('c');
+				add_char('c');
 			}
-			addCharacter('d');
+			add_char('d');
 			WHEN("", "RUN NORUN") {
-				addCharacter('e');
+				add_char('e');
 				THEN("", "RUN") {
-					addCharacter('f');
+					add_char('f');
 				}
-				addCharacter('g');
+				add_char('g');
 			}
-			addCharacter('h');
+			add_char('h');
 			WHEN("", "RUN") {
-				addCharacter('i');
+				add_char('i');
 				THEN("", "RUN") {
-					addCharacter('j');
+					add_char('j');
 				}
-				addCharacter('k');
+				add_char('k');
 			}
-			addCharacter('l');
+			add_char('l');
 		}
 
-		addCharacter('m');
+		add_char('m');
 		WHEN("", "RUN") {
-			addCharacter('n');
+			add_char('n');
 			THEN("", "RUN") {
-				addCharacter('o');
+				add_char('o');
 			}
-			addCharacter('p');
+			add_char('p');
 			THEN("", "RUN") {
-				addCharacter('q');
+				add_char('q');
 				WHEN("", "RUN") {
-					addCharacter('r');
+					add_char('r');
 				}
-				addCharacter('s');
+				add_char('s');
 			}
-			addCharacter('t');
+			add_char('t');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdhijklm amnopqrst ");
+	assert_and_reset_test_checker("abcdhijklm amnopqrst ");
 }
 
 #endif

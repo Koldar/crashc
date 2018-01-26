@@ -19,68 +19,68 @@ REG_SUITE(4);
 TESTS_END
 
 TESTSUITE(1) {
-	clearTestChecker();
+	clear_test_checker();
 
 	TESTCASE("testcase1", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("test", "") {
-			addCharacter('b');
-			WHEN("inner when", "") {addCharacter('c');}
-			addCharacter('d');
-			WHEN("inner when 2", "") {addCharacter('e');}
-			addCharacter('f');
-			THEN("inner then", "") {addCharacter('g');}
-			addCharacter('h');
+			add_char('b');
+			WHEN("inner when", "") {add_char('c');}
+			add_char('d');
+			WHEN("inner when 2", "") {add_char('e');}
+			add_char('f');
+			THEN("inner then", "") {add_char('g');}
+			add_char('h');
 		}
-		addCharacter('i');
-		THEN("test", "") {addCharacter('j');}
-		addCharacter('k');
-		WHEN("test2", "") {addCharacter('l');}
-		addCharacter('m');
-		THEN("test2", "") {addCharacter('n');}
-		addCharacter('o');
-		addCharacter(' ');
+		add_char('i');
+		THEN("test", "") {add_char('j');}
+		add_char('k');
+		WHEN("test2", "") {add_char('l');}
+		add_char('m');
+		THEN("test2", "") {add_char('n');}
+		add_char('o');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcdfghijkmno abdefghijkmno aijklmno ");
+	assert_and_reset_test_checker("abcdfghijkmno abdefghijkmno aijklmno ");
 }
 
 TESTSUITE(2) {
-	clearTestChecker();
+	clear_test_checker();
 
 	TESTCASE("1", "") {
-		addCharacter('a');
+		add_char('a');
 	}
 
-	assertTestCheckerAndReset("a");
+	assert_and_reset_test_checker("a");
 }
 
 TESTSUITE(3) {
-	clearTestChecker();
+	clear_test_checker();
 
 	TESTCASE("1", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("2", "") {
-			addCharacter('b');
+			add_char('b');
 		}
-		addCharacter('c');
+		add_char('c');
 	}
 
-	assertTestCheckerAndReset("abc");
+	assert_and_reset_test_checker("abc");
 }
 
 TESTSUITE(4) {
-	clearTestChecker();
+	clear_test_checker();
 
 	TESTCASE("1", "") {
-		addCharacter('a');
+		add_char('a');
 		THEN("2", "") {
-			addCharacter('b');
+			add_char('b');
 		}
-		addCharacter('c');
+		add_char('c');
 	}
 
-	assertTestCheckerAndReset("abc");
+	assert_and_reset_test_checker("abc");
 }
 
 

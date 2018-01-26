@@ -9,109 +9,109 @@ TESTS_END
 
 TESTSUITE(1) {
 
-	clearTestChecker();
+	clear_test_checker();
 	
 	TESTCASE("passed assertion simple", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("", "") {
-			addCharacter('b');
+			add_char('b');
 			ASSERT(true);
-			addCharacter('d');
+			add_char('d');
 		}
 		WHEN("", "") {
-			addCharacter('c');
+			add_char('c');
 			ASSERT(true);
-			addCharacter('e');
+			add_char('e');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abd ace ");
+	assert_and_reset_test_checker("abd ace ");
 
 	TESTCASE("failed assertion simple", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("W1", "") {
-			addCharacter('b');
+			add_char('b');
 		}
 		WHEN("W2", "") {
-			addCharacter('c');
+			add_char('c');
 			ASSERT(false);
-			addCharacter('x');
+			add_char('x');
 		}
 		WHEN("W3", "") {
-			addCharacter('d');
+			add_char('d');
 		}
 		THEN("T", "") {
-			addCharacter('e');
+			add_char('e');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abe ac");
+	assert_and_reset_test_checker("abe ac");
 
 	TESTCASE("nested sections failed assertion", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("OW", "") {
-			addCharacter('b');
+			add_char('b');
 			WHEN("IW1", "") {
-				addCharacter('c');
+				add_char('c');
 			}
 			WHEN("IW2", "") {
-				addCharacter('d');
+				add_char('d');
 				ASSERT(false);
-				addCharacter('g');
+				add_char('g');
 			}
 			THEN("IT", "") {
-				addCharacter('e');
+				add_char('e');
 			}
 		}
 		THEN("OT", "") {
-			addCharacter('f');
+			add_char('f');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcef abd");
+	assert_and_reset_test_checker("abcef abd");
 
 	TESTCASE("nested sections passed assertion", "") {
-		addCharacter('a');
+		add_char('a');
 		WHEN("OW", "") {
-			addCharacter('b');
+			add_char('b');
 			WHEN("IW1", "") {
-				addCharacter('c');
+				add_char('c');
 			}
 			WHEN("IW2", "") {
-				addCharacter('d');
+				add_char('d');
 				ASSERT(true);
-				addCharacter('g');
+				add_char('g');
 			}
 			THEN("IT", "") {
-				addCharacter('e');
+				add_char('e');
 			}
 		}
 		THEN("OT", "") {
-			addCharacter('f');
+			add_char('f');
 		}
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("abcef abdgef ");
+	assert_and_reset_test_checker("abcef abdgef ");
 
 	TESTCASE("only assertion passed", "") {
-		addCharacter('a');
+		add_char('a');
 		ASSERT(true);
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("a ");
+	assert_and_reset_test_checker("a ");
 
 	TESTCASE("only assertion failed", "") {
-		addCharacter('a');
+		add_char('a');
 		ASSERT(false);
-		addCharacter(' ');
+		add_char(' ');
 	}
 
-	assertTestCheckerAndReset("a");
+	assert_and_reset_test_checker("a");
 	
 }
 

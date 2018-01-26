@@ -9,68 +9,68 @@ REG_SUITE(2);
 TESTS_END
 
 TESTSUITE(1) {
-	clearTestChecker();
+	clear_test_checker();
 	int i=0;
     TESTCASE("testcase1", "") {
     	i += 1;
     	//ct_section_draw_tree(&rootSection, "issue14_%04d", i);
-    	addCharacter('a');
+    	add_char('a');
         WHEN("when 1", "") { //we enter here the first time. We then detect a signal and we mark that section are "signaled"
-        	addCharacter('b');
+        	add_char('b');
             int a = 6;
 			int b = 0;
-			addCharacter(' ');
+			add_char(' ');
 			printf("a/b is %d\n", a/b);
-			addCharacter('c');
+			add_char('c');
         }
-        addCharacter('d');
+        add_char('d');
         THEN("then1", "") {
-        	addCharacter('e');
+        	add_char('e');
         }
-        addCharacter('f');
+        add_char('f');
         WHEN("when2", "") {
-        	addCharacter('g');
+        	add_char('g');
         }
-        addCharacter('h');
+        add_char('h');
         THEN("then2", "") {
-        	addCharacter('i');
+        	add_char('i');
         }
-        addCharacter('j');
-        addCharacter('\0');
+        add_char('j');
+        add_char('\0');
     }
-    assertTestCheckerAndReset("ab ");
+    assert_and_reset_test_checker("ab ");
 }
 
 TESTSUITE(2) {
-	clearTestChecker();
+	clear_test_checker();
 	int i=0;
     TESTCASE("testcase1", "") {
     	i += 1;
     	//ct_section_draw_tree(&rootSection, "issue14_%04d", i);
-    	addCharacter('a');
+    	add_char('a');
         WHEN("when 1", "") { //we enter here the first time. We then detect a signal and we mark that section are "signaled"
-        	addCharacter('b');
+        	add_char('b');
             int a = 6;
 			int b = 0;
 			printf("a/b is %d\n", a/b);
-			addCharacter('c');
+			add_char('c');
         }
     }
 
-    addCharacter(' ');
+    add_char(' ');
 
     TESTCASE("testcase2", "") {
-    	addCharacter('a');
+    	add_char('a');
 		WHEN("when 1", "") {
-			addCharacter('b');
+			add_char('b');
 		}
-		addCharacter('c');
+		add_char('c');
 		WHEN("when 2", "") { //we enter here the first time. We then detect a signal and we mark that section are "signaled"
-			addCharacter('d');
+			add_char('d');
 		}
-		addCharacter('e');
+		add_char('e');
     }
-    assertTestCheckerAndReset("ab abceacde");
+    assert_and_reset_test_checker("ab abceacde");
 }
 
 #endif

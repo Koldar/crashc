@@ -15,11 +15,11 @@ REG_SUITE(1);
 TESTS_END
 
 TESTSUITE(1) {
-	clearTestChecker();
+	clear_test_checker();
 	TESTCASE("test", "") {
-		addCharacter('a');
+		add_char('a');
 	}
-	assertTestCheckerAndReset("a");
+	assert_and_reset_test_checker("a");
 }
 
 #endif
