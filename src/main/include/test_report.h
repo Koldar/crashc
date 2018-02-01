@@ -85,7 +85,6 @@ struct ct_test_report {
 	 *
 	 * @notnull
 	 */
-	 //TODO is this field always not null? Ask lorenzo
 	 struct ct_snapshot* testcase_snapshot;
 	 /**
 	  * The outcome of the test.
