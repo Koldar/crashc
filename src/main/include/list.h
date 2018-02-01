@@ -165,13 +165,13 @@ void* ct_list_get(const ct_list_o* list, int index);
 /**
  *
  * \attention
- * You should use this function only inside ::VARIABLE_ITERATE_ON_LIST. Other uses may (and often will) lead to **undefined behaviour**!
+ * You should use this function only inside ::CT_VARIABLE_ITERATE_ON_LIST. Other uses may (and often will) lead to **undefined behaviour**!
  *
  * This function will allow you to dynamically remove elements inside a list when you're iterating it.
  * A typical example might be:
  *
  * @code
- * VARIABLE_ITERATE_ON_LIST(&list, previous, entry, payload) {
+ * CT_VARIABLE_ITERATE_ON_LIST(&list, previous, entry, payload) {
  * 	if (condition_to_payload()) {
  * 		ct_list_remove_entry_dynamic(&list, &previous, entry);
  * 	}
@@ -213,7 +213,7 @@ ct_list_entry_o* _ct_list_head_entry(const ct_list_o* l);
 /**
  * Allows you to transparently iterate through a list
  *
- * This macro is *slightly* faster than ::VARIABLE_ITERATE_ON_LIST but it doesn't allow you to
+ * This macro is *slightly* faster than ::CT_VARIABLE_ITERATE_ON_LIST but it doesn't allow you to
  * safely remove entries while iterating
  *
  * @param[in] _l a double point to the list you want to iterate through;
@@ -221,35 +221,38 @@ ct_list_entry_o* _ct_list_head_entry(const ct_list_o* l);
  * @param[in] _payload name of the variable representing <tt>entry->payload</tt>
  * @param[in] type type of the variable _payload
  */
-#define ITERATE_ON_LIST(_l, entry, _payload, type) 												\
-		const ct_list_o* UV(l) = (_l);															\
-		ct_list_entry_o* entry = _ct_list_head_entry(UV(l)); 									\
-		ct_list_entry_o* UV(next) = NULL;														\
+#ifdef CT_ITERATE_ON_LIST
+#	error "CrashC - CT_ITERATE_ON_LIST macro already defined!"
+#endif
+#define CT_ITERATE_ON_LIST(_l, entry, _payload, type) 												\
+		const ct_list_o* CT_UV(l) = (_l);															\
+		ct_list_entry_o* entry = _ct_list_head_entry(CT_UV(l)); 									\
+		ct_list_entry_o* CT_UV(next) = NULL;														\
 		type _payload = NULL;																	\
 		if (entry != NULL) {																	\
 			_payload = _ct_list_get_entry_payload(entry);										\
 			if (_ct_list_get_next_entry(entry) != NULL) {										\
-				UV(next) = _ct_list_get_next_entry(entry);										\
+				CT_UV(next) = _ct_list_get_next_entry(entry);										\
 			}																					\
 		}																						\
 		for (																					\
 				;																				\
 				entry != NULL;																	\
-				entry = UV(next), 																\
-				UV(next) = (entry != NULL) ? _ct_list_get_next_entry(entry) : NULL, 			\
+				entry = CT_UV(next), 																\
+				CT_UV(next) = (entry != NULL) ? _ct_list_get_next_entry(entry) : NULL, 			\
 				_payload = (entry != NULL) ? _ct_list_get_entry_payload(entry) : NULL			\
 		)
 
 /**
  * Allows you to transparently iterate through a list
  *
- * This macro is *slightly* slower than ::ITERATE_ON_LIST but allows you to
+ * This macro is *slightly* slower than ::CT_ITERATE_ON_LIST but allows you to
  * safely remove ct_list_entry_o while iterating.
  *
  * A typical example might be:
  *
  * @code
- * VARIABLE_ITERATE_ON_LIST(&list, previous, entry, payload) {
+ * CT_VARIABLE_ITERATE_ON_LIST(&list, previous, entry, payload) {
  * 	if (conditionToPayload()) {
  * 		ct_list_remove_entry_dynamic(&list, &previous, entry);
  * 	}
@@ -262,28 +265,31 @@ ct_list_entry_o* _ct_list_head_entry(const ct_list_o* l);
  * @param[in] _payload name of the variable representing <tt>entry->payload</tt>
  * @param[in] type type of the variable _payload
  */
-#define VARIABLE_ITERATE_ON_LIST(_l, previous_entry, entry, _payload, type) 						\
-		ct_list_o* UV(l) = (_l);																\
-		ct_list_entry_o* UV(next) = NULL;														\
+#ifdef CT_VARIABLE_ITERATE_ON_LIST
+#	error "CrashC - CT_VARIABLE_ITERATE_ON_LIST macro already defined!"
+#endif
+#define CT_VARIABLE_ITERATE_ON_LIST(_l, previous_entry, entry, _payload, type) 						\
+		ct_list_o* CT_UV(l) = (_l);																\
+		ct_list_entry_o* CT_UV(next) = NULL;														\
 		type _payload = NULL;																	\
-		if (_ct_list_head_entry(UV(l)) != NULL) {												\
-			_payload = _ct_list_get_entry_payload(_ct_list_head_entry(UV(l)));					\
-			if (_ct_list_get_next_entry(_ct_list_head_entry(UV(l))) != NULL) {					\
-				UV(next) = _ct_list_get_next_entry(_ct_list_head_entry(UV(l)));					\
+		if (_ct_list_head_entry(CT_UV(l)) != NULL) {												\
+			_payload = _ct_list_get_entry_payload(_ct_list_head_entry(CT_UV(l)));					\
+			if (_ct_list_get_next_entry(_ct_list_head_entry(CT_UV(l))) != NULL) {					\
+				CT_UV(next) = _ct_list_get_next_entry(_ct_list_head_entry(CT_UV(l)));					\
 			}																					\
 		}																						\
 		for (																					\
 				ct_list_entry_o 																\
 				*previous_cell = NULL, 															\
-				*UV(previous_cell_tmp) = NULL, 													\
-				*entry = _ct_list_head_entry(UV(l)) 											\
+				*CT_UV(previous_cell_tmp) = NULL, 													\
+				*entry = _ct_list_head_entry(CT_UV(l)) 											\
 				; 																				\
 				entry != NULL 																	\
 				; 																				\
-				UV(previous_cell_tmp) = previous_cell == NULL ? UV(previous_cell_tmp) : entry, 	\
-				previous_cell = UV(previous_cell_tmp), 											\
-				entry = UV(next), 																\
-				UV(next) = (entry != NULL) ? _ct_list_get_next_entry(entry) : NULL, 			\
+				CT_UV(previous_cell_tmp) = previous_cell == NULL ? CT_UV(previous_cell_tmp) : entry, 	\
+				previous_cell = CT_UV(previous_cell_tmp), 											\
+				entry = CT_UV(next), 																\
+				CT_UV(next) = (entry != NULL) ? _ct_list_get_next_entry(entry) : NULL, 			\
 				_payload = (entry != NULL) ? _ct_list_get_entry_payload(entry) : NULL			\
 		)
 

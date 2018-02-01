@@ -125,7 +125,7 @@ enum ct_snapshot_status {
  * @definition struct ct_section Snapshot
  * Represents the in-test information a given ::ct_section has. Note that one ::ct_section may actually have several, different, section shapshot, since
  * a @containablesection represented by a ::ct_section can be run multiple times in a @testcase. A section snapshot is tree because it is a run
- * of a single cycle of a ::LOOPER, like @testcase: in it, the section are organized as a **tree**, not just as a list. For example a @then may have multiple
+ * of a single cycle of a ::CT_LOOPER, like @testcase: in it, the section are organized as a **tree**, not just as a list. For example a @then may have multiple
  * but different subsection @then.
  *
  * Such information are then used by the test reports to yield to the user a more detailed set of informations about a given test.
@@ -305,7 +305,7 @@ struct ct_section {
 	int times_encountered;
 
 	/**
-	 * The variable used to loop only once inside parent switcher in ::CONTAINABLESECTION
+	 * The variable used to loop only once inside parent switcher in ::CT_CONTAINABLE_SECTION
 	 *
 	 * \attention this variable is for internal usage only
 	 *
@@ -316,7 +316,7 @@ struct ct_section {
 	bool loop1;
 
 	/**
-	 * like ::ct_section::loop1, but for the access cycle inside ::CONTAINABLESECTION
+	 * like ::ct_section::loop1, but for the access cycle inside ::CT_CONTAINABLE_SECTION
 	 */
 	bool loop2;
 

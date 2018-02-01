@@ -15,7 +15,7 @@
 struct ct_test_report* ct_init_test_report(struct ct_snapshot* tc_snapshot) {
 	struct ct_test_report* ret_val = malloc(sizeof(struct ct_test_report));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->filename = NULL;
@@ -36,7 +36,7 @@ void ct_destroy_test_report(struct ct_test_report* report) {
 struct ct_snapshot* ct_init_section_snapshot(struct ct_section* section) {
 	struct ct_snapshot* ret_val = malloc(sizeof(struct ct_snapshot));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->description   = strdup(section->description);

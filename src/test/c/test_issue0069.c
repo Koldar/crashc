@@ -24,14 +24,14 @@ void globalAssert() {
 
 TESTS_START
 //test several registration
-REGTESTS(3,5,6,7,8,10);
+REG_SUITES(3,5,6,7,8,10);
 //test a single registration
-REGTESTS(11);
+REG_SUITES(11);
 
 //test several registration with identifier
-REGTESTS(hello, world);
+REG_SUITES(hello, world);
 //test a single registration with identifier
-REGTESTS(glhf);
+REG_SUITES(glhf);
 ct_set_crashc_teardown(globalAssert);
 TESTS_END
 

@@ -40,7 +40,7 @@ struct ct_hashtable {
 ct_hashtable_o* ct_ht_init() {
 	ct_hashtable_o* ret_val = malloc(sizeof(ct_hashtable_o));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->head = NULL;
@@ -150,7 +150,7 @@ bool ct_ht_is_empty(const ct_hashtable_o* ht) {
 }
 
 void* ct_ht_get_first(const ct_hashtable_o* ht) {
-	ITERATE_VALUES_ON_HT(ht, data, void*) {
+	CT_ITERATE_VALUES_ON_HT(ht, data, void*) {
 		return data;
 	}
 	return NULL;
@@ -240,7 +240,7 @@ void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry) {
 static ct_hashtable_entry_o* ht_init_entry(const void* data, unsigned long key) {
 	ct_hashtable_entry_o* ret_val = malloc(sizeof(ct_hashtable_entry_o));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->id = key;

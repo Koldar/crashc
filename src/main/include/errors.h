@@ -17,8 +17,8 @@
  * C code to execute when a \c malloc returns NULL
  *
  */
-#ifndef MALLOCERRORCALLBACK
-#	define MALLOCERRORCALLBACK() exit(1)
+#ifndef CT_MALLOC_ERROR_CALLBACK
+#	define CT_MALLOC_ERROR_CALLBACK() exit(1)
 #endif
 
 

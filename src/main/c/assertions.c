@@ -17,7 +17,7 @@ struct ct_assert_report* ct_init_assert_report(bool is_mandatory, char* asserted
 	struct ct_assert_report* ret_val = malloc(sizeof(struct ct_assert_report));
 
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->passed = true;
@@ -63,7 +63,7 @@ void ct_general_assert_failed(struct ct_model* model) {
 	model->current_snapshot = NULL;
 
 	//We jump out of this flow of execution to go back at the beginning of the test case and go on with the execution of the other tests
-	siglongjmp(model->jump_point, ASSERT_JUMP_CODE);
+	siglongjmp(model->jump_point, CT_ASSERT_JUMP_CODE);
 }
 
 

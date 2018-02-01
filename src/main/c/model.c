@@ -16,7 +16,7 @@ struct ct_model* ct_setup_default_model() {
 	struct ct_model* ret_val = malloc(sizeof(struct ct_model));
 
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->current_section = NULL;

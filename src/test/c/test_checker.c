@@ -124,7 +124,7 @@ static void ct_testing_report(struct ct_model* model) {
 
 	ct_list_o* report_list = model->test_reports_list;
 
-	ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report*) {
+	CT_ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report*) {
 		ct_testing_test_report(model, report);
 	}
 	

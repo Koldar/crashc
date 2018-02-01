@@ -59,7 +59,7 @@ struct ct_model {
 	 * After registered all the @testsuite, the field represents the numbr of @testsuite registered in the run:
 	 * you can use the values to understand where the field ct_model::tests_array ends to have meanings
 	 *
-	 * @see REGISTER_SUITE
+	 * @see REG_SUITE
 	 */
 	int suites_array_index;
 	/**

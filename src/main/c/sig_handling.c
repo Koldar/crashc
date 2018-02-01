@@ -49,7 +49,7 @@ void ct_register_signal_handlers() {
  * imply a failure in the running test. This handler is used only if the programmer
  * does not register any other signal handler for the particular signal being considered.
  * What we need to do is mark the current running test as failed and update its status
- * in order that it is not run again on the next LOOPER iteration.
+ * in order that it is not run again on the next CT_LOOPER iteration.
  *
  * @param signum an ID representing the signal detected
  *
@@ -67,5 +67,5 @@ static void ct_failsig_handler(int signum) {
 	(ct_model)->current_snapshot = NULL;
 
 	//after handling the signal we return to sigsetjmp function (we will enter in the "if" where sigsetjmp is located)
-    siglongjmp((ct_model)->jump_point, SIGNAL_JUMP_CODE);
+    siglongjmp((ct_model)->jump_point, CT_SIGNAL_JUMP_CODE);
 }

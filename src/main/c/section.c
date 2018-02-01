@@ -60,7 +60,7 @@ struct ct_section* ct_section_get_child(const struct ct_section* parent, int n) 
 struct ct_section* ct_section_init(enum ct_section_type type, const char* description, const char* tags) {
 	struct ct_section* ret_val = malloc(sizeof(struct ct_section));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->id = next_section_id;

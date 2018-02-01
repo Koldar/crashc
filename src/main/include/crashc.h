@@ -28,7 +28,7 @@
  * //this becomes
  *
  * void test_1a() {
- * 	LOOPER(...) {
+ * 	CT_LOOPER(...) {
  * 		test_1b();
  * 	}
  * }
@@ -397,7 +397,7 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  *
  *
  * @definition
- * ::CONTAINABLESECTION is 2 nested for...loop cycles. The outermost is the **parent switcher**, allowing you to keep synchronized the
+ * ::CT_CONTAINABLE_SECTION is 2 nested for...loop cycles. The outermost is the **parent switcher**, allowing you to keep synchronized the
  * @containablesection the code is actually in with the metadata representing @containablesection, namely the tree formed by ::ct_section.
  * This syncronization is a two-pass system: first it change the struct ct_model::current_section from the parent @containablesection to the child one,
  * **regardless** if you have the access to the child. After fully execute the **access cycle**, it repairs struct ct_model::current_section by updating
@@ -407,7 +407,7 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  *
  *
  * @definition
- * ::CONTAINABLESECTION is composed by 2 loops: the most inner one is the **access cycle** that checks if we can **actually enter** in the @containablesection
+ * ::CT_CONTAINABLE_SECTION is composed by 2 loops: the most inner one is the **access cycle** that checks if we can **actually enter** in the @containablesection
  * represented by a  struct ct_section data structure. If the condition is not surpassed, the access cycle immediately release the control to the **parent switcher**. Otherwise
  * the @containablesection source code is executed. The for is implementing an \c if condition with the added feature to execute call code at the end. This function has to be called inside
  * the condition check of the for loop and ensures the loop behaves like an \c if: this is necessary because for loops condition has to be checked twice: one
@@ -425,7 +425,10 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] exit_access_denied_callback a callback (whose type is ::ct_exit_c)to execute if you didnt' enter inside the test code of the @containablesection. Called after \c back_to_parent_callback;
  * @param[in] setup_code a piece of C code to paste in the source code before starting all the reasoning for the @containablesection. struct ct_model::current_section for this @containablesection is already populated though.
  */
-#define CONTAINABLESECTION(model, parent, section_type, description, tags, condition, access_granted_callback, back_to_parent_callback, exit_access_granted_callback, exit_access_denied_callback, setup_code)	\
+#ifdef CT_CONTAINABLE_SECTION
+#	error "CrashC - CT_CONTAINABLE_SECTION macro already defined!"
+#endif
+#define CT_CONTAINABLE_SECTION(model, parent, section_type, description, tags, condition, access_granted_callback, back_to_parent_callback, exit_access_granted_callback, exit_access_denied_callback, setup_code)	\
 		/**
 		 * Every time we enter inside a section (WHEN, THEN, TESTCASE) we
 		 * create a new metadata data representing such section (if not created yet)
@@ -445,8 +448,8 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
 				/**
 				 *  This code is execute when we have already executed the code
 				 *  inside the container. We assume every post condition of
-				 *  CONTAINABLESECTION is satisfied for its children
-				 *  CONTAINABLESECTION. Here current_section has not been repaired yet!
+				 *  CT_CONTAINABLE_SECTION is satisfied for its children
+				 *  CT_CONTAINABLE_SECTION. Here current_section has not been repaired yet!
 				 */																																						\
 				 (model)->current_section->loop1 = false																												\
 		)																																								\
@@ -462,12 +465,15 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
 /**
  * Convenience macro for a NOOP
  */
-#define NOCODE
+#ifdef CT_NO_CODE
+#	error "CrashC - CT_NO_CODE macro already defined!"
+#endif
+#define CT_NO_CODE
 
 /**
  * A @containablesection which embeds a loop.
  *
- * The loop keeps going until the @containablesection is fully visited. This means a ::LOOPER does not
+ * The loop keeps going until the @containablesection is fully visited. This means a ::CT_LOOPER does not
  * stop until every single @containablesection within it has been correctly scanned.
  *
  * @param[inout] model a variable of type ::ct_model containing all the data needed by crashc
@@ -476,27 +482,30 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define LOOPER(model, parent, section_type, description, tags)																										\
-		CONTAINABLESECTION(																																			\
+#ifdef CT_LOOPER
+#	error "CrashC - CT_LOOPER macro already defined!"
+#endif
+#define CT_LOOPER(model, parent, section_type, description, tags)																									\
+		CT_CONTAINABLE_SECTION(																																		\
 				(model),																																			\
-				parent, section_type, description, tags,																												\
-				ct_always_enter, ct_callback_entering_testcase, 																											\
-				ct_exit_callback_reset_container, ct_exit_callback_access_granted_testcase,  ct_exit_callback_do_nothing, 												\
+				parent, section_type, description, tags,																											\
+				ct_always_enter, ct_callback_entering_testcase, 																									\
+				ct_exit_callback_reset_container, ct_exit_callback_access_granted_testcase,  ct_exit_callback_do_nothing, 											\
 																																									\
 				(model)->jump_source_testcase = (model)->current_section;																							\
-				bool UV(jump_occurred) = false;																														\
+				bool CT_UV(jump_occurred) = false;																													\
 				if (sigsetjmp((model)->jump_point, 1)) {                                                                          					        		\
 					/* We have caught a SIGNAL or an ASSERTION HAS FAILED: here current_section is the section where the signal was raised							\
 					 * If the code enters in this if remember that current_section still refer to the containablesection where the signal has happended				\
 					 * or the assertion have failed. If this is the case, you need to reset current_section to the containable section of the test case.			\
 					 * */																																			\
-					UV(jump_occurred) = true; 																														\
+					CT_UV(jump_occurred) = true; 																													\
 					/*we reset the current_section to the test case*/																								\
 					ct_reset_section_after_jump((model), (model)->current_section, (model)->jump_source_testcase);													\
 				}																																					\
 				for (    																																			\
 						;																																			\
-						!UV(jump_occurred) && ct_section_still_needs_execution((model)->current_section)                                                   				\
+						!CT_UV(jump_occurred) && ct_section_still_needs_execution((model)->current_section)                                                   		\
 						;																																			\
 				)																																					\
 		)
@@ -509,12 +518,18 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define TESTCASE(description, tags) LOOPER(ct_model, ((ct_model)->root_section), CT_TESTCASE_SECTION, description, tags)
+#ifdef TESTCASE
+#	error "CrashC - TESTCASE macro already defined!"
+#endif
+#define TESTCASE(description, tags) CT_LOOPER(ct_model, ((ct_model)->root_section), CT_TESTCASE_SECTION, description, tags)
 /**
  * like ::TESTCASE but with the default \c tags value of ""
  *
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  */
+#ifdef EZ_TESTCASE
+#	error "CrashC - EZ_TESTCASE macro already defined!"
+#endif
 #define EZ_TESTCASE(description) TESTCASE(description, "")
 
 /**
@@ -525,12 +540,15 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define ALWAYS_ENTER(model, section_type, description, tags) CONTAINABLESECTION(															\
+#ifdef CT_ALWAYS_ENTER
+#	error "CrashC - CT_ALWAYS_ENTER macro already defined!"
+#endif
+#define CT_ALWAYS_ENTER(model, section_type, description, tags) CT_CONTAINABLE_SECTION(															\
 		(model), 																														\
 		(model)->current_section, section_type, description, tags,																		\
 		ct_always_enter, ct_callback_entering_then,																						\
 		ct_exit_callback_next_sibling,	ct_exit_callback_children_number_computed, ct_exit_callback_do_nothing,							\
-		NOCODE																															\
+		CT_NO_CODE																															\
 )
 
 /**
@@ -542,12 +560,15 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define ENTER_ONCE_PER_LOOP(model, section_type, description, tags) CONTAINABLESECTION(													\
+#ifdef CT_ENTER_ONCE_PER_LOOP
+#	error "CrashC - CT_ENTER_ONCE_PER_LOOP macro already defined!"
+#endif
+#define CT_ENTER_ONCE_PER_LOOP(model, section_type, description, tags) CT_CONTAINABLE_SECTION(													\
 		(model), 																														\
 		(model)->current_section, section_type, description, tags,																		\
 		ct_get_access_when, ct_callback_entering_when, 																					\
 		ct_exit_callback_next_sibling, ct_exit_callback_children_number_computed, ct_exit_callback_do_nothing,								\
-		NOCODE 																															\
+		CT_NO_CODE 																															\
 )
 
 /**
@@ -559,21 +580,36 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define WHEN(description, tags) ENTER_ONCE_PER_LOOP((ct_model), CT_WHEN_SECTION, description, tags)
+#ifdef WHEN
+#	error "CrashC - WHEN macro already defined!"
+#endif
+#define WHEN(description, tags) CT_ENTER_ONCE_PER_LOOP((ct_model), CT_WHEN_SECTION, description, tags)
+
 /**
  * like ::WHEN but with the default \c tags value of ""
  */
+#ifdef EZ_WHEN
+#	error "CrashC - EZ_WHEN macro already defined!"
+#endif
 #define EZ_WHEN(description) WHEN(description, "")
+
 /**
  * Represents a @containablesection you need always to access to
  *
  * @param[in] description a value of type <tt>char*</tt> representing a brief description of the section
  * @param[in] tags a value of type <tt>char*</tt> representing all the tags within the section. See \ref tags for further information.
  */
-#define THEN(description, tags) ALWAYS_ENTER((ct_model), CT_THEN_SECTION, description, tags)
+#ifdef THEN
+#	error "CrashC - THEN macro already defined!"
+#endif
+#define THEN(description, tags) CT_ALWAYS_ENTER((ct_model), CT_THEN_SECTION, description, tags)
+
 /**
  * like ::THEN but with the default \c tags value of ""
  */
+#ifdef EZ_THEN
+#	error "CrashC - EZ_THEN macro already defined!"
+#endif
 #define EZ_THEN(description) THEN(description, "")
 
 //TODO all those functions should be included in the only one global models
@@ -586,6 +622,9 @@ void ct_callback_entering_testcase(struct ct_model* model, struct ct_section* se
  * The macro is actually masking a \c main function
  *
  */
+#ifdef TESTS_START
+#	error "CrashC - TESTS_START macro already defined!"
+#endif
 #define TESTS_START int main(const int argc, char* const args[]) { 																\
 		ct_model = ct_setup_default_model();																					\
 		ct_parse_args(argc, args, CT_TAGS_SEPARATOR, (ct_model)->run_only_if_tags, (ct_model)->exclude_tags); 		\
@@ -613,6 +652,9 @@ void ct_set_crashc_teardown(ct_teardown_c f);
  *
  * Furthermore, it also start the execution of the registered testsuites
  */
+#ifdef TESTS_END
+#	error "CrashC - TESTS_END macro already defined!"
+#endif
 #define TESTS_END 																	\
     for (int i = 0; i < (ct_model)->suites_array_index; i++) { 						\
     	(ct_model)->tests_array[i](); 												\
@@ -636,6 +678,9 @@ void ct_set_crashc_teardown(ct_teardown_c f);
  *
  * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
+#ifdef TESTSUITE
+#	error "CrashC - TESTSUITE macro already defined!"
+#endif
 #define TESTSUITE(id) void suite_ ## id()
 
 /**
@@ -648,16 +693,12 @@ void ct_set_crashc_teardown(ct_teardown_c f);
  *
  * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
- #define REGISTER_SUITE(id) 								\
+#ifdef REG_SUITE
+#	error "CrashC - REG_SUITE macro already defined!"
+#endif
+#define REG_SUITE(id) 									\
      void suite_ ## id(); 								\
      ct_update_test_array((ct_model), suite_ ## id)
-
-/**
- * Alias of ::REGISTER_SUITE
- *
- * @param[in] id a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
- */
-#define REG_SUITE(id) REGISTER_SUITE(id)
 
 /**
  * Register a batch of test suites all in one
@@ -673,7 +714,10 @@ void ct_set_crashc_teardown(ct_teardown_c f);
  *
  * @param[in] ... a sequence of id, either a valid C identifier or a non negative integer number or a valid C identifier prefixed with a non negative integer number
  */
-#define REGTESTS(...) VARIADIC_MACRO(REGISTER_SUITE, ## __VA_ARGS__)
+#ifdef REG_SUITES
+#	error "CrashC - REG_SUITES macro already defined!"
+#endif
+#define REG_SUITES(...) CT_VARIADIC_MACRO(REG_SUITE, ## __VA_ARGS__)
 
 
 #endif

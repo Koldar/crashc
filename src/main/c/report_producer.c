@@ -89,7 +89,7 @@ void ct_default_assertions_report(struct ct_model* model, struct ct_snapshot* sn
 	FILE* file = model->output_file;
 	ct_list_o* assertion_reports = snapshot->assertion_reports;
 
-	ITERATE_ON_LIST(assertion_reports, report_cell, report, struct ct_assert_report*) {
+	CT_ITERATE_ON_LIST(assertion_reports, report_cell, report, struct ct_assert_report*) {
 		for (int i = 0; i < level; i++) {
 			putchar('\t');
 		}
@@ -109,7 +109,7 @@ void ct_default_report(struct ct_model* model) {
 	ct_list_o* report_list = model->test_reports_list;
 
 	//TODO: Move the stats-acquiring code away from the report producer
-	ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report*) {
+	CT_ITERATE_ON_LIST(report_list, report_cell, report, struct ct_test_report*) {
 		if (report->outcome == CT_TEST_SUCCESS) {
 			model->statistics->successful_tests++;
 		}
@@ -129,7 +129,7 @@ struct ct_test_stats* ct_init_stats() {
 	struct ct_test_stats* ret_val = malloc(sizeof(struct ct_test_stats));
 
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->total_tests = 0;
@@ -144,7 +144,7 @@ struct ct_report_producer* ct_init_default_report_producer() {
 	struct ct_report_producer* ret_val = malloc(sizeof(struct ct_report_producer));
 
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->test_reporter = ct_default_test_report;

@@ -43,7 +43,7 @@ enum ct_test_outcome {
  * Represents the actual test report.
  *
  * It contains all the informations regarding the status of an executed test.
- * Note that @crashc considers a test to be a single flow of execution of a ::LOOPER (i.e. A single iteration of a @testcase)
+ * Note that @crashc considers a test to be a single flow of execution of a ::CT_LOOPER (i.e. A single iteration of a @testcase)
  * E.g:
  * Let's suppose we have this @testcase:
  *

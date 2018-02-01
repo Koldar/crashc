@@ -12,7 +12,7 @@
 struct ct_tag* ct_tag_init(const char* name) {
 	struct ct_tag* ret_val = malloc(sizeof(struct ct_tag));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->name = strdup(name);
@@ -36,8 +36,8 @@ int ct_tag_compare(const struct ct_tag* tag1, const struct ct_tag* tag2) {
 bool ct_have_tag_set_intersection(const ct_tag_hashtable_o* tag_set1, const ct_tag_hashtable_o* tag_set2) {
 	//TODO optimization: pick up the set with the least number of elements first. In this way the outer loop will be executed less
 
-	ITERATE_VALUES_ON_HT(tag_set1, tag1, struct ct_tag*) {
-		ITERATE_VALUES_ON_HT(tag_set2, tag2, struct ct_tag*) {
+	CT_ITERATE_VALUES_ON_HT(tag_set1, tag1, struct ct_tag*) {
+		CT_ITERATE_VALUES_ON_HT(tag_set2, tag2, struct ct_tag*) {
 			if (ct_tag_compare(tag1, tag2) == 0) {
 				return true;
 			}

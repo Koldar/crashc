@@ -130,10 +130,10 @@ void ct_parse_args(const int argc, char* const* args, char tag_separator, ct_tag
 	}
 
 //  ACTIVATE IF YOU WANT TO SEE WHAT TAGS HAVE BEEN STORED
-//	ITERATE_VALUES_ON_HT(runIfTags, t, struct ct_tag*) {
+//	CT_ITERATE_VALUES_ON_HT(runIfTags, t, struct ct_tag*) {
 //		printf("run if tag: %s\n", t->name);
 //	}
-//	ITERATE_VALUES_ON_HT(excludeTags, t2, struct ct_tag*) {
+//	CT_ITERATE_VALUES_ON_HT(excludeTags, t2, struct ct_tag*) {
 //		printf("exclude tag: %s\n", t2->name);
 //	}
 

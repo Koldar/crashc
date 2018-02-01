@@ -26,7 +26,10 @@
  * a testcase due to a failed assertion. This lets us distinguish when we do this due to a signal or due to
  * an assertion ad thus let us handle the two cases differently.
  */
-#define ASSERT_JUMP_CODE 2
+#ifdef CT_ASSERT_JUMP_CODE
+#	error "CrashC - CT_ASSERT_JUMP_CODE already defined!"
+#endif
+#define CT_ASSERT_JUMP_CODE 2
 
 /**
  * This struct contains the informations related to a specific assertion
@@ -145,6 +148,9 @@ typedef void (*ct_assert_c)(struct ct_model* model);
  * @param[in] passed_callback function of type ct_assert_c called if the assertion passes;
  * @param[in] failed_callback function of type ct_assert_c called if the assertion doesn't pass;
  */
+#ifdef CT_ASSERTION
+#	error "CrashC - CT_ASSERTION already defined!"
+#endif
 #define CT_ASSERTION(model, is_mandatory, asserted, passed_callback, failed_callback)														\
 	ct_list_add_tail((model)->current_snapshot->assertion_reports, ct_init_assert_report(is_mandatory, #asserted, __FILE__, __LINE__));		\
 	if ((asserted) != true) {																												\
@@ -160,6 +166,9 @@ typedef void (*ct_assert_c)(struct ct_model* model);
  *
  * @param[in] assertion a C code reprsenting the assertion to express. The code is **required** to be a boolean expression.
  */
+#ifdef ASSERT
+#	error "CrashC - ASSERT macro already defined!"
+#endif
 #define ASSERT(assertion) CT_ASSERTION(ct_model, true, assertion, ct_assert_do_nothing, ct_general_assert_failed)
 
 /**

@@ -263,12 +263,15 @@ void* _ct_ht_entry_next(ct_hashtable_entry_o* entry);
 void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry);
 
 //Picked up from uthash HASH_ITER Definition
-#define ITERATE_ON_HT(ht,el)   																								\
-	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*) (ht));												\
+#ifdef CT_ITERATE_ON_HT
+#	error "CrashC - CT_ITERATE_ON_HT macro already defined!"
+#endif
+#define CT_ITERATE_ON_HT(ht,el)   																								\
+	ct_hashtable_entry_o* CT_UV(head) = _ct_ht_head_entry((ct_hashtable_o*) (ht));												\
 	ct_hashtable_entry_o* el = NULL; 																						\
-	ct_hashtable_entry_o* UV(tmp) = NULL;																					\
-	for(((el)=(UV(head))), ((*(char**)(&(UV(tmp))))=(char*)((UV(head)!=NULL)?_ct_ht_entry_next(UV(head)):NULL)); 			\
-  (el) != NULL; ((el)=(UV(tmp))), ((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL)))
+	ct_hashtable_entry_o* CT_UV(tmp) = NULL;																					\
+	for(((el)=(CT_UV(head))), ((*(char**)(&(CT_UV(tmp))))=(char*)((CT_UV(head)!=NULL)?_ct_ht_entry_next(CT_UV(head)):NULL)); 			\
+  (el) != NULL; ((el)=(CT_UV(tmp))), ((*(char**)(&(CT_UV(tmp))))=(char*)((CT_UV(tmp)!=NULL)?_ct_ht_entry_next(CT_UV(tmp)):NULL)))
 
 //TODO replace this code with the correct code in Cutils!!!!
 /**
@@ -278,7 +281,7 @@ void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry);
  *
  * <pre><code>
  * ct_hashtable_o* ht;
- * ITERATE_VALUES_ON_HT(&ht, el, int) {
+ * CT_ITERATE_VALUES_ON_HT(&ht, el, int) {
  * 	printf("value %d\n", *el);
  * }
  * </code></pre>
@@ -287,23 +290,26 @@ void* _ct_ht_entry_payload(ct_hashtable_entry_o* entry);
  * @param[in] _data the name of the variable that will contain a value in the iteration
  * @param[in] type the type of \c _data. So if you put \c int, data will have type <tt>int</tt>
  */
-#define ITERATE_VALUES_ON_HT(ht,_data,type) 															\
-	ct_hashtable_entry_o* UV(head) = _ct_ht_head_entry((ct_hashtable_o*)(ht));						\
-	ct_hashtable_entry_o* UV(el) = NULL; 															\
-	ct_hashtable_entry_o* UV(tmp) = NULL;															\
-	type _data = NULL; 																				\
-	if (UV(head) != NULL) { 																		\
-		_data = _ct_ht_entry_payload(UV(head)); 													\
-	} 																								\
-	for(																							\
-		(UV(el)=(UV(head))), 																		\
-		((*(char**)(&(UV(tmp))))=(char*)((UV(head) != NULL)?_ct_ht_entry_next(UV(head)):NULL)) 		\
-		; 																							\
-		UV(el) != NULL 																				\
-		; 																							\
-		(UV(el)=(UV(tmp))), 																		\
-		_data=(UV(el) != NULL) ? _ct_ht_entry_payload(UV(el)) : NULL,								\
-		((*(char**)(&(UV(tmp))))=(char*)((UV(tmp)!=NULL)?_ct_ht_entry_next(UV(tmp)):NULL))			\
+#ifdef CT_ITERATE_VALUES_ON_HT
+#	error "CrashC - CT_ITERATE_VALUES_ON_HT macro already defined!"
+#endif
+#define CT_ITERATE_VALUES_ON_HT(ht,_data,type) 															\
+	ct_hashtable_entry_o* CT_UV(head) = _ct_ht_head_entry((ct_hashtable_o*)(ht));						\
+	ct_hashtable_entry_o* CT_UV(el) = NULL; 															\
+	ct_hashtable_entry_o* CT_UV(tmp) = NULL;															\
+	type _data = NULL; 																					\
+	if (CT_UV(head) != NULL) { 																			\
+		_data = _ct_ht_entry_payload(CT_UV(head)); 														\
+	} 																									\
+	for(																								\
+		(CT_UV(el)=(CT_UV(head))), 																		\
+		((*(char**)(&(CT_UV(tmp))))=(char*)((CT_UV(head) != NULL)?_ct_ht_entry_next(CT_UV(head)):NULL)) \
+		; 																								\
+		CT_UV(el) != NULL 																				\
+		; 																								\
+		(CT_UV(el)=(CT_UV(tmp))), 																		\
+		_data=(CT_UV(el) != NULL) ? _ct_ht_entry_payload(CT_UV(el)) : NULL,								\
+		((*(char**)(&(CT_UV(tmp))))=(char*)((CT_UV(tmp)!=NULL)?_ct_ht_entry_next(CT_UV(tmp)):NULL))		\
 	)
 
 

@@ -44,7 +44,7 @@ ct_list_entry_o* _ct_list_head_entry(const ct_list_o* l) {
 ct_list_o* ct_list_init() {
 	ct_list_o* ret_val = malloc(sizeof(ct_list_o));
 	if (ret_val == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	ret_val->head = NULL;
@@ -55,14 +55,14 @@ ct_list_o* ct_list_init() {
 }
 
 void ct_list_destroy(const ct_list_o* lst) {
-	ITERATE_ON_LIST(lst, entry, value, void*) {
+	CT_ITERATE_ON_LIST(lst, entry, value, void*) {
 		free(entry);
 	}
 	free((void*) lst);
 }
 
 void ct_list_destroy_with_elements(const ct_list_o* lst, ct_destroyer_c d) {
-	ITERATE_ON_LIST(lst, entry, value, void*) {
+	CT_ITERATE_ON_LIST(lst, entry, value, void*) {
 		d(entry->payload);
 		free(entry);
 	}
@@ -70,7 +70,7 @@ void ct_list_destroy_with_elements(const ct_list_o* lst, ct_destroyer_c d) {
 }
 
 void ct_list_clear(ct_list_o* l) {
-	ITERATE_ON_LIST(l, entry, value, void*) {
+	CT_ITERATE_ON_LIST(l, entry, value, void*) {
 		free(entry);
 	}
 	l->head = NULL;
@@ -81,7 +81,7 @@ void ct_list_clear(ct_list_o* l) {
 void ct_list_add_head(ct_list_o* l, const void* el) {
 	ct_list_entry_o* new_entry = malloc(sizeof(ct_list_entry_o));
 	if (new_entry == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	new_entry->payload = (void*)el;
@@ -97,7 +97,7 @@ void ct_list_add_head(ct_list_o* l, const void* el) {
 void ct_list_add_tail(ct_list_o* l, const void* el) {
 	ct_list_entry_o* new_entry = malloc(sizeof(ct_list_entry_o));
 	if (new_entry == NULL) {
-		MALLOCERRORCALLBACK();
+		CT_MALLOC_ERROR_CALLBACK();
 	}
 
 	new_entry->payload = (void*)el;
@@ -170,7 +170,7 @@ void* ct_list_tail(const ct_list_o* l) {
 }
 
 void* ct_list_get(const ct_list_o* l, int index) {
-	ITERATE_ON_LIST(l, entry, payload, void*) {
+	CT_ITERATE_ON_LIST(l, entry, payload, void*) {
 		if (index == 0) {
 			return payload;
 		}

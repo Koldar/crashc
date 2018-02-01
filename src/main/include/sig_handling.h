@@ -19,11 +19,18 @@
 /**
  * Used by longjmp, no special meaning at the moment
  */
-#define SIGNAL_JUMP_CODE 1
+#ifdef CT_SIGNAL_JUMP_CODE
+#	error "CrashC - CT_SIGNAL_JUMP_CODE macro already defined!"
+#endif
+#define CT_SIGNAL_JUMP_CODE 1
+
 /**
  * Used by struct ct_model::_crashc_sigaction to indicate an empty bitmask
  */
-#define NO_FLAGS 0
+#ifdef CT_NO_FLAGS
+#	error "CrashC - CT_NO_FLAGS macro already defined!"
+#endif
+#define CT_NO_FLAGS 0
 
 /**
  * Registers all the signal @crashc test framework wants to handle
