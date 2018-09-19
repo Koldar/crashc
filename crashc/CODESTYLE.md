@@ -24,16 +24,17 @@ On the other side, a well-thought use of typedef can also _greatly_ increase cod
 For this reason, we use them in 2 possible scenarios:
 * Function pointer types
 * Opaque types
+
 The reasons are simple: C's function pointers syntax is just too annoying to be carried  
  around the code, and opaque types **must** hide their implementation details.
  
 For these two cases we also use different suffixes in order to distinguish between them:
-* "`\_`c" for function pointers (the "c " stands for _callback_ )
-* "`\_o`" for opaque types
+* "`_c`" for function pointers (the "c " stands for _callback_ )
+* "`_o`" for opaque types
 
 ### Public identifiers conventions
 
 With regards to public identifiers (i.e exported function names, types and global variables and _certain_ macros) we prepend  
-the "ct\_" in order to, at least _try_, to avoid name clashes with the user code.
+the "`ct_`" prefix in order to, at least _try_, to avoid name clashes with the user code.
 
 **_DOCUMENT UNDER CONSTRUCTION_**
